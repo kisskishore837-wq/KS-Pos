@@ -1850,9 +1850,90 @@
                         totalExchangeValue: Number(o.total_exchange_value || 0),
                         total: Number(o.total || 0)
                     }));
+                    persistAppStateToLocal();
+                }
+
+                const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
+                if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
+                    const closedRecords = shiftData.filter(s => s.status === 'closed').map(s => ({
+                        shiftId: s.shift_id || s.id,
+                        isoDate: s.iso_date || '',
+                        openedAt: s.opened_at || '',
+                        closedAt: s.closed_at || '',
+                        dateStr: s.date_str || '',
+                        timeStr: s.time_str || '',
+                        sales: Number(s.sales || 0),
+                        openingCash: Number(s.opening_cash || 0),
+                        closingCash: Number(s.closing_cash || 0),
+                        difference: Number(s.difference || 0),
+                        reason: s.reason || '',
+                        cashSales: Number(s.cash_sales || 0),
+                        cashSaleCount: Number(s.cash_sale_count || 0),
+                        cashRefunds: Number(s.cash_refunds || 0),
+                        cashRefundCount: Number(s.cash_refund_count || 0),
+                        storeCreditSales: Number(s.store_credit_sales || 0),
+                        storeCreditSaleCount: Number(s.store_credit_sale_count || 0),
+                        storeCreditRefunds: Number(s.store_credit_refunds || 0),
+                        storeCreditRefundCount: Number(s.store_credit_refund_count || 0),
+                        digitalSales: Number(s.digital_sales || 0),
+                        digitalSaleCount: Number(s.digital_sale_count || 0),
+                        expectedDrawerCash: Number(s.expected_drawer_cash || 0),
+                        adjustments: Array.isArray(s.adjustments) ? s.adjustments : []
+                    }));
+                    if (closedRecords.length > 0) {
+                        pastShiftHistory = closedRecords;
+                    }
+                    persistAppStateToLocal();
+                    renderShiftsScreen();
                 }
             } catch (e) {
                 console.warn('Supabase background sync skipped:', e);
+            }
+        }
+
+        function persistAppStateToLocal() {
+            try {
+                localStorage.setItem('kspos_active_shift_v1', JSON.stringify(activeShiftState));
+                localStorage.setItem('kspos_past_shifts_v1', JSON.stringify(pastShiftHistory));
+                localStorage.setItem('kspos_orders_v1', JSON.stringify(allCompletedOrders));
+                localStorage.setItem('kspos_customers_v1', JSON.stringify(registeredCustomersDatabase));
+            } catch (err) {
+                console.warn('Local storage save warning:', err);
+            }
+        }
+
+        function loadAppStateFromLocal() {
+            try {
+                const savedActiveShift = localStorage.getItem('kspos_active_shift_v1');
+                if (savedActiveShift) {
+                    const parsed = JSON.parse(savedActiveShift);
+                    if (parsed && typeof parsed === 'object') {
+                        activeShiftState = { ...activeShiftState, ...parsed };
+                    }
+                }
+                const savedPastShifts = localStorage.getItem('kspos_past_shifts_v1');
+                if (savedPastShifts) {
+                    const parsedPast = JSON.parse(savedPastShifts);
+                    if (Array.isArray(parsedPast)) {
+                        pastShiftHistory = parsedPast;
+                    }
+                }
+                const savedOrders = localStorage.getItem('kspos_orders_v1');
+                if (savedOrders) {
+                    const parsedOrders = JSON.parse(savedOrders);
+                    if (Array.isArray(parsedOrders)) {
+                        allCompletedOrders = parsedOrders;
+                    }
+                }
+                const savedCustomers = localStorage.getItem('kspos_customers_v1');
+                if (savedCustomers) {
+                    const parsedCust = JSON.parse(savedCustomers);
+                    if (parsedCust && typeof parsedCust === 'object') {
+                        registeredCustomersDatabase = parsedCust;
+                    }
+                }
+            } catch (err) {
+                console.warn('Local storage restore warning:', err);
             }
         }
 
@@ -2874,6 +2955,7 @@
                     credit_given: currentCustomerData.creditGiven || 0,
                     credit_used: currentCustomerData.creditUsed || 0
                 });
+                persistAppStateToLocal();
 
                 updateCustomerCartDisplay();
 
@@ -3921,6 +4003,7 @@
                 total_exchange_value: newOrder.totalExchangeValue,
                 total: newOrder.total
             });
+            persistAppStateToLocal();
 
             posCart = [];
             refundCartItems = [];
@@ -4770,6 +4853,7 @@
                 user: activeUser
             });
             closeAdjustCashModal();
+            persistAppStateToLocal();
             renderShiftsDetailsScreen();
             showNotification('Cash drawer adjusted successfully', 'success');
         }
@@ -5061,7 +5145,7 @@
                 const reasonNote = document.getElementById('modalCloseReasonInput')?.value.trim() || '';
                 const nowFmt = formatReferenceDateTime(new Date());
 
-                pastShiftHistory.unshift({
+                const closedShiftRecord = {
                     shiftId: activeShiftState.shiftId,
                     isoDate: nowFmt.isoDate,
                     openedAt: activeShiftState.openedAt,
@@ -5085,6 +5169,35 @@
                     digitalSaleCount: activeShiftState.digitalSaleCount || 0,
                     expectedDrawerCash: m.expectedDrawerCash,
                     adjustments: JSON.parse(JSON.stringify(activeShiftState.adjustments || []))
+                };
+
+                pastShiftHistory.unshift(closedShiftRecord);
+
+                saveRecordToSupabase('shifts', {
+                    shift_id: closedShiftRecord.shiftId,
+                    status: 'closed',
+                    iso_date: closedShiftRecord.isoDate,
+                    opened_at: closedShiftRecord.openedAt,
+                    closed_at: closedShiftRecord.closedAt,
+                    date_str: closedShiftRecord.dateStr,
+                    time_str: closedShiftRecord.timeStr,
+                    sales: closedShiftRecord.sales,
+                    opening_cash: closedShiftRecord.openingCash,
+                    closing_cash: closedShiftRecord.closingCash,
+                    difference: closedShiftRecord.difference,
+                    reason: closedShiftRecord.reason,
+                    cash_sales: closedShiftRecord.cashSales,
+                    cash_sale_count: closedShiftRecord.cashSaleCount,
+                    cash_refunds: closedShiftRecord.cashRefunds,
+                    cash_refund_count: closedShiftRecord.cashRefundCount,
+                    store_credit_sales: closedShiftRecord.storeCreditSales,
+                    store_credit_sale_count: closedShiftRecord.storeCreditSaleCount,
+                    store_credit_refunds: closedShiftRecord.storeCreditRefunds,
+                    store_credit_refund_count: closedShiftRecord.storeCreditRefundCount,
+                    digital_sales: closedShiftRecord.digitalSales,
+                    digital_sale_count: closedShiftRecord.digitalSaleCount,
+                    expected_drawer_cash: closedShiftRecord.expectedDrawerCash,
+                    adjustments: closedShiftRecord.adjustments
                 });
 
                 activeShiftState.isOpen = false;
@@ -5102,6 +5215,7 @@
                 activeShiftState.digitalSaleCount = 0;
                 activeShiftState.adjustments = [];
 
+                persistAppStateToLocal();
                 isOpeningCartShift = false;
                 resetCartOpenShiftBtnState();
 
@@ -5143,6 +5257,7 @@
                 adjustments: []
             };
 
+            persistAppStateToLocal();
             closeShiftActionModal();
             renderPOSCart();
             navigateTo('shiftsScreen');
@@ -5199,6 +5314,7 @@
                     adjustments: []
                 };
 
+                persistAppStateToLocal();
                 isOpeningCartShift = false;
                 resetCartOpenShiftBtnState();
                 renderShiftsScreen();
@@ -5268,6 +5384,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadAppStateFromLocal();
             renderPlanFeaturesPreview();
             renderPOSProducts();
             renderPOSCart();
