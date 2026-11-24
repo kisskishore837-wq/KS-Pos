@@ -8,10 +8,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KS POS">
-    <meta name="theme-color" content="#0284c7">
-    <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" href="">
-    <link id="dynamicFavicon" rel="icon" type="image/png" href="">
-    <link id="dynamicWebManifest" rel="manifest" href="">
+    <meta name="theme-color" content="#00adef">
+    <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" sizes="180x180" href="./IMG_8948.jpeg">
+    <link id="dynamicFavicon" rel="icon" type="image/jpeg" href="./IMG_8948.jpeg">
+    <link id="dynamicWebManifest" rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22KS%20POS%22%2C%22short_name%22%3A%22KS%20POS%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eaedf4%22%2C%22theme_color%22%3A%22%2300adef%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2FIMG_8948.jpeg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpeg%22%7D%5D%7D">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -140,18 +140,6 @@
             transform: rotate(30deg);
         }
 
-        .logo-camera-badge {
-            width: 32px !important;
-            height: 32px !important;
-            min-width: 32px !important;
-            min-height: 32px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background-color: #0284c7 !important;
-            color: #ffffff !important;
-        }
-
         .sidebar-drawer {
             transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -226,9 +214,8 @@
 
     <!-- APP LAUNCH SPLASH SCREEN (3 SECONDS WHITE SPINNER) -->
     <div id="appLaunchSplashOverlay" class="fixed inset-0 z-[100] bg-gradient-to-br from-sky-600 via-sky-500 to-blue-700 flex flex-col items-center justify-center gap-5 transition-opacity duration-500">
-        <div class="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center overflow-hidden">
-            <span id="splashDefaultKS" class="luxury-heading text-3xl font-bold text-white tracking-widest select-none">KS</span>
-            <img id="splashUploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
+        <div class="w-20 h-20 rounded-3xl bg-[#eaedf4] border border-white/40 shadow-2xl flex items-center justify-center overflow-hidden">
+            <img id="splashUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS POS Logo" class="w-full h-full object-cover">
         </div>
         <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
         <p class="luxury-heading text-sm font-semibold text-white/95 tracking-[0.2em] uppercase">KS POS</p>
@@ -236,9 +223,8 @@
 
     <!-- APP RESUME DATA SYNC OVERLAY (5 SECONDS WHITE SPINNER AFTER IDLE) -->
     <div id="appResumeSyncOverlay" class="fixed inset-0 z-[95] bg-slate-950/60 backdrop-blur-md hidden flex-col items-center justify-center gap-4 p-4 transition-opacity duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-white/15 border border-white/25 shadow-xl flex items-center justify-center overflow-hidden">
-            <span id="resumeDefaultKS" class="luxury-heading text-2xl font-bold text-white tracking-widest select-none">KS</span>
-            <img id="resumeUploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
+        <div class="w-16 h-16 rounded-2xl bg-[#eaedf4] border border-white/30 shadow-xl flex items-center justify-center overflow-hidden">
+            <img id="resumeUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS POS Logo" class="w-full h-full object-cover">
         </div>
         <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
         <p class="text-xs sm:text-sm font-bold text-white tracking-wide">Syncing store data...</p>
@@ -347,11 +333,8 @@
         <main id="welcomeScreen" class="page-view page-visible flex-col items-center justify-between w-full screen-centered-card min-h-[85vh] glass-panel rounded-3xl p-4 sm:p-10 md:p-12 my-auto overflow-y-auto">
             <div class="w-full flex flex-col items-center pt-1">
                 <div class="relative inline-block">
-                    <div id="logoContainer" class="logo-box-trigger w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white border border-sky-200/80 shadow-md flex items-center justify-center overflow-hidden transition-all duration-300">
-                        <span id="defaultLogoText" class="luxury-heading text-3xl sm:text-4xl font-semibold text-sky-600 tracking-widest select-none">
-                            KS
-                        </span>
-                        <img id="uploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
+                    <div id="logoContainer" class="logo-box-trigger w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#eaedf4] border border-sky-200/80 shadow-md flex items-center justify-center overflow-hidden transition-all duration-300">
+                        <img id="uploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS POS Logo" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
@@ -396,8 +379,8 @@
 
             <div class="w-full my-auto py-6 space-y-6">
                 <div class="text-center space-y-2">
-                    <div class="w-12 h-12 mx-auto rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center mb-3 shadow-xs">
-                        <span class="luxury-heading text-lg font-semibold text-sky-600">KS</span>
+                    <div class="w-12 h-12 mx-auto rounded-2xl bg-[#eaedf4] border border-sky-200 flex items-center justify-center mb-3 shadow-xs overflow-hidden">
+                        <img id="loginUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS" class="w-full h-full object-cover">
                     </div>
                     <h2 class="luxury-heading text-xl sm:text-2xl font-semibold tracking-wider text-slate-900">
                         Login account details
@@ -536,9 +519,8 @@
         <!-- 4. DASHBOARD SCREEN -->
         <main id="dashboardScreen" class="page-view page-hidden flex-col justify-between w-full min-h-screen sm:min-h-[82vh] bg-white sm:glass-panel rounded-none sm:rounded-3xl p-0 m-0 sm:my-auto overflow-y-auto container-padded">
             <div class="w-full flex items-center justify-start gap-2.5 pb-3 pt-1 px-1 border-b border-sky-100">
-                <button type="button" id="dashboardLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                    <span id="dashDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                    <img id="dashUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                <button type="button" id="dashboardLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                    <img id="dashUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                 </button>
                 <span class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wider">KS POS</span>
             </div>
@@ -703,9 +685,8 @@
         <main id="sellScreen" class="page-view page-hidden flex-col w-full h-screen bg-white rounded-none p-0 m-0 overflow-y-auto scroll-smooth container-padded">
             <div id="sellTopHeader" class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 flex-shrink-0">
                 <div class="flex items-center gap-2.5">
-                    <button type="button" id="sellLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                        <span id="sellDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                        <img id="sellUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                    <button type="button" id="sellLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                        <img id="sellUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                     </button>
                     <h2 class="luxury-heading text-base sm:text-lg font-bold tracking-wider text-slate-900">KS-POS</h2>
                 </div>
@@ -1124,9 +1105,8 @@
             <div class="w-full">
                 <div class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
                     <div class="flex items-center gap-2.5">
-                        <button type="button" id="orderHistoryLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                            <span id="orderHistoryDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                            <img id="orderHistoryUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                        <button type="button" id="orderHistoryLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                            <img id="orderHistoryUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                         </button>
                         <h2 class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">Order History</h2>
                     </div>
@@ -1231,9 +1211,8 @@
             <div class="w-full space-y-5 pb-8">
                 <div class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
                     <div class="flex items-center gap-2.5">
-                        <button type="button" id="shiftsLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                            <span id="shiftsDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                            <img id="shiftsUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                        <button type="button" id="shiftsLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                            <img id="shiftsUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                         </button>
                         <h2 class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">Shifts</h2>
                     </div>
@@ -1294,9 +1273,8 @@
                         <button type="button" onclick="navigateTo('shiftsScreen')" title="Back to Shifts" class="p-2 rounded-xl bg-sky-50 hover:bg-sky-600 text-slate-700 hover:text-white border border-sky-200 transition-colors cursor-pointer">
                             <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         </button>
-                        <button type="button" id="shiftsDetailsLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                            <span id="shiftsDetailsDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                            <img id="shiftsDetailsUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                        <button type="button" id="shiftsDetailsLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                            <img id="shiftsDetailsUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                         </button>
                         <h2 class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900 uppercase">Shifts Details</h2>
                     </div>
@@ -1386,9 +1364,8 @@
             <div class="w-full space-y-5 pb-8">
                 <div class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
                     <div class="flex items-center gap-2.5">
-                        <button type="button" id="moduleLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
-                            <span id="moduleDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
-                            <img id="moduleUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
+                        <button type="button" id="moduleLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
+                            <img id="moduleUploadedLogoImg" src="./IMG_8948.jpeg" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="KS Logo" class="w-full h-full object-cover">
                         </button>
                         <h2 id="sidebarModuleTitleText" class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">Stock Transfer</h2>
                     </div>
@@ -1867,6 +1844,22 @@
     </div>
 
     <script>
+        // Built-in vector fallback matching your exact circular sky-blue KS monogram on #eaedf4 background
+        window.DEFAULT_KS_MONOGRAM_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <rect width="512" height="512" fill="#eaedf4"/>
+                <g fill="#00adef">
+                    <!-- Left curved arc -->
+                    <path d="M116 128 A182 182 0 0 0 116 384 L148 352 A136 136 0 0 1 148 160 Z"/>
+                    <!-- K vertical + diagonals -->
+                    <path d="M186 84 A182 182 0 0 1 236 76 L236 184 L172 248 L236 312 L236 436 A182 182 0 0 1 186 428 L186 332 L134 280 L134 232 L186 180 Z"/>
+                    <rect x="130" y="236" width="58" height="40"/>
+                    <!-- S monogram -->
+                    <path d="M276 76 A182 182 0 0 1 448 196 L402 214 A136 136 0 0 0 326 130 L326 232 L456 232 A182 182 0 0 1 276 436 L276 346 L326 346 L326 382 A136 136 0 0 0 408 278 L276 278 Z"/>
+                </g>
+            </svg>
+        `);
+
         // Supabase Configuration (Non-blocking background connection)
         const SUPABASE_URL = 'https://rzemcjkkevopjvgmzgcf.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_0agGmEjocqDxRl9t6swgcw_uTsR8oxV';
@@ -2967,6 +2960,7 @@
                             </div>
                         `;
                     } else {
+                        const previewSrc = pendingAdminLogoDataUrl || uploadedLogoDataUrl || './IMG_8948.jpeg';
                         bodyEl.innerHTML = `
                             <!-- Official App Brand Logo Control (Admin Only) -->
                             <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
@@ -2978,11 +2972,8 @@
                                     ${uploadedLogoDataUrl ? `<button type="button" onclick="resetOfficialBrandLogo()" class="px-3 py-1 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-600 hover:text-white transition-colors cursor-pointer">Reset Default KS</button>` : ''}
                                 </div>
                                 <div class="flex flex-wrap items-center gap-4">
-                                    <div class="w-20 h-20 rounded-2xl bg-white border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0">
-                                        ${(pendingAdminLogoDataUrl || uploadedLogoDataUrl)
-                                            ? `<img src="${pendingAdminLogoDataUrl || uploadedLogoDataUrl}" alt="Brand Logo Preview" class="w-full h-full object-cover">`
-                                            : `<span class="luxury-heading text-2xl font-bold text-sky-600 tracking-widest select-none">KS</span>`
-                                        }
+                                    <div class="w-20 h-20 rounded-2xl bg-[#eaedf4] border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        <img src="${previewSrc}" onerror="this.src=window.DEFAULT_KS_MONOGRAM_SVG || ''" alt="Brand Logo Preview" class="w-full h-full object-cover">
                                     </div>
                                     <div class="flex-1 min-w-[200px] space-y-2.5">
                                         <input type="file" id="adminBrandLogoInput" accept="image/*" class="hidden" onchange="handleAdminLogoFileSelect(event)">
@@ -6387,33 +6378,13 @@
         }
 
         function handleLogoUpload(event) {
-            // Kept for backward compatibility; Admin Panel controls official logo
             handleAdminLogoFileSelect(event);
         }
 
         let pendingAdminLogoDataUrl = "";
 
-        function generateDefaultKSAppIconDataUrl() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createLinearGradient(0, 0, 512, 512);
-            grad.addColorStop(0, '#0284c7');
-            grad.addColorStop(1, '#1d4ed8');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 512, 512);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 210px Georgia, serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('KS', 256, 266);
-            return canvas.toDataURL('image/png');
-        }
-
         function updateHomeScreenAppIcons(logoUrl) {
-            const finalIconUrl = logoUrl || generateDefaultKSAppIconDataUrl();
+            const finalIconUrl = logoUrl || './IMG_8948.jpeg';
 
             const appleIconEl = document.getElementById('dynamicAppleTouchIcon');
             if (appleIconEl) appleIconEl.href = finalIconUrl;
@@ -6427,13 +6398,13 @@
                     const manifestObj = {
                         name: "KS POS - Smart Retail Management",
                         short_name: "KS POS",
-                        start_url: window.location.origin + "/",
+                        start_url: "./",
                         display: "standalone",
-                        background_color: "#ffffff",
-                        theme_color: "#0284c7",
+                        background_color: "#eaedf4",
+                        theme_color: "#00adef",
                         icons: [
-                            { src: finalIconUrl, sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                            { src: finalIconUrl, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                            { src: finalIconUrl, sizes: "192x192", type: "image/jpeg", purpose: "any maskable" },
+                            { src: finalIconUrl, sizes: "512x512", type: "image/jpeg", purpose: "any maskable" }
                         ]
                     };
                     const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
@@ -6456,33 +6427,30 @@
                 }
             }
 
-            updateHomeScreenAppIcons(uploadedLogoDataUrl);
+            const effectiveSrc = uploadedLogoDataUrl || './IMG_8948.jpeg';
+            updateHomeScreenAppIcons(effectiveSrc);
 
-            const pairs = [
-                { textId: 'defaultLogoText', imgId: 'uploadedLogoImg' },
-                { textId: 'splashDefaultKS', imgId: 'splashUploadedLogoImg' },
-                { textId: 'resumeDefaultKS', imgId: 'resumeUploadedLogoImg' },
-                { textId: 'dashDefaultKS', imgId: 'dashUploadedLogoImg' },
-                { textId: 'sellDefaultKS', imgId: 'sellUploadedLogoImg' },
-                { textId: 'orderHistoryDefaultKS', imgId: 'orderHistoryUploadedLogoImg' },
-                { textId: 'shiftsDefaultKS', imgId: 'shiftsUploadedLogoImg' },
-                { textId: 'shiftsDetailsDefaultKS', imgId: 'shiftsDetailsUploadedLogoImg' },
-                { textId: 'moduleDefaultKS', imgId: 'moduleUploadedLogoImg' }
+            const logoImgIds = [
+                'uploadedLogoImg',
+                'loginUploadedLogoImg',
+                'splashUploadedLogoImg',
+                'resumeUploadedLogoImg',
+                'dashUploadedLogoImg',
+                'sellUploadedLogoImg',
+                'orderHistoryUploadedLogoImg',
+                'shiftsUploadedLogoImg',
+                'shiftsDetailsUploadedLogoImg',
+                'moduleUploadedLogoImg'
             ];
 
-            pairs.forEach(pair => {
-                const txt = document.getElementById(pair.textId);
-                const img = document.getElementById(pair.imgId);
-                if (txt && img) {
-                    if (uploadedLogoDataUrl) {
-                        txt.classList.add('hidden');
-                        img.src = uploadedLogoDataUrl;
-                        img.classList.remove('hidden');
-                    } else {
-                        img.src = "";
-                        img.classList.add('hidden');
-                        txt.classList.remove('hidden');
-                    }
+            logoImgIds.forEach(imgId => {
+                const img = document.getElementById(imgId);
+                if (img) {
+                    img.onerror = function() {
+                        this.onerror = null;
+                        this.src = window.DEFAULT_KS_MONOGRAM_SVG || '';
+                    };
+                    img.src = effectiveSrc;
                 }
             });
         }
@@ -6494,13 +6462,12 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Resize to 512x512 square so it renders crisply as iPhone Home Screen App Icon & UI Logo
                     const canvas = document.createElement('canvas');
                     const size = 512;
                     canvas.width = size;
                     canvas.height = size;
                     const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#ffffff';
+                    ctx.fillStyle = '#eaedf4';
                     ctx.fillRect(0, 0, size, size);
 
                     const scale = Math.max(size / img.width, size / img.height);
@@ -6510,7 +6477,7 @@
                     const offsetY = (size - drawH) / 2;
                     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
-                    pendingAdminLogoDataUrl = canvas.toDataURL('image/png', 0.9);
+                    pendingAdminLogoDataUrl = canvas.toDataURL('image/png', 0.92);
                     openSidebarModuleScreen('Admin Panel');
                     showNotification('Photo selected! Click "Save Logo" to apply for all users.', 'success');
                 };
@@ -6552,7 +6519,7 @@
                 if (btnText) btnText.textContent = 'Save Logo';
 
                 openSidebarModuleScreen('Admin Panel');
-                showNotification('Official App Logo saved! Re-add to Home Screen to update icon.', 'success', 4500);
+                showNotification('Official App Logo saved across the app!', 'success', 4000);
             }, 1200);
         }
 
@@ -6574,7 +6541,7 @@
                 const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
                 applyGlobalBrandLogo(savedLogo || "", false);
             } catch (e) {
-                updateHomeScreenAppIcons("");
+                applyGlobalBrandLogo("", false);
             }
 
             const splashOverlay = document.getElementById('appLaunchSplashOverlay');
