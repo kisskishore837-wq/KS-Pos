@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KS POS - Smart Retail Management</title>
+    <!-- iOS & Android Home Screen App Icon & Standalone Web App Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="KS POS">
+    <meta name="theme-color" content="#0284c7">
+    <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" href="">
+    <link id="dynamicFavicon" rel="icon" type="image/png" href="">
+    <link id="dynamicWebManifest" rel="manifest" href="">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -6385,6 +6393,55 @@
 
         let pendingAdminLogoDataUrl = "";
 
+        function generateDefaultKSAppIconDataUrl() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 512, 512);
+            grad.addColorStop(0, '#0284c7');
+            grad.addColorStop(1, '#1d4ed8');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 210px Georgia, serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('KS', 256, 266);
+            return canvas.toDataURL('image/png');
+        }
+
+        function updateHomeScreenAppIcons(logoUrl) {
+            const finalIconUrl = logoUrl || generateDefaultKSAppIconDataUrl();
+
+            const appleIconEl = document.getElementById('dynamicAppleTouchIcon');
+            if (appleIconEl) appleIconEl.href = finalIconUrl;
+
+            const favIconEl = document.getElementById('dynamicFavicon');
+            if (favIconEl) favIconEl.href = finalIconUrl;
+
+            const manifestEl = document.getElementById('dynamicWebManifest');
+            if (manifestEl) {
+                try {
+                    const manifestObj = {
+                        name: "KS POS - Smart Retail Management",
+                        short_name: "KS POS",
+                        start_url: window.location.origin + "/",
+                        display: "standalone",
+                        background_color: "#ffffff",
+                        theme_color: "#0284c7",
+                        icons: [
+                            { src: finalIconUrl, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                            { src: finalIconUrl, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                        ]
+                    };
+                    const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+                    manifestEl.href = URL.createObjectURL(blob);
+                } catch (e) {}
+            }
+        }
+
         function applyGlobalBrandLogo(dataUrl, persistLocally = false) {
             uploadedLogoDataUrl = dataUrl || "";
             if (persistLocally) {
@@ -6398,6 +6455,8 @@
                     console.warn('Brand logo local save warning:', e);
                 }
             }
+
+            updateHomeScreenAppIcons(uploadedLogoDataUrl);
 
             const pairs = [
                 { textId: 'defaultLogoText', imgId: 'uploadedLogoImg' },
@@ -6435,25 +6494,23 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Compress & resize logo cleanly so it saves fast to LocalStorage & Supabase
+                    // Resize to 512x512 square so it renders crisply as iPhone Home Screen App Icon & UI Logo
                     const canvas = document.createElement('canvas');
-                    const maxDim = 256;
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > maxDim || h > maxDim) {
-                        if (w > h) {
-                            h = Math.round((h * maxDim) / w);
-                            w = maxDim;
-                        } else {
-                            w = Math.round((w * maxDim) / h);
-                            h = maxDim;
-                        }
-                    }
-                    canvas.width = w;
-                    canvas.height = h;
+                    const size = 512;
+                    canvas.width = size;
+                    canvas.height = size;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    pendingAdminLogoDataUrl = canvas.toDataURL('image/png', 0.88);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, size, size);
+
+                    const scale = Math.max(size / img.width, size / img.height);
+                    const drawW = img.width * scale;
+                    const drawH = img.height * scale;
+                    const offsetX = (size - drawW) / 2;
+                    const offsetY = (size - drawH) / 2;
+                    ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+
+                    pendingAdminLogoDataUrl = canvas.toDataURL('image/png', 0.9);
                     openSidebarModuleScreen('Admin Panel');
                     showNotification('Photo selected! Click "Save Logo" to apply for all users.', 'success');
                 };
@@ -6495,7 +6552,7 @@
                 if (btnText) btnText.textContent = 'Save Logo';
 
                 openSidebarModuleScreen('Admin Panel');
-                showNotification('Official App Logo saved & synced for all users!', 'success');
+                showNotification('Official App Logo saved! Re-add to Home Screen to update icon.', 'success', 4500);
             }, 1200);
         }
 
@@ -6515,10 +6572,10 @@
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
-                if (savedLogo) {
-                    applyGlobalBrandLogo(savedLogo, false);
-                }
-            } catch (e) {}
+                applyGlobalBrandLogo(savedLogo || "", false);
+            } catch (e) {
+                updateHomeScreenAppIcons("");
+            }
 
             const splashOverlay = document.getElementById('appLaunchSplashOverlay');
             if (splashOverlay) {
