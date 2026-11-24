@@ -1881,8 +1881,7 @@
             if (!client) return;
             try {
                 const { data: prodData, error: prodErr } = await client.from('products').select('*');
-                if (!prodErr && Array.isArray(prodData) && prodData.length > 0) {
-                    samplePOSProducts.length = 0;
+                if (!prodErr && Array.isArray(prodData) && prodData.length > 0 && samplePOSProducts.length === 0) {
                     prodData.forEach((p, i) => {
                         samplePOSProducts.push({
                             id: p.id || (i + 1),
@@ -1893,13 +1892,14 @@
                             stock: Number(p.stock ?? 10)
                         });
                     });
+                    persistAppStateToLocal();
                     renderPOSProducts();
                 }
 
                 const { data: custData, error: custErr } = await client.from('customers').select('*');
                 if (!custErr && Array.isArray(custData) && custData.length > 0) {
                     custData.forEach(c => {
-                        if (c.phone) {
+                        if (c.phone && !registeredCustomersDatabase[c.phone]) {
                             registeredCustomersDatabase[c.phone] = {
                                 isSaved: true,
                                 name: c.name || '',
@@ -1917,68 +1917,78 @@
 
                 const { data: ordData, error: ordErr } = await client.from('orders').select('*').order('created_at', { ascending: false });
                 if (!ordErr && Array.isArray(ordData) && ordData.length > 0) {
-                    allCompletedOrders = ordData.map(o => ({
-                        orderId: o.order_id || o.id,
-                        dateStr: o.date_str || '',
-                        timeStr: o.time_str || '',
-                        isoDate: o.iso_date || '',
-                        dateTime: o.date_time || '',
-                        customerName: o.customer_name || 'Walk-in Customer',
-                        customerPhone: o.customer_phone || 'N/A',
-                        userEmail: o.user_email || 'owner@kspos.com',
-                        location: o.location || 'Hyderabad, Telangana, India',
-                        staff: o.staff || 'Store Staff',
-                        paymentMode: o.payment_mode || 'Cash',
-                        paymentStatus: o.payment_status || 'Paid',
-                        fulfillmentStatus: o.fulfillment_status || 'Fulfilled',
-                        items: Array.isArray(o.items) ? o.items : [],
-                        itemCount: Number(o.item_count || 0),
-                        subtotal: Number(o.subtotal || 0),
-                        discount: Number(o.discount || 0),
-                        tax: Number(o.tax || 0),
-                        storeCreditUsed: Number(o.store_credit_used || 0),
-                        storeCreditGiven: Number(o.store_credit_given || 0),
-                        isRefundExchange: Boolean(o.is_refund_exchange),
-                        originOrderId: o.origin_order_id || '',
-                        refundItemCount: Number(o.refund_item_count || 0),
-                        exchangeItemCount: Number(o.exchange_item_count || 0),
-                        totalRefundValue: Number(o.total_refund_value || 0),
-                        totalExchangeValue: Number(o.total_exchange_value || 0),
-                        total: Number(o.total || 0)
-                    }));
+                    const existingOrderIds = new Set(allCompletedOrders.map(o => o.orderId));
+                    ordData.forEach(o => {
+                        const oid = o.order_id || o.id;
+                        if (oid && !existingOrderIds.has(oid)) {
+                            allCompletedOrders.push({
+                                orderId: oid,
+                                dateStr: o.date_str || '',
+                                timeStr: o.time_str || '',
+                                isoDate: o.iso_date || '',
+                                dateTime: o.date_time || '',
+                                customerName: o.customer_name || 'Walk-in Customer',
+                                customerPhone: o.customer_phone || 'N/A',
+                                userEmail: o.user_email || 'owner@kspos.com',
+                                location: o.location || 'Hyderabad, Telangana, India',
+                                staff: o.staff || 'Store Staff',
+                                paymentMode: o.payment_mode || 'Cash',
+                                paymentStatus: o.payment_status || 'Paid',
+                                fulfillmentStatus: o.fulfillment_status || 'Fulfilled',
+                                items: Array.isArray(o.items) ? o.items : [],
+                                itemCount: Number(o.item_count || 0),
+                                subtotal: Number(o.subtotal || 0),
+                                discount: Number(o.discount || 0),
+                                tax: Number(o.tax || 0),
+                                storeCreditUsed: Number(o.store_credit_used || 0),
+                                storeCreditGiven: Number(o.store_credit_given || 0),
+                                isRefundExchange: Boolean(o.is_refund_exchange),
+                                originOrderId: o.origin_order_id || '',
+                                refundItemCount: Number(o.refund_item_count || 0),
+                                exchangeItemCount: Number(o.exchange_item_count || 0),
+                                totalRefundValue: Number(o.total_refund_value || 0),
+                                totalExchangeValue: Number(o.total_exchange_value || 0),
+                                total: Number(o.total || 0)
+                            });
+                        }
+                    });
                     persistAppStateToLocal();
+                    renderOrderHistoryScreen();
                 }
 
                 const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
                 if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
-                    const closedRecords = shiftData.filter(s => s.status === 'closed').map(s => ({
-                        shiftId: s.shift_id || s.id,
-                        isoDate: s.iso_date || '',
-                        openedAt: s.opened_at || '',
-                        closedAt: s.closed_at || '',
-                        dateStr: s.date_str || '',
-                        timeStr: s.time_str || '',
-                        sales: Number(s.sales || 0),
-                        openingCash: Number(s.opening_cash || 0),
-                        closingCash: Number(s.closing_cash || 0),
-                        difference: Number(s.difference || 0),
-                        reason: s.reason || '',
-                        cashSales: Number(s.cash_sales || 0),
-                        cashSaleCount: Number(s.cash_sale_count || 0),
-                        cashRefunds: Number(s.cash_refunds || 0),
-                        cashRefundCount: Number(s.cash_refund_count || 0),
-                        storeCreditSales: Number(s.store_credit_sales || 0),
-                        storeCreditSaleCount: Number(s.store_credit_sale_count || 0),
-                        storeCreditRefunds: Number(s.store_credit_refunds || 0),
-                        storeCreditRefundCount: Number(s.store_credit_refund_count || 0),
-                        digitalSales: Number(s.digital_sales || 0),
-                        digitalSaleCount: Number(s.digital_sale_count || 0),
-                        expectedDrawerCash: Number(s.expected_drawer_cash || 0),
-                        adjustments: Array.isArray(s.adjustments) ? s.adjustments : []
-                    }));
-                    if (closedRecords.length > 0) {
-                        pastShiftHistory = closedRecords;
-                    }
+                    const existingShiftIds = new Set(pastShiftHistory.map(s => s.shiftId));
+                    shiftData.filter(s => s.status === 'closed').forEach(s => {
+                        const sid = s.shift_id || s.id;
+                        if (sid && !existingShiftIds.has(sid)) {
+                            pastShiftHistory.push({
+                                shiftId: sid,
+                                isoDate: s.iso_date || '',
+                                openedAt: s.opened_at || '',
+                                closedAt: s.closed_at || '',
+                                dateStr: s.date_str || '',
+                                timeStr: s.time_str || '',
+                                sales: Number(s.sales || 0),
+                                openingCash: Number(s.opening_cash || 0),
+                                closingCash: Number(s.closing_cash || 0),
+                                difference: Number(s.difference || 0),
+                                reason: s.reason || '',
+                                cashSales: Number(s.cash_sales || 0),
+                                cashSaleCount: Number(s.cash_sale_count || 0),
+                                cashRefunds: Number(s.cash_refunds || 0),
+                                cashRefundCount: Number(s.cash_refund_count || 0),
+                                storeCreditSales: Number(s.store_credit_sales || 0),
+                                storeCreditSaleCount: Number(s.store_credit_sale_count || 0),
+                                storeCreditRefunds: Number(s.store_credit_refunds || 0),
+                                storeCreditRefundCount: Number(s.store_credit_refund_count || 0),
+                                digitalSales: Number(s.digital_sales || 0),
+                                digitalSaleCount: Number(s.digital_sale_count || 0),
+                                expectedDrawerCash: Number(s.expected_drawer_cash || 0),
+                                adjustments: Array.isArray(s.adjustments) ? s.adjustments : []
+                            });
+                        }
+                    });
                     persistAppStateToLocal();
                     renderShiftsScreen();
                 }
@@ -2003,6 +2013,8 @@
                 localStorage.setItem('kspos_past_shifts_v1', JSON.stringify(pastShiftHistory));
                 localStorage.setItem('kspos_orders_v1', JSON.stringify(allCompletedOrders));
                 localStorage.setItem('kspos_customers_v1', JSON.stringify(registeredCustomersDatabase));
+                localStorage.setItem('kspos_products_v1', JSON.stringify(samplePOSProducts));
+                localStorage.setItem('kspos_session_user_v1', JSON.stringify(currentSessionUser));
             } catch (err) {
                 console.warn('Local storage save warning:', err);
             }
@@ -2036,6 +2048,21 @@
                     const parsedCust = JSON.parse(savedCustomers);
                     if (parsedCust && typeof parsedCust === 'object') {
                         registeredCustomersDatabase = parsedCust;
+                    }
+                }
+                const savedProducts = localStorage.getItem('kspos_products_v1');
+                if (savedProducts) {
+                    const parsedProds = JSON.parse(savedProducts);
+                    if (Array.isArray(parsedProds) && parsedProds.length > 0) {
+                        samplePOSProducts.length = 0;
+                        parsedProds.forEach(p => samplePOSProducts.push(p));
+                    }
+                }
+                const savedSession = localStorage.getItem('kspos_session_user_v1');
+                if (savedSession) {
+                    const parsedSession = JSON.parse(savedSession);
+                    if (parsedSession && parsedSession.username) {
+                        currentSessionUser = { ...currentSessionUser, ...parsedSession };
                     }
                 }
             } catch (err) {
@@ -6562,10 +6589,18 @@
             renderPlanFeaturesPreview();
             renderPOSProducts();
             renderPOSCart();
+            renderOrderHistoryScreen();
             renderShiftsScreen();
             setInterval(updateShiftsLiveClock, 1000);
             if (window.lucide) lucide.createIcons();
             setTimeout(syncInitialDataFromSupabase, 100);
+        });
+
+        // Auto-save state whenever app goes to background or closes on iPhone
+        window.addEventListener('pagehide', () => {
+            persistAppStateToLocal();
+            persistStockTransfersToLocal();
+            persistMultiTenantAuthState();
         });
 
         // Smart App Resume Data Sync (triggers 5s white spinner when returning after >= 15s idle)
@@ -6574,6 +6609,9 @@
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
+                persistAppStateToLocal();
+                persistStockTransfersToLocal();
+                persistMultiTenantAuthState();
                 appBackgroundTimestamp = Date.now();
             } else if (appBackgroundTimestamp !== null && !isResumeSyncRunning) {
                 const idleDurationMs = Date.now() - appBackgroundTimestamp;
