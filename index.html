@@ -216,6 +216,15 @@
 </head>
 <body class="bg-white text-slate-900 min-h-screen w-full relative selection:bg-sky-200 selection:text-sky-900">
 
+    <!-- APP LAUNCH SPLASH SCREEN (3 SECONDS WHITE SPINNER) -->
+    <div id="appLaunchSplashOverlay" class="fixed inset-0 z-[100] bg-gradient-to-br from-sky-600 via-sky-500 to-blue-700 flex flex-col items-center justify-center gap-5 transition-opacity duration-500">
+        <div class="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center">
+            <span class="luxury-heading text-3xl font-bold text-white tracking-widest select-none">KS</span>
+        </div>
+        <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
+        <p class="luxury-heading text-sm font-semibold text-white/95 tracking-[0.2em] uppercase">KS POS</p>
+    </div>
+
     <!-- TOP FLOATING STACKED NOTIFICATION CONTAINER -->
     <div id="topNotificationBar" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-[330px] px-2 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -6277,6 +6286,16 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            const splashOverlay = document.getElementById('appLaunchSplashOverlay');
+            if (splashOverlay) {
+                setTimeout(() => {
+                    splashOverlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        splashOverlay.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+
             loadMultiTenantAuthState();
             loadAppStateFromLocal();
             loadStockTransfersFromLocal();
