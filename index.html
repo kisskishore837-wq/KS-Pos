@@ -225,6 +225,15 @@
         <p class="luxury-heading text-sm font-semibold text-white/95 tracking-[0.2em] uppercase">KS POS</p>
     </div>
 
+    <!-- APP RESUME DATA SYNC OVERLAY (5 SECONDS WHITE SPINNER AFTER IDLE) -->
+    <div id="appResumeSyncOverlay" class="fixed inset-0 z-[95] bg-slate-950/60 backdrop-blur-md hidden flex-col items-center justify-center gap-4 p-4 transition-opacity duration-300">
+        <div class="w-16 h-16 rounded-2xl bg-white/15 border border-white/25 shadow-xl flex items-center justify-center">
+            <span class="luxury-heading text-2xl font-bold text-white tracking-widest select-none">KS</span>
+        </div>
+        <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
+        <p class="text-xs sm:text-sm font-bold text-white tracking-wide">Syncing store data...</p>
+    </div>
+
     <!-- TOP FLOATING STACKED NOTIFICATION CONTAINER -->
     <div id="topNotificationBar" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-[330px] px-2 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -6307,6 +6316,40 @@
             setInterval(updateShiftsLiveClock, 1000);
             if (window.lucide) lucide.createIcons();
             setTimeout(syncInitialDataFromSupabase, 100);
+        });
+
+        // Smart App Resume Data Sync (triggers 5s white spinner when returning after >= 15s idle)
+        let appBackgroundTimestamp = null;
+        let isResumeSyncRunning = false;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                appBackgroundTimestamp = Date.now();
+            } else if (appBackgroundTimestamp !== null && !isResumeSyncRunning) {
+                const idleDurationMs = Date.now() - appBackgroundTimestamp;
+                appBackgroundTimestamp = null;
+
+                if (idleDurationMs >= 15000) {
+                    const resumeOverlay = document.getElementById('appResumeSyncOverlay');
+                    if (resumeOverlay) {
+                        isResumeSyncRunning = true;
+                        resumeOverlay.classList.remove('hidden', 'opacity-0');
+                        resumeOverlay.classList.add('flex');
+
+                        syncInitialDataFromSupabase();
+
+                        setTimeout(() => {
+                            resumeOverlay.classList.add('opacity-0');
+                            setTimeout(() => {
+                                resumeOverlay.classList.add('hidden');
+                                resumeOverlay.classList.remove('flex', 'opacity-0');
+                                isResumeSyncRunning = false;
+                                showNotification('Store data synced successfully', 'success');
+                            }, 300);
+                        }, 5000);
+                    }
+                }
+            }
         });
     </script>
 </body>
