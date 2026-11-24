@@ -969,6 +969,7 @@
                 <button type="button" onclick="navigateTo('orderHistoryScreen')" class="py-2 px-3.5 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Order History</button>
                 <button type="button" onclick="handleOrderRefundExchangeFromDetails()" class="py-2 px-3.5 rounded-xl bg-amber-50 hover:bg-amber-600 text-amber-800 hover:text-white border border-amber-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Refund / Exchange</button>
                 <button type="button" onclick="window.print()" class="py-2 px-3.5 rounded-xl bg-emerald-100/90 hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-300 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Print</button>
+                <button type="button" id="odDeleteOrderBtn" onclick="openDeleteOrderModal()" class="py-2 px-3.5 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white border border-red-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Delete Order</button>
             </div>
 
             <div class="w-full flex-1 py-4 space-y-4 text-xs sm:text-sm">
@@ -1836,6 +1837,29 @@
         </div>
     </div>
 
+    <!-- Delete Order Reason Modal -->
+    <div id="deleteOrderModalOverlay" onclick="closeDeleteOrderModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-sm glass-panel bg-white/95 rounded-3xl p-5 sm:p-6 shadow-2xl border border-red-200 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-red-100">
+                <h3 class="luxury-heading text-base sm:text-lg font-bold text-red-700 tracking-wide">Delete Order</h3>
+                <button type="button" onclick="closeDeleteOrderModal()" class="p-1.5 rounded-xl hover:bg-red-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div>
+                <label for="deleteOrderReasonInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Reason / Note</label>
+                <textarea id="deleteOrderReasonInput" rows="3" placeholder="Enter reason why you are deleting this order..." class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 resize-none"></textarea>
+            </div>
+            <div class="pt-1 flex justify-end gap-2">
+                <button type="button" onclick="closeDeleteOrderModal()" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">Cancel</button>
+                <button type="button" id="confirmDeleteOrderBtn" onclick="confirmDeleteOrderAction()" class="py-2 px-5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all">
+                    <div id="confirmDeleteOrderSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
+                    <span id="confirmDeleteOrderBtnText">Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Supabase Configuration (Non-blocking background connection)
         const SUPABASE_URL = 'https://rzemcjkkevopjvgmzgcf.supabase.co';
@@ -2044,6 +2068,8 @@
             pin: '8804'
         };
 
+        let isDeleteOrderEnabled = true;
+
         let isAdminPinUnlocked = false;
         let currentSessionUser = {
             role: 'admin',
@@ -2092,6 +2118,10 @@
                         rentedStoresList = parsedStores;
                     }
                 }
+                const savedDelToggle = localStorage.getItem('kspos_delete_order_enabled_v1');
+                if (savedDelToggle !== null) {
+                    isDeleteOrderEnabled = savedDelToggle === 'true';
+                }
             } catch (e) {
                 console.warn('Multi-tenant auth load warning:', e);
             }
@@ -2101,6 +2131,7 @@
             try {
                 localStorage.setItem('kspos_admin_creds_v1', JSON.stringify(adminCredentials));
                 localStorage.setItem('kspos_rented_stores_v1', JSON.stringify(rentedStoresList));
+                localStorage.setItem('kspos_delete_order_enabled_v1', String(isDeleteOrderEnabled));
             } catch (e) {
                 console.warn('Multi-tenant auth save warning:', e);
             }
@@ -2389,275 +2420,73 @@
             showNotification(`${store.storeName} is now ${store.status}`, store.status === 'Active' ? 'success' : 'warning');
         }
 
-        function refreshStoreLocation() {
-            showNotification('Location updated: Hyderabad, Telangana, India', 'success');
+        function toggleDeleteOrderVisibilitySetting() {
+            isDeleteOrderEnabled = !isDeleteOrderEnabled;
+            persistMultiTenantAuthState();
+            updateDeleteOrderButtonVisibility();
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`Delete Order button ${isDeleteOrderEnabled ? 'Enabled' : 'Disabled'}`, isDeleteOrderEnabled ? 'success' : 'warning');
         }
 
-        let activeLogoBoxEl = null;
-
-        function openSidebarWithRotation(btnEl) {
-            activeLogoBoxEl = btnEl || document.getElementById('dashboardLogoBox');
-            const sidebar = document.getElementById('appSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-
-            if (activeLogoBoxEl) activeLogoBoxEl.classList.add('logo-box-rotated');
-            backdrop.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                backdrop.classList.remove('opacity-0');
-                sidebar.classList.remove('-translate-x-full');
-            });
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('appSidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-
-            sidebar.classList.add('-translate-x-full');
-            backdrop.classList.add('opacity-0');
-            if (activeLogoBoxEl) {
-                activeLogoBoxEl.classList.remove('logo-box-rotated');
+        function updateDeleteOrderButtonVisibility() {
+            const delBtn = document.getElementById('odDeleteOrderBtn');
+            if (!delBtn) return;
+            if (isDeleteOrderEnabled) {
+                delBtn.classList.remove('hidden');
+            } else {
+                delBtn.classList.add('hidden');
             }
+        }
+
+        function openDeleteOrderModal() {
+            if (!currentViewedOrder) return;
+            const input = document.getElementById('deleteOrderReasonInput');
+            if (input) input.value = '';
+            document.getElementById('deleteOrderModalOverlay').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => input?.focus(), 50);
+        }
+
+        function closeDeleteOrderModal() {
+            document.getElementById('deleteOrderModalOverlay').classList.add('hidden');
+        }
+
+        function confirmDeleteOrderAction() {
+            if (!currentViewedOrder) return;
+            const reason = document.getElementById('deleteOrderReasonInput')?.value.trim();
+            if (!reason) {
+                showNotification('Please enter a reason to delete this order', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('confirmDeleteOrderBtn');
+            const spinner = document.getElementById('confirmDeleteOrderSpinner');
+            const btnText = document.getElementById('confirmDeleteOrderBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Deleting order...';
+
             setTimeout(() => {
-                backdrop.classList.add('hidden');
-            }, 160);
-        }
+                const targetId = currentViewedOrder.orderId;
+                allCompletedOrders = allCompletedOrders.filter(o => o.orderId !== targetId);
+                persistAppStateToLocal();
 
-        function handleSidebarNav(sectionName) {
-            closeSidebar();
-            if (currentSessionUser.role !== 'admin' && sectionName !== 'Admin Panel') {
-                const allowed = currentSessionUser.allowedFeatures || [];
-                if (!allowed.includes(sectionName)) {
-                    showNotification(`Access restricted for ${sectionName}. Contact Admin.`, 'warning');
-                    return;
+                const client = getSupabaseClient();
+                if (client) {
+                    try {
+                        client.from('orders').delete().eq('order_id', targetId).then(() => {});
+                    } catch (e) {}
                 }
-            }
-            if (sectionName === 'Dashboard') {
-                exitStockTransferSellMode();
-                navigateTo('dashboardScreen');
-            } else if (sectionName === 'Sell Screen') {
-                exitStockTransferSellMode();
-                navigateTo('sellScreen');
-            } else if (sectionName === 'Order History') {
-                exitStockTransferSellMode();
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Delete';
+
+                closeDeleteOrderModal();
+                currentViewedOrder = null;
+                showNotification(`Order ${targetId} deleted (${reason})`, 'warning');
                 navigateTo('orderHistoryScreen');
-            } else if (sectionName === 'Shifts') {
-                exitStockTransferSellMode();
-                navigateTo('shiftsScreen');
-            } else {
-                exitStockTransferSellMode();
-                openSidebarModuleScreen(sectionName);
-            }
-        }
-
-        // --- STOCK TRANSFER WORKFLOW STATE & HANDLERS ---
-        const storeBranchLocations = [
-            { id: 'loc-1', name: 'Hyderabad Main', address: 'Banjara Hills, Hyderabad, Telangana' },
-            { id: 'loc-2', name: 'Vijayawada Store', address: 'MG Road, Vijayawada, Andhra Pradesh' },
-            { id: 'loc-3', name: 'Secunderabad Branch', address: 'SD Road, Secunderabad, Telangana' },
-            { id: 'loc-4', name: 'Gachibowli Outlet', address: 'Financial District, Hyderabad, Telangana' },
-            { id: 'loc-5', name: 'Visakhapatnam Hub', address: 'Dwaraka Nagar, Visakhapatnam, AP' }
-        ];
-
-        let stockTransfersList = [
-            {
-                transferId: '#ST-101',
-                fromBranch: 'Hyderabad Main',
-                toBranch: 'Vijayawada Store',
-                status: 'Completed',
-                createdAt: '23 Nov 2026, 04:15:00 PM',
-                items: [
-                    { id: 1, name: 'Classic Cotton Shirt', variant: 'Standard Size', sku: 'KS-10101010', price: 1299, qty: 8, checked: true },
-                    { id: 3, name: 'Casual Linen Kurta', variant: 'Large', sku: 'KS-10303030', price: 1499, qty: 6, checked: true }
-                ]
-            }
-        ];
-
-        let isStockTransferSellMode = false;
-        let selectedTransferDestination = '';
-        let currentViewedTransferId = null;
-        let isStockTransferGridView = false;
-
-        function toggleStockTransferGridView() {
-            isStockTransferGridView = !isStockTransferGridView;
-            openSidebarModuleScreen('Stock Transfer');
-        }
-
-        function exitStockTransferSellMode() {
-            if (!isStockTransferSellMode) return;
-            isStockTransferSellMode = false;
-            selectedTransferDestination = '';
-            posCart = [];
-            applyStockTransferSellModeUI();
-        }
-
-        function applyStockTransferSellModeUI() {
-            const custLabel = document.getElementById('cartCustomerLabel');
-            const custIconWrap = document.getElementById('cartCustomerIconWrap');
-            const subCreditEl = document.getElementById('cartCustomerSubCredit');
-            const removeBtn = document.getElementById('removeCartCustomerBtn');
-            const proceedBtn = document.querySelector('#sellCartSection button[onclick="openPaymentsScreen()"]');
-
-            if (isStockTransferSellMode) {
-                if (custIconWrap) {
-                    custIconWrap.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i>';
-                }
-                if (custLabel) {
-                    custLabel.textContent = selectedTransferDestination || 'Add Location';
-                }
-                if (subCreditEl) subCreditEl.classList.add('hidden');
-                if (removeBtn) {
-                    if (selectedTransferDestination) {
-                        removeBtn.classList.remove('hidden');
-                    } else {
-                        removeBtn.classList.add('hidden');
-                    }
-                }
-                if (proceedBtn) {
-                    proceedBtn.innerHTML = '<span>Create New Transfer</span>';
-                }
-            } else {
-                if (custIconWrap) {
-                    custIconWrap.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i>';
-                }
-                if (custLabel) {
-                    custLabel.textContent = currentCustomerData?.name || currentCustomerName || 'Add Customer';
-                }
-                if (removeBtn) {
-                    if (currentCustomerData && currentCustomerData.isSaved) {
-                        removeBtn.classList.remove('hidden');
-                    } else {
-                        removeBtn.classList.add('hidden');
-                    }
-                }
-                if (proceedBtn) {
-                    proceedBtn.innerHTML = '<span>Proceed to Pay</span>';
-                }
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function openAddLocationModal() {
-            const searchInput = document.getElementById('transferLocationSearchInput');
-            if (searchInput) searchInput.value = '';
-            renderTransferLocationsList(storeBranchLocations);
-            document.getElementById('addLocationModalOverlay').classList.remove('hidden');
-            if (window.lucide) lucide.createIcons();
-            setTimeout(() => searchInput?.focus(), 50);
-        }
-
-        function closeAddLocationModal() {
-            document.getElementById('addLocationModalOverlay').classList.add('hidden');
-        }
-
-        function filterTransferLocations(query) {
-            const q = (query || '').toLowerCase().trim();
-            const filtered = storeBranchLocations.filter(loc =>
-                loc.name.toLowerCase().includes(q) || loc.address.toLowerCase().includes(q)
-            );
-            renderTransferLocationsList(filtered);
-        }
-
-        function renderTransferLocationsList(list) {
-            const container = document.getElementById('transferLocationsListContainer');
-            if (!container) return;
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No matching locations found.</p>`;
-                return;
-            }
-            container.innerHTML = list.map(loc => {
-                const isSelected = selectedTransferDestination === loc.name;
-                return `
-                    <div onclick="selectTransferDestinationLocation('${loc.name.replace(/'/g, "\\'")}')" class="p-3 rounded-2xl border ${isSelected ? 'border-sky-500 bg-sky-100/80' : 'border-sky-100 bg-sky-50/60 hover:bg-sky-100'} flex items-center justify-between gap-2 cursor-pointer transition-all">
-                        <div class="min-w-0">
-                            <p class="text-xs sm:text-sm font-bold text-slate-900 truncate">${loc.name}</p>
-                            <p class="text-[11px] text-slate-500 truncate">${loc.address}</p>
-                        </div>
-                        <i data-lucide="${isSelected ? 'check-circle-2' : 'map-pin'}" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
-                    </div>
-                `;
-            }).join('');
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function selectTransferDestinationLocation(locationName) {
-            selectedTransferDestination = locationName;
-            applyStockTransferSellModeUI();
-            closeAddLocationModal();
-            showNotification(`Destination selected: ${locationName}`, 'success');
-        }
-
-        function startNewStockTransferFlow() {
-            isStockTransferSellMode = true;
-            isRefundExchangeActive = false;
-            selectedTransferDestination = '';
-            posCart = [];
-            refundCartItems = [];
-            exchangeCartItems = [];
-            discountConfig = { type: 'rupees', value: 0 };
-
-            applyStockTransferSellModeUI();
-            navigateTo('sellScreen');
-            switchMobilePOSTab('products');
-            const searchInput = document.getElementById('posProductSearch');
-            if (searchInput) {
-                searchInput.value = '';
-                setTimeout(() => searchInput.focus(), 100);
-            }
-            showNotification('Select destination location & add items to transfer', 'success');
-        }
-
-        function handleCreateNewStockTransfer() {
-            if (!selectedTransferDestination) {
-                showNotification('Please select a destination location first', 'warning');
-                openAddLocationModal();
-                return;
-            }
-            if (posCart.length === 0) {
-                showNotification('Please add at least one product to transfer', 'warning');
-                return;
-            }
-
-            const overlay = document.getElementById('orderProcessingOverlay');
-            const statusText = document.getElementById('orderProcessingStatusText');
-            if (overlay) overlay.classList.remove('hidden');
-            if (statusText) statusText.textContent = 'Creating stock transfer...';
-
-            setTimeout(() => {
-                if (overlay) overlay.classList.add('hidden');
-
-                const nowFmt = formatOrderDateTime(new Date());
-                const nextNum = 101 + stockTransfersList.length;
-                const newTransferId = `#ST-${nextNum}`;
-                const fromBranchName = document.getElementById('sidebarLocationText')?.textContent.trim() || 'Hyderabad Main';
-
-                const newTransferRecord = {
-                    transferId: newTransferId,
-                    fromBranch: fromBranchName,
-                    toBranch: selectedTransferDestination,
-                    status: 'Pending',
-                    createdAt: nowFmt.fullStr,
-                    items: posCart.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        variant: item.variant || 'Standard',
-                        sku: item.sku || 'CUSTOM',
-                        price: item.price,
-                        qty: item.qty,
-                        checked: false,
-                        received: false
-                    }))
-                };
-
-                stockTransfersList.unshift(newTransferRecord);
-                persistStockTransfersToLocal();
-
-                isStockTransferSellMode = false;
-                selectedTransferDestination = '';
-                posCart = [];
-                applyStockTransferSellModeUI();
-
-                openSidebarModuleScreen('Stock Transfer');
-                showNotification(`Transfer ${newTransferId} created!`, 'success');
             }, 3000);
         }
 
@@ -3187,6 +3016,17 @@
                                         </div>
                                     `;
                                 }).join('')}
+                            </div>
+
+                            <!-- Delete Order Button Visibility Toggle Control -->
+                            <div class="w-full rounded-2xl border border-red-200 bg-red-50/40 p-4 sm:p-5 flex items-center justify-between gap-3 shadow-2xs mt-2">
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Delete Order</h3>
+                                    <p class="text-xs text-slate-600 mt-0.5">Enable or disable the Delete Order button on Order Details screen</p>
+                                </div>
+                                <button type="button" onclick="toggleDeleteOrderVisibilitySetting()" aria-pressed="${isDeleteOrderEnabled}" class="toggle-track w-12 h-6 rounded-full ${isDeleteOrderEnabled ? 'bg-red-500' : 'bg-slate-300'} p-0.5 flex items-center flex-shrink-0 cursor-pointer">
+                                    <span class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform ${isDeleteOrderEnabled ? 'translate-x-6' : 'translate-x-0'}"></span>
+                                </button>
                             </div>
                         `;
                     }
@@ -4796,6 +4636,224 @@
             }, totalDelay);
         }
 
+        // --- SIDEBAR, LOCATION & STOCK TRANSFER HELPERS ---
+        let isStockTransferSellMode = false;
+        let selectedTransferDestination = "";
+        let isStockTransferGridView = false;
+        let currentViewedTransferId = "";
+        let transferBranchLocations = [
+            "Kukatpally Branch, Hyderabad",
+            "Ameerpet Main Store, Hyderabad",
+            "Madhapur Hi-Tech Branch, Hyderabad",
+            "Secunderabad Central Warehouse",
+            "Gachibowli Retail Outlet"
+        ];
+        let stockTransfersList = [
+            {
+                transferId: "TR-1001",
+                fromBranch: "Hyderabad Main Store",
+                toBranch: "Kukatpally Branch, Hyderabad",
+                createdAt: "24 Nov 2026, 10:15 AM",
+                status: "Completed",
+                items: [
+                    { id: 1, name: "Classic Cotton Shirt", variant: "Standard Size", sku: "KS-10101010", price: 1299, qty: 3, received: true }
+                ]
+            }
+        ];
+
+        function openSidebarWithRotation(el) {
+            if (el) {
+                el.classList.add('logo-box-rotated');
+                setTimeout(() => el.classList.remove('logo-box-rotated'), 220);
+            }
+            const sidebar = document.getElementById('appSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.remove('-translate-x-full');
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (backdrop) {
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 160);
+            }
+        }
+
+        function handleSidebarNav(menuName) {
+            closeSidebar();
+            if (menuName === 'Sell Screen') {
+                exitStockTransferSellMode();
+                navigateTo('sellScreen');
+                switchMobilePOSTab('products');
+            } else if (menuName === 'Order History') {
+                exitStockTransferSellMode();
+                navigateTo('orderHistoryScreen');
+            } else if (menuName === 'Shifts') {
+                exitStockTransferSellMode();
+                navigateTo('shiftsScreen');
+            } else if (menuName === 'Dashboard') {
+                exitStockTransferSellMode();
+                navigateTo('dashboardScreen');
+            } else {
+                exitStockTransferSellMode();
+                openSidebarModuleScreen(menuName);
+            }
+        }
+
+        function refreshStoreLocation() {
+            const locText = document.getElementById('dashboardLocationText');
+            const sideLocText = document.getElementById('sidebarLocationText');
+            if (locText) {
+                locText.textContent = "Hyderabad, Telangana, India (Synced)";
+            }
+            if (sideLocText && currentSessionUser.role === 'admin') {
+                sideLocText.textContent = "Hyderabad, Telangana";
+            }
+            showNotification('Store location refreshed!', 'success');
+        }
+
+        function startNewStockTransferFlow() {
+            isStockTransferSellMode = true;
+            selectedTransferDestination = "";
+            posCart = [];
+            isRefundExchangeActive = false;
+            discountConfig = { type: 'rupees', value: 0 };
+            applyStockTransferSellModeUI();
+            navigateTo('sellScreen');
+            switchMobilePOSTab('products');
+            renderPOSCart();
+            showNotification('Select items and destination location for transfer', 'success');
+        }
+
+        function exitStockTransferSellMode() {
+            isStockTransferSellMode = false;
+            selectedTransferDestination = "";
+            applyStockTransferSellModeUI();
+        }
+
+        function applyStockTransferSellModeUI() {
+            const label = document.getElementById('cartCustomerLabel');
+            const iconWrap = document.getElementById('cartCustomerIconWrap');
+            const removeBtn = document.getElementById('removeCartCustomerBtn');
+            const proceedBtnSpan = document.querySelector('#sellCartSection button[onclick="openPaymentsScreen()"] span');
+
+            if (isStockTransferSellMode) {
+                if (iconWrap) iconWrap.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i>`;
+                if (label) label.textContent = selectedTransferDestination || "Add Location";
+                if (removeBtn) {
+                    if (selectedTransferDestination) removeBtn.classList.remove('hidden');
+                    else removeBtn.classList.add('hidden');
+                }
+                if (proceedBtnSpan) proceedBtnSpan.textContent = "Create New Transfer";
+            } else {
+                if (iconWrap) iconWrap.innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i>`;
+                if (label) label.textContent = (currentCustomerData && currentCustomerData.name) ? currentCustomerData.name : "Add Customer";
+                if (proceedBtnSpan) proceedBtnSpan.textContent = "Proceed to Pay";
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openAddLocationModal() {
+            const input = document.getElementById('transferLocationSearchInput');
+            if (input) input.value = '';
+            renderTransferLocationsList(transferBranchLocations);
+            document.getElementById('addLocationModalOverlay').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => input?.focus(), 50);
+        }
+
+        function closeAddLocationModal() {
+            document.getElementById('addLocationModalOverlay').classList.add('hidden');
+        }
+
+        function filterTransferLocations(q) {
+            const term = (q || '').toLowerCase().trim();
+            const filtered = transferBranchLocations.filter(loc => loc.toLowerCase().includes(term));
+            renderTransferLocationsList(filtered);
+        }
+
+        function renderTransferLocationsList(list) {
+            const container = document.getElementById('transferLocationsListContainer');
+            if (!container) return;
+            if (!list || list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No matching branch locations found.</p>`;
+                return;
+            }
+            container.innerHTML = list.map(loc => `
+                <button type="button" onclick="selectTransferDestinationLocation('${loc.replace(/'/g, "\\'")}')" class="w-full p-3 rounded-xl bg-sky-50/70 hover:bg-sky-600 text-slate-800 hover:text-white border border-sky-200 text-xs font-bold text-left flex items-center justify-between transition-colors cursor-pointer">
+                    <span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-3.5 h-3.5 flex-shrink-0"></i><span>${loc}</span></span>
+                    <i data-lucide="check" class="w-3.5 h-3.5 opacity-75"></i>
+                </button>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function selectTransferDestinationLocation(loc) {
+            selectedTransferDestination = loc;
+            applyStockTransferSellModeUI();
+            closeAddLocationModal();
+            showNotification(`Destination selected: ${loc}`, 'success');
+        }
+
+        function toggleStockTransferGridView() {
+            isStockTransferGridView = !isStockTransferGridView;
+            openSidebarModuleScreen('Stock Transfer');
+        }
+
+        function handleCreateNewStockTransfer() {
+            if (posCart.length === 0) {
+                showNotification('Please add at least one product to transfer', 'warning');
+                return;
+            }
+            if (!selectedTransferDestination) {
+                showNotification('Please select a destination location', 'warning');
+                openAddLocationModal();
+                return;
+            }
+
+            const overlay = document.getElementById('orderProcessingOverlay');
+            const statusText = document.getElementById('orderProcessingStatusText');
+            if (overlay) overlay.classList.remove('hidden');
+            if (statusText) statusText.textContent = "Creating stock transfer...";
+
+            setTimeout(() => {
+                if (overlay) overlay.classList.add('hidden');
+
+                const nowFmt = formatOrderDateTime(new Date());
+                const newTransfer = {
+                    transferId: `TR-${1001 + stockTransfersList.length}`,
+                    fromBranch: document.getElementById('dashboardLocationText')?.textContent.trim() || "Hyderabad Main Store",
+                    toBranch: selectedTransferDestination,
+                    createdAt: nowFmt.fullStr,
+                    status: "Pending",
+                    items: posCart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        variant: item.variant || 'Standard',
+                        sku: item.sku,
+                        price: item.price,
+                        qty: item.qty,
+                        received: false
+                    }))
+                };
+
+                stockTransfersList.unshift(newTransfer);
+                persistStockTransfersToLocal();
+
+                posCart = [];
+                exitStockTransferSellMode();
+                renderPOSCart();
+                openSidebarModuleScreen('Stock Transfer');
+                showNotification(`Stock Transfer ${newTransfer.transferId} created!`, 'success');
+            }, 3000);
+        }
+
         function finalizeAndCreateOrder(wasRefundExchange) {
             const now = new Date();
             const formatted = formatOrderDateTime(now);
@@ -5140,6 +5198,7 @@
             document.getElementById('odCreatedAtText').textContent = order.dateTime;
             document.getElementById('odUserEmailText').innerHTML = `<i data-lucide="mail" class="w-3.5 h-3.5 text-sky-600 flex-shrink-0"></i><span>${order.userEmail}</span>`;
 
+            updateDeleteOrderButtonVisibility();
             if (window.lucide) lucide.createIcons();
         }
 
@@ -6309,6 +6368,7 @@
             loadAppStateFromLocal();
             loadStockTransfersFromLocal();
             applyRolePermissionsToUI();
+            updateDeleteOrderButtonVisibility();
             renderPlanFeaturesPreview();
             renderPOSProducts();
             renderPOSCart();
