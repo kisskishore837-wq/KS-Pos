@@ -1858,7 +1858,7 @@
         </div>
     </div>
 
-    <!-- Add Location Modal (Stock Transfer Mode) -->
+    <!-- Add Location Modal (Stock Transfer Mode - Real-Time Locations) -->
     <div id="addLocationModalOverlay" onclick="closeAddLocationModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 transition-opacity">
         <div onclick="event.stopPropagation()" class="w-full max-w-sm glass-panel bg-white/95 rounded-3xl p-5 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-sky-100">
@@ -1868,12 +1868,22 @@
                 </button>
             </div>
 
-            <div class="relative">
-                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600 pointer-events-none"></i>
-                <input type="text" id="transferLocationSearchInput" oninput="filterTransferLocations(this.value)" placeholder="Search branch location..." class="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 placeholder-slate-400">
+            <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">Add New Branch Location</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="newBranchLocationInput" onkeydown="if(event.key==='Enter') addNewRealTimeBranchLocation()" placeholder="Enter branch name & city..." class="glass-input flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 placeholder-slate-400">
+                    <button type="button" onclick="addNewRealTimeBranchLocation()" class="btn-glass-primary py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer whitespace-nowrap">
+                        Add
+                    </button>
+                </div>
             </div>
 
-            <div id="transferLocationsListContainer" class="space-y-2 max-h-56 overflow-y-auto scrollable-pane pr-1"></div>
+            <div class="relative pt-1 border-t border-sky-100">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 mt-0.5 text-sky-600 pointer-events-none"></i>
+                <input type="text" id="transferLocationSearchInput" oninput="filterTransferLocations(this.value)" placeholder="Search saved or registered locations..." class="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 placeholder-slate-400">
+            </div>
+
+            <div id="transferLocationsListContainer" class="space-y-2 max-h-52 overflow-y-auto scrollable-pane pr-1"></div>
         </div>
     </div>
 
@@ -1944,17 +1954,18 @@
             const client = getSupabaseClient();
             if (!client) return;
             try {
-                // 1. Sync Rented Stores & Permissions across Safari and iOS Home Screen PWA
+                // 1. Sync Real-Time Registered Stores & Locations from Cloud
                 const { data: storesData, error: storesErr } = await client
                     .from('stores')
                     .select('*')
                     .order('created_at', { ascending: false });
-                if (!storesErr && Array.isArray(storesData) && storesData.length > 0) {
+                if (!storesErr && Array.isArray(storesData)) {
                     const localByUser = {};
                     rentedStoresList.forEach(st => {
                         if (st.username) localByUser[st.username.toLowerCase()] = st;
                     });
 
+                    const cloudStores = [];
                     storesData.forEach((row, idx) => {
                         const uname = (row.username || row.email || '').trim();
                         if (!uname) return;
@@ -1963,7 +1974,7 @@
                             ? row.allowed_features
                             : (localByUser[key]?.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']);
 
-                        const syncedStore = {
+                        cloudStores.push({
                             storeId: row.store_id || localByUser[key]?.storeId || `ST-${100 + idx}`,
                             storeName: row.store_name || localByUser[key]?.storeName || 'Registered Store',
                             ownerName: row.owner_name || localByUser[key]?.ownerName || 'Owner',
@@ -1974,21 +1985,19 @@
                             location: row.location || localByUser[key]?.location || '',
                             pincode: row.pincode || localByUser[key]?.pincode || '',
                             status: row.status || localByUser[key]?.status || 'Active',
-                            trialStartDate: row.trial_start_date || (row.created_at ? String(row.created_at).split('T')[0] : '2026-11-24'),
+                            trialStartDate: row.trial_start_date || (row.created_at ? String(row.created_at).split('T')[0] : new Date().toISOString().split('T')[0]),
                             trialDays: Number(row.trial_days ?? 30),
                             allowedFeatures: parsedFeatures,
                             pendingUtr: row.pending_utr || localByUser[key]?.pendingUtr || '',
                             paymentSubmittedAt: row.payment_submitted_at || localByUser[key]?.paymentSubmittedAt || '',
                             expiryAlertSent: Boolean(row.expiry_alert_sent || localByUser[key]?.expiryAlertSent)
-                        };
-
-                        if (localByUser[key]) {
-                            const existingIdx = rentedStoresList.findIndex(s => s.username.toLowerCase() === key);
-                            if (existingIdx >= 0) rentedStoresList[existingIdx] = syncedStore;
-                        } else {
-                            rentedStoresList.unshift(syncedStore);
-                        }
+                        });
                     });
+
+                    // Merge cloud stores with any local stores not yet pushed
+                    const cloudUserSet = new Set(cloudStores.map(s => s.username.toLowerCase()));
+                    const localOnlyStores = rentedStoresList.filter(s => s.username && !cloudUserSet.has(s.username.toLowerCase()));
+                    rentedStoresList = [...cloudStores, ...localOnlyStores];
 
                     persistMultiTenantAuthState();
                     if (currentSessionUser.role === 'store') {
@@ -2145,7 +2154,7 @@
                 }
 
                 if (showToastOnComplete) {
-                    showNotification('Rented stores synced from cloud!', 'success');
+                    showNotification('Registered stores & locations synced!', 'success');
                 }
             } catch (e) {
                 console.warn('Supabase background sync skipped:', e);
@@ -2499,7 +2508,7 @@
                 if (textEl) textEl.textContent = 'Sync Stores';
 
                 openSidebarModuleScreen('Admin Panel');
-                showNotification('Stores synced from cloud!', 'success');
+                showNotification(`Synced ${rentedStoresList.length} registered store(s) & locations!`, 'success');
             }, 3000);
         }
 
@@ -2534,23 +2543,8 @@
             trialDaysLeft: 30
         };
 
-        let rentedStoresList = [
-            {
-                storeId: 'ST-001',
-                storeName: 'Sri Lakshmi Retail Mart',
-                ownerName: 'Ramesh Babu',
-                username: 'lakshmi_mart',
-                password: 'store123',
-                phone: '+91 98480 11223',
-                email: 'lakshmi@store.com',
-                location: 'Kukatpally, Hyderabad',
-                pincode: '500072',
-                status: 'Active',
-                trialStartDate: '2026-11-24',
-                trialDays: 30,
-                allowedFeatures: ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
-            }
-        ];
+        // Real-Time Registered Stores Only (No Dummy Stores)
+        let rentedStoresList = [];
 
         function loadMultiTenantAuthState() {
             try {
@@ -2565,11 +2559,11 @@
                         persistMultiTenantAuthState();
                     }
                 }
-                const savedStores = localStorage.getItem('kspos_rented_stores_v1');
+                const savedStores = localStorage.getItem('kspos_rented_stores_v2');
                 if (savedStores) {
                     const parsedStores = JSON.parse(savedStores);
-                    if (Array.isArray(parsedStores) && parsedStores.length > 0) {
-                        rentedStoresList = parsedStores;
+                    if (Array.isArray(parsedStores)) {
+                        rentedStoresList = parsedStores.filter(s => s.username !== 'lakshmi_mart');
                     }
                 }
                 const savedDelToggle = localStorage.getItem('kspos_delete_order_enabled_v1');
@@ -2584,7 +2578,7 @@
         function persistMultiTenantAuthState() {
             try {
                 localStorage.setItem('kspos_admin_creds_v1', JSON.stringify(adminCredentials));
-                localStorage.setItem('kspos_rented_stores_v1', JSON.stringify(rentedStoresList));
+                localStorage.setItem('kspos_rented_stores_v2', JSON.stringify(rentedStoresList));
                 localStorage.setItem('kspos_delete_order_enabled_v1', String(isDeleteOrderEnabled));
             } catch (e) {
                 console.warn('Multi-tenant auth save warning:', e);
@@ -2616,12 +2610,14 @@
             });
 
             const locText = document.getElementById('sidebarLocationText');
-            if (locText) {
-                if (!isAdmin && currentSessionUser.storeName) {
-                    locText.textContent = `${currentSessionUser.storeName} (${currentSessionUser.trialDaysLeft}d Trial)`;
-                } else {
-                    locText.textContent = 'Hyderabad, Telangana';
-                }
+            const dashLocText = document.getElementById('dashboardLocationText');
+            if (!isAdmin && currentSessionUser.storeName) {
+                const activeStore = rentedStoresList.find(s => s.username.toLowerCase() === currentSessionUser.username.toLowerCase());
+                const storeLoc = activeStore?.location ? `${activeStore.location}${activeStore.pincode ? ' - ' + activeStore.pincode : ''}` : currentSessionUser.storeName;
+                if (locText) locText.textContent = `${currentSessionUser.storeName} (${currentSessionUser.trialDaysLeft}d Trial)`;
+                if (dashLocText) dashLocText.textContent = storeLoc;
+            } else {
+                if (locText) locText.textContent = 'Hyderabad, Telangana';
             }
         }
 
@@ -2795,7 +2791,7 @@
 
                 const defaultAllowed = ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'];
                 const newStoreObj = {
-                    storeId: `ST-00${rentedStoresList.length + 1}`,
+                    storeId: `ST-${String(rentedStoresList.length + 1).padStart(3, '0')}`,
                     storeName: storeName,
                     ownerName: ownerName,
                     username: regUser,
@@ -2832,7 +2828,7 @@
                 document.getElementById('usernameInput').value = regUser;
                 document.getElementById('passwordInput').value = regPass;
 
-                showNotification('Store registered with 30-Day Free Trial! Please login.', 'success');
+                showNotification('Store & Location saved! Please login.', 'success');
                 navigateTo('loginScreen');
             }, 1500);
         }
@@ -3235,7 +3231,8 @@
 
         function persistStockTransfersToLocal() {
             try {
-                localStorage.setItem('kspos_stock_transfers_v1', JSON.stringify(stockTransfersList));
+                localStorage.setItem('kspos_stock_transfers_v2', JSON.stringify(stockTransfersList));
+                localStorage.setItem('kspos_custom_branch_locations_v1', JSON.stringify(customBranchLocations));
             } catch (e) {
                 console.warn('Stock transfer save warning:', e);
             }
@@ -3243,11 +3240,18 @@
 
         function loadStockTransfersFromLocal() {
             try {
-                const raw = localStorage.getItem('kspos_stock_transfers_v1');
+                const raw = localStorage.getItem('kspos_stock_transfers_v2');
                 if (raw) {
                     const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    if (Array.isArray(parsed)) {
                         stockTransfersList = parsed;
+                    }
+                }
+                const savedLocs = localStorage.getItem('kspos_custom_branch_locations_v1');
+                if (savedLocs) {
+                    const parsedLocs = JSON.parse(savedLocs);
+                    if (Array.isArray(parsedLocs)) {
+                        customBranchLocations = parsedLocs;
                     }
                 }
             } catch (e) {
@@ -3265,7 +3269,15 @@
                     const toggleTrackClass = isStockTransferGridView ? 'bg-sky-500' : 'bg-slate-300';
                     const toggleThumbClass = isStockTransferGridView ? 'translate-x-5' : 'translate-x-0';
 
-                    const tableHtml = `
+                    const emptyTransfersHtml = `
+                        <div class="w-full rounded-2xl border border-sky-200 bg-white p-8 text-center space-y-2 shadow-2xs">
+                            <i data-lucide="arrow-left-right" class="w-8 h-8 mx-auto text-sky-500"></i>
+                            <h4 class="text-sm font-bold text-slate-800">No Stock Transfers Yet</h4>
+                            <p class="text-xs text-slate-500">Click <b>"+ New Transfer"</b> above to send inventory to a real-time store or branch location.</p>
+                        </div>
+                    `;
+
+                    const tableHtml = stockTransfersList.length === 0 ? emptyTransfersHtml : `
                         <div class="w-full rounded-2xl border border-sky-200 bg-white overflow-hidden shadow-2xs">
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse min-w-[820px]">
@@ -3314,7 +3326,7 @@
                         </div>
                     `;
 
-                    const gridHtml = `
+                    const gridHtml = stockTransfersList.length === 0 ? emptyTransfersHtml : `
                         <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             ${stockTransfersList.map(tr => {
                                 const itemsList = tr.items || [];
@@ -3354,7 +3366,7 @@
                         <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/50 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <h3 class="text-sm sm:text-base font-bold text-slate-900">Branch Stock Transfers</h3>
-                                <p class="text-xs text-slate-600 mt-0.5">Move inventory items across store branches</p>
+                                <p class="text-xs text-slate-600 mt-0.5">Move inventory items across real-time store branches</p>
                             </div>
                             <button type="button" onclick="startNewStockTransferFlow()" class="btn-glass-primary py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
@@ -3447,6 +3459,92 @@
                     } else {
                         const previewSrc = pendingAdminLogoDataUrl || uploadedLogoDataUrl || './IMG_8948.jpeg';
                         const qrPreviewSrc = pendingAdminQrDataUrl || adminPaymentConfig.qrDataUrl || '';
+                        const storesListHtml = rentedStoresList.length === 0
+                            ? `
+                                <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-6 text-center space-y-1.5">
+                                    <i data-lucide="store" class="w-8 h-8 mx-auto text-sky-500"></i>
+                                    <h4 class="text-sm font-bold text-slate-800">No Registered Stores Yet</h4>
+                                    <p class="text-xs text-slate-500">When any store signs up, their store details, location &amp; PIN code will appear here in real time. Tap <b>Sync Stores</b> to fetch from cloud.</p>
+                                </div>
+                            `
+                            : rentedStoresList.map(st => {
+                                const remDays = getStoreRemainingTrialDays(st);
+                                const isExpired = st.status === 'Expired' || remDays <= 0;
+                                const isActive = st.status === 'Active' && !isExpired;
+                                const statusLabel = isExpired ? 'Expired' : st.status;
+                                const statusBadgeClass = isActive
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-red-100 text-red-700';
+                                const fullLocationDisplay = st.location
+                                    ? `${st.location}${st.pincode ? ' - ' + st.pincode : ''}`
+                                    : (st.pincode ? `PIN: ${st.pincode}` : 'Location not specified');
+
+                                return `
+                                    <div class="w-full rounded-2xl border ${st.pendingUtr ? 'border-amber-400 bg-amber-50/20' : 'border-sky-200 bg-white'} p-4 sm:p-5 space-y-3 shadow-2xs">
+                                        <div class="flex flex-wrap items-start justify-between gap-2 pb-2.5 border-b border-sky-100">
+                                            <div class="space-y-1">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <h4 class="text-sm sm:text-base font-bold text-slate-900">${st.storeName}</h4>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadgeClass}">${statusLabel}</span>
+                                                    ${st.pendingUtr ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">Payment UTR: ${st.pendingUtr}</span>` : ''}
+                                                </div>
+                                                <p class="text-xs text-slate-600">Owner: <b>${st.ownerName}</b> • User: <b class="text-sky-700">${st.username}</b> • Pass: <b>${st.password}</b></p>
+                                                <p class="text-[11px] text-slate-500">${st.phone} • ${st.email} • <b>${remDays} Days Left</b></p>
+                                                <p class="text-xs font-bold text-sky-800 flex items-center gap-1 pt-0.5">
+                                                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-sky-600 flex-shrink-0"></i>
+                                                    <span>${fullLocationDisplay}</span>
+                                                </p>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs" title="Approve Payment & Renew 30 Days">
+                                                    ${st.pendingUtr ? 'Verify UTR & Activate (+30d)' : 'Renew +30d'}
+                                                </button>
+                                                <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-600 hover:text-white' : 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-600 hover:text-white'} transition-colors cursor-pointer">
+                                                    ${isActive ? 'Suspend' : 'Activate'}
+                                                </button>
+                                                <button type="button" onclick="deleteStoreFromAdminPanel('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer shadow-2xs" title="Delete Store Account">
+                                                    Delete Store
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quick Expiry Alert Buttons (Gmail & SMS/WhatsApp) -->
+                                        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/80 text-[11px]">
+                                            <span class="font-semibold text-slate-600">Send Plan Expiry / Renewal Alert:</span>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" onclick='sendStoreExpiryAlertToUser(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
+                                                    <i data-lucide="mail" class="w-3 h-3"></i>
+                                                    <span>Gmail Alert</span>
+                                                </button>
+                                                <button type="button" onclick='sendStoreExpiryAlertSMS(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
+                                                    <i data-lucide="message-square" class="w-3 h-3"></i>
+                                                    <span>SMS / WhatsApp</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Allowed App Features:</p>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                                                ${DEFAULT_ALL_FEATURES.map(feat => {
+                                                    const enabled = (st.allowedFeatures || []).includes(feat);
+                                                    const trackClass = enabled ? 'bg-sky-500' : 'bg-slate-300';
+                                                    const thumbClass = enabled ? 'translate-x-5' : 'translate-x-0';
+                                                    return `
+                                                        <div onclick="toggleStoreFeaturePermission('${st.storeId}', '${feat}')" class="px-3.5 py-2.5 rounded-xl border ${enabled ? 'border-sky-300 bg-sky-50/70' : 'border-slate-200 bg-slate-50/60'} flex items-center justify-between gap-3 cursor-pointer hover:border-sky-400 transition-all select-none">
+                                                            <span class="text-xs font-bold ${enabled ? 'text-slate-900' : 'text-slate-500'} truncate">${feat}</span>
+                                                            <button type="button" aria-pressed="${enabled}" class="toggle-track w-11 h-6 rounded-full ${trackClass} p-0.5 flex items-center flex-shrink-0 cursor-pointer">
+                                                                <span class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform ${thumbClass}"></span>
+                                                            </button>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+
                         bodyEl.innerHTML = `
                             <!-- Official App Brand Logo Control (Admin Only) -->
                             <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
@@ -3553,86 +3651,17 @@
                                 </div>
                             </div>
 
-                            <!-- Rented Stores & Feature Permissions Control -->
+                            <!-- Real-Time Rented Stores & Locations Control -->
                             <div class="w-full space-y-3 pt-2">
                                 <div class="flex flex-wrap items-center justify-between gap-2 px-1">
-                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Rented Stores &amp; Feature Access (${rentedStoresList.length})</h3>
+                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Registered Stores &amp; Locations (${rentedStoresList.length})</h3>
                                     <button type="button" id="adminSyncStoresBtn" onclick="handleManualSyncStores()" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white border border-sky-600 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
                                         <div id="adminSyncStoresSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
                                         <i id="adminSyncStoresIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                                         <span id="adminSyncStoresText">Sync Stores</span>
                                     </button>
                                 </div>
-                                ${rentedStoresList.map(st => {
-                                    const remDays = getStoreRemainingTrialDays(st);
-                                    const isExpired = st.status === 'Expired' || remDays <= 0;
-                                    const isActive = st.status === 'Active' && !isExpired;
-                                    const statusLabel = isExpired ? 'Expired' : st.status;
-                                    const statusBadgeClass = isActive
-                                        ? 'bg-emerald-100 text-emerald-800'
-                                        : 'bg-red-100 text-red-700';
-
-                                    return `
-                                        <div class="w-full rounded-2xl border ${st.pendingUtr ? 'border-amber-400 bg-amber-50/20' : 'border-sky-200 bg-white'} p-4 sm:p-5 space-y-3 shadow-2xs">
-                                            <div class="flex flex-wrap items-start justify-between gap-2 pb-2.5 border-b border-sky-100">
-                                                <div class="space-y-0.5">
-                                                    <div class="flex items-center gap-2 flex-wrap">
-                                                        <h4 class="text-sm sm:text-base font-bold text-slate-900">${st.storeName}</h4>
-                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadgeClass}">${statusLabel}</span>
-                                                        ${st.pendingUtr ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">Payment UTR: ${st.pendingUtr}</span>` : ''}
-                                                    </div>
-                                                    <p class="text-xs text-slate-600">Owner: <b>${st.ownerName}</b> • User: <b class="text-sky-700">${st.username}</b> • Pass: <b>${st.password}</b></p>
-                                                    <p class="text-[11px] text-slate-500">${st.phone} • ${st.email} • <b>${remDays} Days Left</b></p>
-                                                </div>
-                                                <div class="flex flex-wrap items-center gap-1.5">
-                                                    <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs" title="Approve Payment & Renew 30 Days">
-                                                        ${st.pendingUtr ? 'Verify UTR & Activate (+30d)' : 'Renew +30d'}
-                                                    </button>
-                                                    <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-600 hover:text-white' : 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-600 hover:text-white'} transition-colors cursor-pointer">
-                                                        ${isActive ? 'Suspend' : 'Activate'}
-                                                    </button>
-                                                    <button type="button" onclick="deleteStoreFromAdminPanel('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer shadow-2xs" title="Delete Store Account">
-                                                        Delete Store
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Quick Expiry Alert Buttons (Gmail & SMS/WhatsApp) -->
-                                            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/80 text-[11px]">
-                                                <span class="font-semibold text-slate-600">Send Plan Expiry / Renewal Alert:</span>
-                                                <div class="flex items-center gap-2">
-                                                    <button type="button" onclick='sendStoreExpiryAlertToUser(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
-                                                        <i data-lucide="mail" class="w-3 h-3"></i>
-                                                        <span>Gmail Alert</span>
-                                                    </button>
-                                                    <button type="button" onclick='sendStoreExpiryAlertSMS(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
-                                                        <i data-lucide="message-square" class="w-3 h-3"></i>
-                                                        <span>SMS / WhatsApp</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Allowed App Features:</p>
-                                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                                                    ${DEFAULT_ALL_FEATURES.map(feat => {
-                                                        const enabled = (st.allowedFeatures || []).includes(feat);
-                                                        const trackClass = enabled ? 'bg-sky-500' : 'bg-slate-300';
-                                                        const thumbClass = enabled ? 'translate-x-5' : 'translate-x-0';
-                                                        return `
-                                                            <div onclick="toggleStoreFeaturePermission('${st.storeId}', '${feat}')" class="px-3.5 py-2.5 rounded-xl border ${enabled ? 'border-sky-300 bg-sky-50/70' : 'border-slate-200 bg-slate-50/60'} flex items-center justify-between gap-3 cursor-pointer hover:border-sky-400 transition-all select-none">
-                                                                <span class="text-xs font-bold ${enabled ? 'text-slate-900' : 'text-slate-500'} truncate">${feat}</span>
-                                                                <button type="button" aria-pressed="${enabled}" class="toggle-track w-11 h-6 rounded-full ${trackClass} p-0.5 flex items-center flex-shrink-0 cursor-pointer">
-                                                                    <span class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform ${thumbClass}"></span>
-                                                                </button>
-                                                            </div>
-                                                        `;
-                                                    }).join('')}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
+                                ${storesListHtml}
                             </div>
 
                             <!-- Delete Order Button Visibility Toggle Control -->
@@ -5253,30 +5282,48 @@
             }, totalDelay);
         }
 
-        // --- SIDEBAR, LOCATION & STOCK TRANSFER HELPERS ---
+        // --- SIDEBAR, LOCATION & REAL-TIME STOCK TRANSFER HELPERS ---
         let isStockTransferSellMode = false;
         let selectedTransferDestination = "";
         let isStockTransferGridView = false;
         let currentViewedTransferId = "";
-        let transferBranchLocations = [
-            "Kukatpally Branch, Hyderabad",
-            "Ameerpet Main Store, Hyderabad",
-            "Madhapur Hi-Tech Branch, Hyderabad",
-            "Secunderabad Central Warehouse",
-            "Gachibowli Retail Outlet"
-        ];
-        let stockTransfersList = [
-            {
-                transferId: "TR-1001",
-                fromBranch: "Hyderabad Main Store",
-                toBranch: "Kukatpally Branch, Hyderabad",
-                createdAt: "24 Nov 2026, 10:15 AM",
-                status: "Completed",
-                items: [
-                    { id: 1, name: "Classic Cotton Shirt", variant: "Standard Size", sku: "KS-10101010", price: 1299, qty: 3, received: true }
-                ]
+        let customBranchLocations = [];
+        let stockTransfersList = [];
+
+        function getAllRealTimeBranchLocations() {
+            const locSet = new Set();
+            // 1. Include all real-time registered store names & locations
+            (rentedStoresList || []).forEach(st => {
+                if (st.storeName && st.location) {
+                    locSet.add(`${st.storeName} (${st.location}${st.pincode ? ' - ' + st.pincode : ''})`);
+                } else if (st.location) {
+                    locSet.add(`${st.location}${st.pincode ? ' - ' + st.pincode : ''}`);
+                }
+            });
+            // 2. Include user-added real-time branch locations
+            (customBranchLocations || []).forEach(loc => {
+                if (loc && loc.trim()) locSet.add(loc.trim());
+            });
+            return Array.from(locSet);
+        }
+
+        function addNewRealTimeBranchLocation() {
+            const input = document.getElementById('newBranchLocationInput');
+            const val = (input?.value || '').trim();
+            if (!val) {
+                showNotification('Please enter a branch location name', 'warning');
+                return;
             }
-        ];
+            if (!customBranchLocations.includes(val)) {
+                customBranchLocations.unshift(val);
+                persistStockTransfersToLocal();
+            }
+            if (input) input.value = '';
+            selectedTransferDestination = val;
+            applyStockTransferSellModeUI();
+            closeAddLocationModal();
+            showNotification(`Added & selected: ${val}`, 'success');
+        }
 
         function openSidebarWithRotation(el) {
             if (el) {
@@ -5326,11 +5373,14 @@
         function refreshStoreLocation() {
             const locText = document.getElementById('dashboardLocationText');
             const sideLocText = document.getElementById('sidebarLocationText');
-            if (locText) {
-                locText.textContent = "Hyderabad, Telangana, India (Synced)";
-            }
-            if (sideLocText && currentSessionUser.role === 'admin') {
-                sideLocText.textContent = "Hyderabad, Telangana";
+            if (currentSessionUser.role === 'store') {
+                const activeStore = rentedStoresList.find(s => s.username.toLowerCase() === currentSessionUser.username.toLowerCase());
+                if (activeStore && activeStore.location && locText) {
+                    locText.textContent = `${activeStore.location}${activeStore.pincode ? ' - ' + activeStore.pincode : ''}`;
+                }
+            } else {
+                if (locText) locText.textContent = "Hyderabad, Telangana, India (Synced)";
+                if (sideLocText) sideLocText.textContent = "Hyderabad, Telangana";
             }
             showNotification('Store location refreshed!', 'success');
         }
@@ -5345,7 +5395,7 @@
             navigateTo('sellScreen');
             switchMobilePOSTab('products');
             renderPOSCart();
-            showNotification('Select items and destination location for transfer', 'success');
+            showNotification('Select items and add/choose real-time destination location', 'success');
         }
 
         function exitStockTransferSellMode() {
@@ -5377,12 +5427,14 @@
         }
 
         function openAddLocationModal() {
-            const input = document.getElementById('transferLocationSearchInput');
-            if (input) input.value = '';
-            renderTransferLocationsList(transferBranchLocations);
+            const searchInput = document.getElementById('transferLocationSearchInput');
+            const newInput = document.getElementById('newBranchLocationInput');
+            if (searchInput) searchInput.value = '';
+            if (newInput) newInput.value = '';
+            renderTransferLocationsList(getAllRealTimeBranchLocations());
             document.getElementById('addLocationModalOverlay').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
-            setTimeout(() => input?.focus(), 50);
+            setTimeout(() => newInput?.focus(), 50);
         }
 
         function closeAddLocationModal() {
@@ -5391,7 +5443,8 @@
 
         function filterTransferLocations(q) {
             const term = (q || '').toLowerCase().trim();
-            const filtered = transferBranchLocations.filter(loc => loc.toLowerCase().includes(term));
+            const allLocs = getAllRealTimeBranchLocations();
+            const filtered = allLocs.filter(loc => loc.toLowerCase().includes(term));
             renderTransferLocationsList(filtered);
         }
 
@@ -5399,7 +5452,7 @@
             const container = document.getElementById('transferLocationsListContainer');
             if (!container) return;
             if (!list || list.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No matching branch locations found.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No locations saved yet. Enter a new branch location above and click <b>Add</b>.</p>`;
                 return;
             }
             container.innerHTML = list.map(loc => `
@@ -5429,7 +5482,7 @@
                 return;
             }
             if (!selectedTransferDestination) {
-                showNotification('Please select a destination location', 'warning');
+                showNotification('Please add or select a destination location', 'warning');
                 openAddLocationModal();
                 return;
             }
@@ -5445,7 +5498,7 @@
                 const nowFmt = formatOrderDateTime(new Date());
                 const newTransfer = {
                     transferId: `TR-${1001 + stockTransfersList.length}`,
-                    fromBranch: document.getElementById('dashboardLocationText')?.textContent.trim() || "Hyderabad Main Store",
+                    fromBranch: document.getElementById('dashboardLocationText')?.textContent.trim() || "Main Store",
                     toBranch: selectedTransferDestination,
                     createdAt: nowFmt.fullStr,
                     status: "Pending",
