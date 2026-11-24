@@ -218,8 +218,9 @@
 
     <!-- APP LAUNCH SPLASH SCREEN (3 SECONDS WHITE SPINNER) -->
     <div id="appLaunchSplashOverlay" class="fixed inset-0 z-[100] bg-gradient-to-br from-sky-600 via-sky-500 to-blue-700 flex flex-col items-center justify-center gap-5 transition-opacity duration-500">
-        <div class="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center">
-            <span class="luxury-heading text-3xl font-bold text-white tracking-widest select-none">KS</span>
+        <div class="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center overflow-hidden">
+            <span id="splashDefaultKS" class="luxury-heading text-3xl font-bold text-white tracking-widest select-none">KS</span>
+            <img id="splashUploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
         </div>
         <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
         <p class="luxury-heading text-sm font-semibold text-white/95 tracking-[0.2em] uppercase">KS POS</p>
@@ -227,8 +228,9 @@
 
     <!-- APP RESUME DATA SYNC OVERLAY (5 SECONDS WHITE SPINNER AFTER IDLE) -->
     <div id="appResumeSyncOverlay" class="fixed inset-0 z-[95] bg-slate-950/60 backdrop-blur-md hidden flex-col items-center justify-center gap-4 p-4 transition-opacity duration-300">
-        <div class="w-16 h-16 rounded-2xl bg-white/15 border border-white/25 shadow-xl flex items-center justify-center">
-            <span class="luxury-heading text-2xl font-bold text-white tracking-widest select-none">KS</span>
+        <div class="w-16 h-16 rounded-2xl bg-white/15 border border-white/25 shadow-xl flex items-center justify-center overflow-hidden">
+            <span id="resumeDefaultKS" class="luxury-heading text-2xl font-bold text-white tracking-widest select-none">KS</span>
+            <img id="resumeUploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
         </div>
         <div class="w-9 h-9 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
         <p class="text-xs sm:text-sm font-bold text-white tracking-wide">Syncing store data...</p>
@@ -336,16 +338,12 @@
         <!-- 1. WELCOME SCREEN -->
         <main id="welcomeScreen" class="page-view page-visible flex-col items-center justify-between w-full screen-centered-card min-h-[85vh] glass-panel rounded-3xl p-4 sm:p-10 md:p-12 my-auto overflow-y-auto">
             <div class="w-full flex flex-col items-center pt-1">
-                <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-                <div onclick="document.getElementById('logoFileInput').click()" title="Tap to open photo gallery & upload logo" class="group relative cursor-pointer inline-block">
-                    <div id="logoContainer" class="logo-box-trigger w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white border border-sky-200/80 shadow-md flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-sky-400">
+                <div class="relative inline-block">
+                    <div id="logoContainer" class="logo-box-trigger w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white border border-sky-200/80 shadow-md flex items-center justify-center overflow-hidden transition-all duration-300">
                         <span id="defaultLogoText" class="luxury-heading text-3xl sm:text-4xl font-semibold text-sky-600 tracking-widest select-none">
                             KS
                         </span>
                         <img id="uploadedLogoImg" src="" alt="KS POS Logo" class="hidden w-full h-full object-cover">
-                    </div>
-                    <div class="logo-camera-badge absolute -bottom-2 -right-2 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 z-20">
-                        <i data-lucide="camera" class="w-4 h-4 flex-shrink-0 text-white"></i>
                     </div>
                 </div>
             </div>
@@ -969,7 +967,7 @@
                 <button type="button" onclick="navigateTo('orderHistoryScreen')" class="py-2 px-3.5 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Order History</button>
                 <button type="button" onclick="handleOrderRefundExchangeFromDetails()" class="py-2 px-3.5 rounded-xl bg-amber-50 hover:bg-amber-600 text-amber-800 hover:text-white border border-amber-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Refund / Exchange</button>
                 <button type="button" onclick="window.print()" class="py-2 px-3.5 rounded-xl bg-emerald-100/90 hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-300 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Print</button>
-                <button type="button" id="odDeleteOrderBtn" onclick="openDeleteOrderModal()" class="py-2 px-3.5 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white border border-red-200 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer">Delete Order</button>
+                <button type="button" id="odDeleteOrderBtn" onclick="openDeleteOrderModal()" class="py-2 px-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white border border-red-600 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer shadow-2xs">Delete Order</button>
             </div>
 
             <div class="w-full flex-1 py-4 space-y-4 text-xs sm:text-sm">
@@ -1983,6 +1981,16 @@
                     persistAppStateToLocal();
                     renderShiftsScreen();
                 }
+
+                // Sync Official App Brand Logo from Supabase (if saved by Admin)
+                const { data: brandData, error: brandErr } = await client
+                    .from('app_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'official_brand_logo')
+                    .limit(1);
+                if (!brandErr && Array.isArray(brandData) && brandData.length > 0 && brandData[0].setting_value) {
+                    applyGlobalBrandLogo(brandData[0].setting_value, true);
+                }
             } catch (e) {
                 console.warn('Supabase background sync skipped:', e);
             }
@@ -2377,6 +2385,12 @@
             }
         }
 
+        function lockAdminPanelPin() {
+            isAdminPinUnlocked = false;
+            openSidebarModuleScreen('Admin Panel');
+            showNotification('Admin Panel PIN Locked', 'warning');
+        }
+
         function saveUpdatedAdminCredentials() {
             const newUser = document.getElementById('adminNewUsernameInput')?.value.trim();
             const newPass = document.getElementById('adminNewPasswordInput')?.value.trim();
@@ -2432,14 +2446,16 @@
             const delBtn = document.getElementById('odDeleteOrderBtn');
             if (!delBtn) return;
             if (isDeleteOrderEnabled) {
-                delBtn.classList.remove('hidden');
+                delBtn.disabled = false;
+                delBtn.className = "py-2 px-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white border border-red-600 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer shadow-2xs";
             } else {
-                delBtn.classList.add('hidden');
+                delBtn.disabled = true;
+                delBtn.className = "py-2 px-3.5 rounded-xl bg-red-50/70 text-red-300 border border-red-200/70 font-bold text-xs whitespace-nowrap flex-shrink-0 opacity-65 cursor-not-allowed pointer-events-none select-none";
             }
         }
 
         function openDeleteOrderModal() {
-            if (!currentViewedOrder) return;
+            if (!isDeleteOrderEnabled || !currentViewedOrder) return;
             const input = document.getElementById('deleteOrderReasonInput');
             if (input) input.value = '';
             document.getElementById('deleteOrderModalOverlay').classList.remove('hidden');
@@ -2926,22 +2942,57 @@
                         bodyEl.innerHTML = `<div class="p-6 text-center text-red-600 font-bold">Unauthorized Access</div>`;
                     } else if (!isAdminPinUnlocked) {
                         bodyEl.innerHTML = `
-                            <div class="w-full max-w-sm mx-auto rounded-3xl border border-amber-300 bg-amber-50/60 p-6 text-center space-y-4 shadow-sm my-6">
-                                <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800">
-                                    <i data-lucide="key-round" class="w-6 h-6"></i>
+                            <div class="w-full max-w-sm mx-auto rounded-3xl border border-amber-300 bg-amber-50/50 p-6 sm:p-7 text-center space-y-4 shadow-sm my-4">
+                                <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shadow-2xs">
+                                    <i data-lucide="lock" class="w-7 h-7"></i>
                                 </div>
                                 <div class="space-y-1">
-                                    <h3 class="text-base font-bold text-slate-900">Admin PIN Verification</h3>
-                                    <p class="text-xs text-slate-600">Enter your 4-digit Admin PIN to manage rented stores &amp; security settings</p>
+                                    <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900">Admin Panel Locked</h3>
+                                    <p class="text-xs text-slate-600">Enter your Admin PIN to unlock store controls</p>
                                 </div>
-                                <input type="password" id="adminPinVerifyInput" maxlength="8" placeholder="Enter PIN" class="glass-input w-full px-4 py-3 rounded-xl text-center text-base font-bold tracking-widest text-slate-900">
-                                <button type="button" onclick="verifyAdminPinLock()" class="btn-glass-primary w-full py-3 px-5 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer">
+                                <div>
+                                    <input type="password" id="adminPinVerifyInput" maxlength="8" onkeydown="if(event.key==='Enter') verifyAdminPinLock()" placeholder="Enter PIN" class="glass-input w-full px-4 py-3 rounded-xl text-center text-base font-bold tracking-[0.25em] text-slate-900">
+                                </div>
+                                <button type="button" onclick="verifyAdminPinLock()" class="btn-glass-primary w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider cursor-pointer">
                                     Unlock Admin Panel
                                 </button>
                             </div>
                         `;
                     } else {
                         bodyEl.innerHTML = `
+                            <!-- Official App Brand Logo Control (Admin Only) -->
+                            <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="image" class="w-5 h-5 text-sky-600"></i>
+                                        <h3 class="text-sm sm:text-base font-bold text-slate-900">App Brand Logo (Visible to All Users)</h3>
+                                    </div>
+                                    ${uploadedLogoDataUrl ? `<button type="button" onclick="resetOfficialBrandLogo()" class="px-3 py-1 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-600 hover:text-white transition-colors cursor-pointer">Reset Default KS</button>` : ''}
+                                </div>
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="w-20 h-20 rounded-2xl bg-white border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        ${(pendingAdminLogoDataUrl || uploadedLogoDataUrl)
+                                            ? `<img src="${pendingAdminLogoDataUrl || uploadedLogoDataUrl}" alt="Brand Logo Preview" class="w-full h-full object-cover">`
+                                            : `<span class="luxury-heading text-2xl font-bold text-sky-600 tracking-widest select-none">KS</span>`
+                                        }
+                                    </div>
+                                    <div class="flex-1 min-w-[200px] space-y-2.5">
+                                        <input type="file" id="adminBrandLogoInput" accept="image/*" class="hidden" onchange="handleAdminLogoFileSelect(event)">
+                                        <div class="flex flex-wrap items-center gap-2.5">
+                                            <button type="button" onclick="document.getElementById('adminBrandLogoInput').click()" class="py-2 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs">
+                                                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                                <span>Choose Photo</span>
+                                            </button>
+                                            <button type="button" id="saveAdminBrandLogoBtn" onclick="saveOfficialBrandLogo()" class="btn-glass-primary py-2 px-5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+                                                <div id="saveAdminLogoSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-sky-600/30 border-t-sky-700 animate-spin"></div>
+                                                <span id="saveAdminLogoBtnText">Save Logo</span>
+                                            </button>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500">Only Admin can upload &amp; update the app logo. Once saved, all store users will automatically see this logo.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Admin Credentials & PIN Change Card -->
                             <div class="w-full rounded-2xl border border-amber-300 bg-amber-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
                                 <div class="flex items-center justify-between">
@@ -2949,7 +3000,10 @@
                                         <i data-lucide="shield-check" class="w-5 h-5 text-amber-600"></i>
                                         <h3 class="text-sm sm:text-base font-bold text-slate-900">Super Admin Security &amp; PIN Settings</h3>
                                     </div>
-                                    <button type="button" onclick="isAdminPinUnlocked=false; openSidebarModuleScreen('Admin Panel');" class="px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">Lock PIN</button>
+                                    <button type="button" onclick="lockAdminPanelPin()" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white border border-amber-600 text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors">
+                                        <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                        <span>Lock PIN</span>
+                                    </button>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
@@ -6325,35 +6379,147 @@
         }
 
         function handleLogoUpload(event) {
+            // Kept for backward compatibility; Admin Panel controls official logo
+            handleAdminLogoFileSelect(event);
+        }
+
+        let pendingAdminLogoDataUrl = "";
+
+        function applyGlobalBrandLogo(dataUrl, persistLocally = false) {
+            uploadedLogoDataUrl = dataUrl || "";
+            if (persistLocally) {
+                try {
+                    if (uploadedLogoDataUrl) {
+                        localStorage.setItem('kspos_official_brand_logo_v1', uploadedLogoDataUrl);
+                    } else {
+                        localStorage.removeItem('kspos_official_brand_logo_v1');
+                    }
+                } catch (e) {
+                    console.warn('Brand logo local save warning:', e);
+                }
+            }
+
+            const pairs = [
+                { textId: 'defaultLogoText', imgId: 'uploadedLogoImg' },
+                { textId: 'splashDefaultKS', imgId: 'splashUploadedLogoImg' },
+                { textId: 'resumeDefaultKS', imgId: 'resumeUploadedLogoImg' },
+                { textId: 'dashDefaultKS', imgId: 'dashUploadedLogoImg' },
+                { textId: 'sellDefaultKS', imgId: 'sellUploadedLogoImg' },
+                { textId: 'orderHistoryDefaultKS', imgId: 'orderHistoryUploadedLogoImg' },
+                { textId: 'shiftsDefaultKS', imgId: 'shiftsUploadedLogoImg' },
+                { textId: 'shiftsDetailsDefaultKS', imgId: 'shiftsDetailsUploadedLogoImg' },
+                { textId: 'moduleDefaultKS', imgId: 'moduleUploadedLogoImg' }
+            ];
+
+            pairs.forEach(pair => {
+                const txt = document.getElementById(pair.textId);
+                const img = document.getElementById(pair.imgId);
+                if (txt && img) {
+                    if (uploadedLogoDataUrl) {
+                        txt.classList.add('hidden');
+                        img.src = uploadedLogoDataUrl;
+                        img.classList.remove('hidden');
+                    } else {
+                        img.src = "";
+                        img.classList.add('hidden');
+                        txt.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        function handleAdminLogoFileSelect(event) {
             const file = event.target.files?.[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                uploadedLogoDataUrl = e.target.result;
-                const pairs = [
-                    { textId: 'defaultLogoText', imgId: 'uploadedLogoImg' },
-                    { textId: 'dashDefaultKS', imgId: 'dashUploadedLogoImg' },
-                    { textId: 'sellDefaultKS', imgId: 'sellUploadedLogoImg' },
-                    { textId: 'orderHistoryDefaultKS', imgId: 'orderHistoryUploadedLogoImg' },
-                    { textId: 'shiftsDefaultKS', imgId: 'shiftsUploadedLogoImg' },
-                    { textId: 'shiftsDetailsDefaultKS', imgId: 'shiftsDetailsUploadedLogoImg' },
-                    { textId: 'moduleDefaultKS', imgId: 'moduleUploadedLogoImg' }
-                ];
-                pairs.forEach(pair => {
-                    const txt = document.getElementById(pair.textId);
-                    const img = document.getElementById(pair.imgId);
-                    if (txt && img) {
-                        txt.classList.add('hidden');
-                        img.src = uploadedLogoDataUrl;
-                        img.classList.remove('hidden');
+                const img = new Image();
+                img.onload = function() {
+                    // Compress & resize logo cleanly so it saves fast to LocalStorage & Supabase
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 256;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        } else {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
                     }
-                });
-                showNotification('Store logo updated!', 'success');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    pendingAdminLogoDataUrl = canvas.toDataURL('image/png', 0.88);
+                    openSidebarModuleScreen('Admin Panel');
+                    showNotification('Photo selected! Click "Save Logo" to apply for all users.', 'success');
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
+        function saveOfficialBrandLogo() {
+            const logoToSave = pendingAdminLogoDataUrl || uploadedLogoDataUrl;
+            if (!logoToSave) {
+                showNotification('Please choose a photo first', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('saveAdminBrandLogoBtn');
+            const spinner = document.getElementById('saveAdminLogoSpinner');
+            const btnText = document.getElementById('saveAdminLogoBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Saving...';
+
+            setTimeout(() => {
+                pendingAdminLogoDataUrl = "";
+                applyGlobalBrandLogo(logoToSave, true);
+
+                const client = getSupabaseClient();
+                if (client) {
+                    try {
+                        client.from('app_settings').upsert([
+                            { setting_key: 'official_brand_logo', setting_value: logoToSave }
+                        ], { onConflict: 'setting_key' }).then(() => {});
+                    } catch (e) {}
+                }
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Save Logo';
+
+                openSidebarModuleScreen('Admin Panel');
+                showNotification('Official App Logo saved & synced for all users!', 'success');
+            }, 1200);
+        }
+
+        function resetOfficialBrandLogo() {
+            pendingAdminLogoDataUrl = "";
+            applyGlobalBrandLogo("", true);
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('app_settings').delete().eq('setting_key', 'official_brand_logo').then(() => {});
+                } catch (e) {}
+            }
+            openSidebarModuleScreen('Admin Panel');
+            showNotification('Reset to default KS logo', 'warning');
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
+                if (savedLogo) {
+                    applyGlobalBrandLogo(savedLogo, false);
+                }
+            } catch (e) {}
+
             const splashOverlay = document.getElementById('appLaunchSplashOverlay');
             if (splashOverlay) {
                 setTimeout(() => {
