@@ -2000,7 +2000,7 @@
                     }
                     const modTitle = document.getElementById('sidebarModuleTitleText')?.textContent;
                     const modScreen = document.getElementById('sidebarModuleScreen');
-                    if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden')) {
+                    if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden') && !isSyncingStoresNow) {
                         openSidebarModuleScreen('Admin Panel');
                     }
                 }
@@ -2472,6 +2472,35 @@
 
             openSidebarModuleScreen('Admin Panel');
             showNotification(`Store "${store.storeName}" deleted permanently`, 'warning');
+        }
+
+        let isSyncingStoresNow = false;
+        async function handleManualSyncStores() {
+            if (isSyncingStoresNow) return;
+            isSyncingStoresNow = true;
+
+            const btn = document.getElementById('adminSyncStoresBtn');
+            const spinner = document.getElementById('adminSyncStoresSpinner');
+            const icon = document.getElementById('adminSyncStoresIcon');
+            const textEl = document.getElementById('adminSyncStoresText');
+
+            if (btn) btn.disabled = true;
+            if (icon) icon.classList.add('hidden');
+            if (spinner) spinner.classList.remove('hidden');
+            if (textEl) textEl.textContent = 'Syncing...';
+
+            await syncInitialDataFromSupabase(false);
+
+            setTimeout(() => {
+                isSyncingStoresNow = false;
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (icon) icon.classList.remove('hidden');
+                if (textEl) textEl.textContent = 'Sync Stores';
+
+                openSidebarModuleScreen('Admin Panel');
+                showNotification('Stores synced from cloud!', 'success');
+            }, 3000);
         }
 
         // --- SUPER ADMIN & MULTI-TENANT STORE ACCESS CONTROL ---
@@ -3528,9 +3557,10 @@
                             <div class="w-full space-y-3 pt-2">
                                 <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                                     <h3 class="text-sm sm:text-base font-bold text-slate-900">Rented Stores &amp; Feature Access (${rentedStoresList.length})</h3>
-                                    <button type="button" onclick="syncInitialDataFromSupabase(true)" class="px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
-                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                        <span>Sync Stores</span>
+                                    <button type="button" id="adminSyncStoresBtn" onclick="handleManualSyncStores()" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white border border-sky-600 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs">
+                                        <div id="adminSyncStoresSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
+                                        <i id="adminSyncStoresIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                        <span id="adminSyncStoresText">Sync Stores</span>
                                     </button>
                                 </div>
                                 ${rentedStoresList.map(st => {
