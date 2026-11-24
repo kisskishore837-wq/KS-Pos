@@ -516,6 +516,70 @@
             </div>
         </main>
 
+        <!-- 3B. SUBSCRIPTION EXPIRED / RENEWAL SCREEN -->
+        <main id="planExpiredScreen" class="page-view page-hidden flex-col items-center justify-between w-full screen-centered-card min-h-[85vh] glass-panel rounded-3xl p-5 sm:p-9 my-auto overflow-y-auto">
+            <div class="w-full flex items-center justify-between pb-3 border-b border-red-100">
+                <button type="button" onclick="navigateTo('loginScreen')" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-100 cursor-pointer">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                    <span>Back to Login</span>
+                </button>
+                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Plan Expired / Suspended</span>
+            </div>
+
+            <div class="w-full my-auto py-5 space-y-5 text-center">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shadow-xs">
+                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                </div>
+                <div class="space-y-1.5">
+                    <h2 id="expiredStoreTitleText" class="luxury-heading text-xl sm:text-2xl font-bold text-slate-900">Your Plan is Expired</h2>
+                    <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
+                        Your 30-day free trial or subscription period has ended. Please scan the Admin QR below to renew your plan and submit your payment UTR / Transaction ID.
+                    </p>
+                </div>
+
+                <!-- Admin QR Payment Card -->
+                <div class="w-full max-w-sm mx-auto rounded-3xl border border-sky-200 bg-sky-50/60 p-5 space-y-3.5 shadow-xs">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                        <span>Scan &amp; Pay (UPI / QR)</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800">₹999 / Month</span>
+                    </div>
+
+                    <div id="renewalQrImageContainer" class="w-48 h-48 mx-auto rounded-2xl bg-white border border-sky-200 p-2 flex items-center justify-center overflow-hidden shadow-2xs">
+                        <img id="renewalAdminQrImg" src="" alt="Admin Payment QR" class="w-full h-full object-contain hidden">
+                        <div id="renewalNoQrPlaceholder" class="text-center p-3 space-y-1">
+                            <i data-lucide="qr-code" class="w-12 h-12 mx-auto text-sky-600"></i>
+                            <p class="text-[11px] font-bold text-slate-700">UPI ID: <span id="renewalAdminUpiText">kspos@upi</span></p>
+                        </div>
+                    </div>
+
+                    <div class="text-left space-y-2 pt-1">
+                        <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">Enter UPI Transaction ID / UTR Number</label>
+                        <input type="text" id="renewalPaymentUtrInput" placeholder="e.g. 432910582910" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-900 placeholder-slate-400">
+                    </div>
+
+                    <button type="button" id="submitRenewalPaymentBtn" onclick="submitStoreRenewalPayment()" class="w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
+                        <div id="submitRenewalSpinner" class="hidden w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
+                        <span id="submitRenewalBtnText">Payment Completed (Notify Admin)</span>
+                    </button>
+
+                    <div class="pt-1 flex items-center justify-center gap-2">
+                        <button type="button" onclick="sendRenewalAlertViaGmail()" class="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                            <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            <span>Email Admin</span>
+                        </button>
+                        <button type="button" onclick="sendRenewalAlertViaWhatsApp()" class="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                            <span>SMS / WhatsApp</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full pt-3 border-t border-sky-100 text-center text-[11px] text-slate-500">
+                Once Admin verifies your UTR payment, your store account will be activated immediately.
+            </div>
+        </main>
+
         <!-- 4. DASHBOARD SCREEN -->
         <main id="dashboardScreen" class="page-view page-hidden flex-col justify-between w-full min-h-screen sm:min-h-[82vh] bg-white sm:glass-panel rounded-none sm:rounded-3xl p-0 m-0 sm:my-auto overflow-y-auto container-padded">
             <div class="w-full flex items-center justify-start gap-2.5 pb-3 pt-1 px-1 border-b border-sky-100">
@@ -1876,10 +1940,72 @@
             return supabaseClient;
         }
 
-        async function syncInitialDataFromSupabase() {
+        async function syncInitialDataFromSupabase(showToastOnComplete = false) {
             const client = getSupabaseClient();
             if (!client) return;
             try {
+                // 1. Sync Rented Stores & Permissions across Safari and iOS Home Screen PWA
+                const { data: storesData, error: storesErr } = await client
+                    .from('stores')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (!storesErr && Array.isArray(storesData) && storesData.length > 0) {
+                    const localByUser = {};
+                    rentedStoresList.forEach(st => {
+                        if (st.username) localByUser[st.username.toLowerCase()] = st;
+                    });
+
+                    storesData.forEach((row, idx) => {
+                        const uname = (row.username || row.email || '').trim();
+                        if (!uname) return;
+                        const key = uname.toLowerCase();
+                        const parsedFeatures = Array.isArray(row.allowed_features) && row.allowed_features.length > 0
+                            ? row.allowed_features
+                            : (localByUser[key]?.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']);
+
+                        const syncedStore = {
+                            storeId: row.store_id || localByUser[key]?.storeId || `ST-${100 + idx}`,
+                            storeName: row.store_name || localByUser[key]?.storeName || 'Registered Store',
+                            ownerName: row.owner_name || localByUser[key]?.ownerName || 'Owner',
+                            username: uname,
+                            password: row.password || localByUser[key]?.password || 'store123',
+                            phone: row.phone || localByUser[key]?.phone || '',
+                            email: row.email || localByUser[key]?.email || '',
+                            location: row.location || localByUser[key]?.location || '',
+                            pincode: row.pincode || localByUser[key]?.pincode || '',
+                            status: row.status || localByUser[key]?.status || 'Active',
+                            trialStartDate: row.trial_start_date || (row.created_at ? String(row.created_at).split('T')[0] : '2026-11-24'),
+                            trialDays: Number(row.trial_days ?? 30),
+                            allowedFeatures: parsedFeatures,
+                            pendingUtr: row.pending_utr || localByUser[key]?.pendingUtr || '',
+                            paymentSubmittedAt: row.payment_submitted_at || localByUser[key]?.paymentSubmittedAt || '',
+                            expiryAlertSent: Boolean(row.expiry_alert_sent || localByUser[key]?.expiryAlertSent)
+                        };
+
+                        if (localByUser[key]) {
+                            const existingIdx = rentedStoresList.findIndex(s => s.username.toLowerCase() === key);
+                            if (existingIdx >= 0) rentedStoresList[existingIdx] = syncedStore;
+                        } else {
+                            rentedStoresList.unshift(syncedStore);
+                        }
+                    });
+
+                    persistMultiTenantAuthState();
+                    if (currentSessionUser.role === 'store') {
+                        const activeStore = rentedStoresList.find(s => s.username.toLowerCase() === currentSessionUser.username.toLowerCase());
+                        if (activeStore) {
+                            currentSessionUser.allowedFeatures = activeStore.allowedFeatures;
+                            applyRolePermissionsToUI();
+                        }
+                    }
+                    const modTitle = document.getElementById('sidebarModuleTitleText')?.textContent;
+                    const modScreen = document.getElementById('sidebarModuleScreen');
+                    if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden')) {
+                        openSidebarModuleScreen('Admin Panel');
+                    }
+                }
+
+                // 2. Sync Products
                 const { data: prodData, error: prodErr } = await client.from('products').select('*');
                 if (!prodErr && Array.isArray(prodData) && prodData.length > 0 && samplePOSProducts.length === 0) {
                     prodData.forEach((p, i) => {
@@ -1896,6 +2022,7 @@
                     renderPOSProducts();
                 }
 
+                // 3. Sync Customers
                 const { data: custData, error: custErr } = await client.from('customers').select('*');
                 if (!custErr && Array.isArray(custData) && custData.length > 0) {
                     custData.forEach(c => {
@@ -1915,6 +2042,7 @@
                     });
                 }
 
+                // 4. Sync Orders
                 const { data: ordData, error: ordErr } = await client.from('orders').select('*').order('created_at', { ascending: false });
                 if (!ordErr && Array.isArray(ordData) && ordData.length > 0) {
                     const existingOrderIds = new Set(allCompletedOrders.map(o => o.orderId));
@@ -1956,6 +2084,7 @@
                     renderOrderHistoryScreen();
                 }
 
+                // 5. Sync Shifts
                 const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
                 if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
                     const existingShiftIds = new Set(pastShiftHistory.map(s => s.shiftId));
@@ -1993,14 +2122,30 @@
                     renderShiftsScreen();
                 }
 
-                // Sync Official App Brand Logo from Supabase (if saved by Admin)
+                // 6. Sync Official App Brand Logo & Admin Payment QR from Supabase
                 const { data: brandData, error: brandErr } = await client
                     .from('app_settings')
-                    .select('setting_value')
-                    .eq('setting_key', 'official_brand_logo')
-                    .limit(1);
-                if (!brandErr && Array.isArray(brandData) && brandData.length > 0 && brandData[0].setting_value) {
-                    applyGlobalBrandLogo(brandData[0].setting_value, true);
+                    .select('setting_key, setting_value')
+                    .in('setting_key', ['official_brand_logo', 'admin_payment_qr', 'admin_payment_upi', 'admin_notify_email']);
+                if (!brandErr && Array.isArray(brandData) && brandData.length > 0) {
+                    brandData.forEach(row => {
+                        if (row.setting_key === 'official_brand_logo' && row.setting_value) {
+                            applyGlobalBrandLogo(row.setting_value, true);
+                        } else if (row.setting_key === 'admin_payment_qr' && row.setting_value) {
+                            adminPaymentConfig.qrDataUrl = row.setting_value;
+                            persistAdminPaymentConfig();
+                        } else if (row.setting_key === 'admin_payment_upi' && row.setting_value) {
+                            adminPaymentConfig.upiId = row.setting_value;
+                            persistAdminPaymentConfig();
+                        } else if (row.setting_key === 'admin_notify_email' && row.setting_value) {
+                            adminPaymentConfig.adminEmail = row.setting_value;
+                            persistAdminPaymentConfig();
+                        }
+                    });
+                }
+
+                if (showToastOnComplete) {
+                    showNotification('Rented stores synced from cloud!', 'success');
                 }
             } catch (e) {
                 console.warn('Supabase background sync skipped:', e);
@@ -2084,6 +2229,250 @@
 
         let isFirstStartSellingAfterLogin = true;
         let uploadedLogoDataUrl = "";
+
+        // --- ADMIN PAYMENT QR & SUBSCRIPTION CONFIG ---
+        let adminPaymentConfig = {
+            qrDataUrl: "",
+            upiId: "kspos@upi",
+            adminEmail: "kisskishore837@gmail.com",
+            adminPhone: "+919876543210"
+        };
+        let pendingAdminQrDataUrl = "";
+        let currentExpiredStoreObj = null;
+
+        function loadAdminPaymentConfig() {
+            try {
+                const raw = localStorage.getItem('kspos_admin_payment_cfg_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        adminPaymentConfig = { ...adminPaymentConfig, ...parsed };
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function persistAdminPaymentConfig() {
+            try {
+                localStorage.setItem('kspos_admin_payment_cfg_v1', JSON.stringify(adminPaymentConfig));
+            } catch (e) {}
+        }
+
+        function handleAdminQrFileSelect(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                pendingAdminQrDataUrl = e.target.result;
+                openSidebarModuleScreen('Admin Panel');
+                showNotification('QR Code selected! Click "Save QR" to publish.', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveAdminPaymentQr() {
+            const upiVal = document.getElementById('adminUpiIdInput')?.value.trim() || adminPaymentConfig.upiId;
+            const emailVal = document.getElementById('adminNotifyEmailInput')?.value.trim() || adminPaymentConfig.adminEmail;
+            const phoneVal = document.getElementById('adminNotifyPhoneInput')?.value.trim() || adminPaymentConfig.adminPhone;
+            const qrToSave = pendingAdminQrDataUrl || adminPaymentConfig.qrDataUrl;
+
+            adminPaymentConfig = {
+                qrDataUrl: qrToSave,
+                upiId: upiVal,
+                adminEmail: emailVal,
+                adminPhone: phoneVal
+            };
+            pendingAdminQrDataUrl = "";
+            persistAdminPaymentConfig();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    const upserts = [
+                        { setting_key: 'admin_payment_upi', setting_value: upiVal },
+                        { setting_key: 'admin_notify_email', setting_value: emailVal }
+                    ];
+                    if (qrToSave) {
+                        upserts.push({ setting_key: 'admin_payment_qr', setting_value: qrToSave });
+                    }
+                    client.from('app_settings').upsert(upserts, { onConflict: 'setting_key' }).then(() => {});
+                } catch (e) {}
+            }
+
+            openSidebarModuleScreen('Admin Panel');
+            showNotification('Admin Payment QR & Notification details saved!', 'success');
+        }
+
+        function getStoreRemainingTrialDays(store) {
+            if (!store) return 0;
+            const totalDays = Number(store.trialDays ?? 30);
+            if (!store.trialStartDate) return totalDays;
+            const start = new Date(store.trialStartDate + 'T00:00:00');
+            if (isNaN(start.getTime())) return totalDays;
+            const now = new Date();
+            const elapsedDays = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+            return Math.max(0, totalDays - elapsedDays);
+        }
+
+        function openPlanExpiredScreen(store) {
+            currentExpiredStoreObj = store;
+            const titleEl = document.getElementById('expiredStoreTitleText');
+            if (titleEl) {
+                titleEl.textContent = `${store.storeName}: Your Plan is Expired`;
+            }
+            const qrImg = document.getElementById('renewalAdminQrImg');
+            const qrPlaceholder = document.getElementById('renewalNoQrPlaceholder');
+            const upiText = document.getElementById('renewalAdminUpiText');
+
+            if (upiText) upiText.textContent = adminPaymentConfig.upiId || 'kspos@upi';
+            if (adminPaymentConfig.qrDataUrl && qrImg && qrPlaceholder) {
+                qrImg.src = adminPaymentConfig.qrDataUrl;
+                qrImg.classList.remove('hidden');
+                qrPlaceholder.classList.add('hidden');
+            } else if (qrImg && qrPlaceholder) {
+                qrImg.classList.add('hidden');
+                qrPlaceholder.classList.remove('hidden');
+            }
+
+            const utrInput = document.getElementById('renewalPaymentUtrInput');
+            if (utrInput) utrInput.value = store.pendingUtr || '';
+
+            navigateTo('planExpiredScreen');
+        }
+
+        function submitStoreRenewalPayment() {
+            if (!currentExpiredStoreObj) return;
+            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim();
+            if (!utrVal) {
+                showNotification('Please enter your UPI Transaction ID / UTR Number', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('submitRenewalPaymentBtn');
+            const spinner = document.getElementById('submitRenewalSpinner');
+            const btnText = document.getElementById('submitRenewalBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Submitting Payment...';
+
+            setTimeout(() => {
+                const nowStr = new Date().toLocaleString();
+                currentExpiredStoreObj.pendingUtr = utrVal;
+                currentExpiredStoreObj.paymentSubmittedAt = nowStr;
+                persistMultiTenantAuthState();
+
+                const client = getSupabaseClient();
+                if (client) {
+                    try {
+                        client.from('stores').update({
+                            pending_utr: utrVal,
+                            payment_submitted_at: nowStr
+                        }).eq('username', currentExpiredStoreObj.username).then(() => {});
+                    } catch (e) {}
+                }
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Payment Completed (Notify Admin)';
+
+                showNotification('Payment UTR submitted! Admin notified for activation.', 'success', 4500);
+            }, 1500);
+        }
+
+        function sendRenewalAlertViaGmail() {
+            if (!currentExpiredStoreObj) return;
+            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || 'Pending';
+            const subject = encodeURIComponent(`KS POS Plan Renewal Payment Completed - ${currentExpiredStoreObj.storeName}`);
+            const body = encodeURIComponent(
+                `Hello KS POS Admin,\n\n` +
+                `Store Name: ${currentExpiredStoreObj.storeName}\n` +
+                `Owner: ${currentExpiredStoreObj.ownerName}\n` +
+                `Username: ${currentExpiredStoreObj.username}\n` +
+                `Phone: ${currentExpiredStoreObj.phone}\n` +
+                `Payment UTR / Transaction ID: ${utrVal}\n\n` +
+                `Please verify the payment and activate our KS POS plan.`
+            );
+            window.open(`mailto:${adminPaymentConfig.adminEmail}?subject=${subject}&body=${body}`, '_blank');
+        }
+
+        function sendRenewalAlertViaWhatsApp() {
+            if (!currentExpiredStoreObj) return;
+            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || 'Pending';
+            const cleanPhone = String(adminPaymentConfig.adminPhone || '').replace(/[^0-9]/g, '');
+            const msg = encodeURIComponent(
+                `Hello KS POS Admin, Payment Completed for *${currentExpiredStoreObj.storeName}* (User: ${currentExpiredStoreObj.username}). UTR ID: *${utrVal}*. Please activate our plan.`
+            );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+        }
+
+        function sendStoreExpiryAlertToUser(store) {
+            if (!store) return;
+            const subject = encodeURIComponent(`Your KS POS Plan is Expired - Please Renew`);
+            const body = encodeURIComponent(
+                `Hello ${store.ownerName},\n\n` +
+                `Your plan for "${store.storeName}" (Username: ${store.username}) is expired.\n` +
+                `Please renew the plan by logging into KS POS and scanning the Admin Payment QR.\n\n` +
+                `Thank you,\nKS POS Team`
+            );
+            window.open(`mailto:${store.email}?cc=${adminPaymentConfig.adminEmail}&subject=${subject}&body=${body}`, '_blank');
+        }
+
+        function sendStoreExpiryAlertSMS(store) {
+            if (!store) return;
+            const cleanPhone = String(store.phone || '').replace(/[^0-9]/g, '');
+            const msg = encodeURIComponent(
+                `Hello ${store.ownerName}, your KS POS plan for ${store.storeName} is expired. Please renew the plan to continue using KS POS.`
+            );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+        }
+
+        function approveAndActivateStorePlan(storeId, daysToAdd = 30) {
+            const store = rentedStoresList.find(s => s.storeId === storeId);
+            if (!store) return;
+            store.status = 'Active';
+            store.trialStartDate = new Date().toISOString().split('T')[0];
+            store.trialDays = daysToAdd;
+            store.pendingUtr = '';
+            store.paymentSubmittedAt = '';
+            persistMultiTenantAuthState();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('stores').update({
+                        status: 'Active',
+                        trial_start_date: store.trialStartDate,
+                        trial_days: daysToAdd,
+                        pending_utr: '',
+                        payment_submitted_at: ''
+                    }).eq('username', store.username).then(() => {});
+                } catch (e) {}
+            }
+
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`${store.storeName} activated for +${daysToAdd} days!`, 'success');
+        }
+
+        function deleteStoreFromAdminPanel(storeId) {
+            const store = rentedStoresList.find(s => s.storeId === storeId);
+            if (!store) return;
+            const confirmed = window.confirm(`Are you sure you want to permanently delete "${store.storeName}" (${store.username})?`);
+            if (!confirmed) return;
+
+            rentedStoresList = rentedStoresList.filter(s => s.storeId !== storeId);
+            persistMultiTenantAuthState();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('stores').delete().eq('username', store.username).then(() => {});
+                } catch (e) {}
+            }
+
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`Store "${store.storeName}" deleted permanently`, 'warning');
+        }
 
         // --- SUPER ADMIN & MULTI-TENANT STORE ACCESS CONTROL ---
         const DEFAULT_ALL_FEATURES = [
@@ -2259,7 +2648,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const usernameVal = document.getElementById('usernameInput').value.trim();
             const passwordVal = document.getElementById('passwordInput').value.trim();
@@ -2278,6 +2667,8 @@
             if (icon) icon.classList.add('hidden');
             if (btnText) btnText.textContent = 'Logging in...';
 
+            await syncInitialDataFromSupabase(false);
+
             setTimeout(() => {
                 btn.disabled = false;
                 if (spinner) spinner.classList.add('hidden');
@@ -2295,6 +2686,7 @@
                         allowedFeatures: [...DEFAULT_ALL_FEATURES],
                         trialDaysLeft: 999
                     };
+                    persistAppStateToLocal();
                     applyRolePermissionsToUI();
                     isFirstStartSellingAfterLogin = true;
                     showNotification('Welcome KS POS Super Admin (Full Access)!', 'success');
@@ -2308,8 +2700,14 @@
                 );
 
                 if (matchedStore) {
-                    if (matchedStore.status === 'Suspended') {
-                        showNotification('Your store subscription is suspended. Contact Admin.', 'warning');
+                    const remainingDays = getStoreRemainingTrialDays(matchedStore);
+                    if (matchedStore.status === 'Suspended' || matchedStore.status === 'Expired' || remainingDays <= 0) {
+                        if (matchedStore.status === 'Active' && remainingDays <= 0) {
+                            matchedStore.status = 'Expired';
+                            persistMultiTenantAuthState();
+                        }
+                        showNotification('Your plan is expired. Please renew the plan.', 'warning', 4500);
+                        openPlanExpiredScreen(matchedStore);
                         return;
                     }
                     currentSessionUser = {
@@ -2318,17 +2716,18 @@
                         storeName: matchedStore.storeName,
                         username: matchedStore.username,
                         allowedFeatures: matchedStore.allowedFeatures || ['Sell Screen', 'Order History', 'Dashboard'],
-                        trialDaysLeft: matchedStore.trialDays || 30
+                        trialDaysLeft: remainingDays
                     };
+                    persistAppStateToLocal();
                     applyRolePermissionsToUI();
                     isFirstStartSellingAfterLogin = true;
-                    showNotification(`Logged in: ${matchedStore.storeName} (30-Day Free Trial)`, 'success');
+                    showNotification(`Logged in: ${matchedStore.storeName} (${remainingDays}d Left)`, 'success');
                     navigateTo('dashboardScreen');
                     return;
                 }
 
                 showNotification('Invalid username or password', 'warning');
-            }, 800);
+            }, 500);
         }
 
         function handleRegisterSave(event) {
@@ -2365,6 +2764,7 @@
                 spinner.classList.add('hidden');
                 text.textContent = 'Save register & Start 30-Day Free Trial';
 
+                const defaultAllowed = ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'];
                 const newStoreObj = {
                     storeId: `ST-00${rentedStoresList.length + 1}`,
                     storeName: storeName,
@@ -2378,20 +2778,26 @@
                     status: 'Active',
                     trialStartDate: new Date().toISOString().split('T')[0],
                     trialDays: 30,
-                    allowedFeatures: ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+                    allowedFeatures: defaultAllowed
                 };
 
                 rentedStoresList.unshift(newStoreObj);
                 persistMultiTenantAuthState();
 
                 saveRecordToSupabase('stores', {
+                    store_id: newStoreObj.storeId,
                     store_name: storeName,
                     owner_name: ownerName,
                     username: regUser,
+                    password: regPass,
                     phone: phone,
                     email: email,
                     location: location,
-                    pincode: pincode
+                    pincode: pincode,
+                    status: 'Active',
+                    trial_start_date: newStoreObj.trialStartDate,
+                    trial_days: 30,
+                    allowed_features: defaultAllowed
                 });
 
                 document.getElementById('usernameInput').value = regUser;
@@ -2406,6 +2812,7 @@
             const enteredPin = document.getElementById('adminPinVerifyInput')?.value.trim();
             if (enteredPin === adminCredentials.pin) {
                 isAdminPinUnlocked = true;
+                syncInitialDataFromSupabase(false);
                 openSidebarModuleScreen('Admin Panel');
                 showNotification('Admin PIN verified!', 'success');
             } else {
@@ -2449,6 +2856,17 @@
                 store.allowedFeatures.push(featureName);
             }
             persistMultiTenantAuthState();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('stores')
+                        .update({ allowed_features: store.allowedFeatures })
+                        .eq('username', store.username)
+                        .then(() => {});
+                } catch (e) {}
+            }
+
             openSidebarModuleScreen('Admin Panel');
             showNotification(`Updated ${featureName} access for ${store.storeName}`, 'success');
         }
@@ -2458,6 +2876,17 @@
             if (!store) return;
             store.status = store.status === 'Active' ? 'Suspended' : 'Active';
             persistMultiTenantAuthState();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('stores')
+                        .update({ status: store.status })
+                        .eq('username', store.username)
+                        .then(() => {});
+                } catch (e) {}
+            }
+
             openSidebarModuleScreen('Admin Panel');
             showNotification(`${store.storeName} is now ${store.status}`, store.status === 'Active' ? 'success' : 'warning');
         }
@@ -2988,6 +3417,7 @@
                         `;
                     } else {
                         const previewSrc = pendingAdminLogoDataUrl || uploadedLogoDataUrl || './IMG_8948.jpeg';
+                        const qrPreviewSrc = pendingAdminQrDataUrl || adminPaymentConfig.qrDataUrl || '';
                         bodyEl.innerHTML = `
                             <!-- Official App Brand Logo Control (Admin Only) -->
                             <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
@@ -3015,6 +3445,48 @@
                                             </button>
                                         </div>
                                         <p class="text-[11px] text-slate-500">Only Admin can upload &amp; update the app logo. Once saved, all store users will automatically see this logo.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Admin Payment QR & Renewal Alerts Configuration -->
+                            <div class="w-full rounded-2xl border border-emerald-200 bg-emerald-50/35 p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="qr-code" class="w-5 h-5 text-emerald-600"></i>
+                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Admin Payment QR &amp; Renewal Notifications</h3>
+                                </div>
+                                <div class="flex flex-wrap items-start gap-4">
+                                    <div class="w-24 h-24 rounded-2xl bg-white border border-emerald-200 shadow-2xs flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
+                                        ${qrPreviewSrc
+                                            ? `<img src="${qrPreviewSrc}" alt="Admin QR" class="w-full h-full object-contain">`
+                                            : `<div class="text-center text-slate-400"><i data-lucide="qr-code" class="w-8 h-8 mx-auto"></i><span class="text-[10px] block mt-1">No QR</span></div>`
+                                        }
+                                    </div>
+                                    <div class="flex-1 min-w-[220px] space-y-2.5">
+                                        <input type="file" id="adminPaymentQrInput" accept="image/*" class="hidden" onchange="handleAdminQrFileSelect(event)">
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Admin UPI ID</label>
+                                                <input type="text" id="adminUpiIdInput" value="${adminPaymentConfig.upiId}" class="glass-input w-full px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Admin Gmail (Alerts)</label>
+                                                <input type="email" id="adminNotifyEmailInput" value="${adminPaymentConfig.adminEmail}" class="glass-input w-full px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Admin Phone (SMS/WA)</label>
+                                                <input type="tel" id="adminNotifyPhoneInput" value="${adminPaymentConfig.adminPhone}" class="glass-input w-full px-3 py-1.5 rounded-xl text-xs font-bold text-slate-900">
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                                            <button type="button" onclick="document.getElementById('adminPaymentQrInput').click()" class="py-2 px-4 rounded-xl bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs">
+                                                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                                <span>Upload Payment QR</span>
+                                            </button>
+                                            <button type="button" onclick="saveAdminPaymentQr()" class="py-2 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-2xs">
+                                                Save QR &amp; Alerts
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -3054,27 +3526,62 @@
 
                             <!-- Rented Stores & Feature Permissions Control -->
                             <div class="w-full space-y-3 pt-2">
-                                <div class="flex items-center justify-between px-1">
+                                <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                                     <h3 class="text-sm sm:text-base font-bold text-slate-900">Rented Stores &amp; Feature Access (${rentedStoresList.length})</h3>
-                                    <span class="text-xs font-semibold text-sky-700">Toggle features per store</span>
+                                    <button type="button" onclick="syncInitialDataFromSupabase(true)" class="px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                        <span>Sync Stores</span>
+                                    </button>
                                 </div>
                                 ${rentedStoresList.map(st => {
-                                    const isActive = st.status === 'Active';
+                                    const remDays = getStoreRemainingTrialDays(st);
+                                    const isExpired = st.status === 'Expired' || remDays <= 0;
+                                    const isActive = st.status === 'Active' && !isExpired;
+                                    const statusLabel = isExpired ? 'Expired' : st.status;
+                                    const statusBadgeClass = isActive
+                                        ? 'bg-emerald-100 text-emerald-800'
+                                        : 'bg-red-100 text-red-700';
+
                                     return `
-                                        <div class="w-full rounded-2xl border border-sky-200 bg-white p-4 sm:p-5 space-y-3 shadow-2xs">
+                                        <div class="w-full rounded-2xl border ${st.pendingUtr ? 'border-amber-400 bg-amber-50/20' : 'border-sky-200 bg-white'} p-4 sm:p-5 space-y-3 shadow-2xs">
                                             <div class="flex flex-wrap items-start justify-between gap-2 pb-2.5 border-b border-sky-100">
                                                 <div class="space-y-0.5">
-                                                    <div class="flex items-center gap-2">
+                                                    <div class="flex items-center gap-2 flex-wrap">
                                                         <h4 class="text-sm sm:text-base font-bold text-slate-900">${st.storeName}</h4>
-                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">${st.status}</span>
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadgeClass}">${statusLabel}</span>
+                                                        ${st.pendingUtr ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">Payment UTR: ${st.pendingUtr}</span>` : ''}
                                                     </div>
                                                     <p class="text-xs text-slate-600">Owner: <b>${st.ownerName}</b> • User: <b class="text-sky-700">${st.username}</b> • Pass: <b>${st.password}</b></p>
-                                                    <p class="text-[11px] text-slate-500">${st.phone} • ${st.location} • <b>${st.trialDays} Days Free Trial</b></p>
+                                                    <p class="text-[11px] text-slate-500">${st.phone} • ${st.email} • <b>${remDays} Days Left</b></p>
                                                 </div>
-                                                <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white'} transition-colors cursor-pointer">
-                                                    ${isActive ? 'Suspend Store' : 'Activate Store'}
-                                                </button>
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs" title="Approve Payment & Renew 30 Days">
+                                                        ${st.pendingUtr ? 'Verify UTR & Activate (+30d)' : 'Renew +30d'}
+                                                    </button>
+                                                    <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-600 hover:text-white' : 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-600 hover:text-white'} transition-colors cursor-pointer">
+                                                        ${isActive ? 'Suspend' : 'Activate'}
+                                                    </button>
+                                                    <button type="button" onclick="deleteStoreFromAdminPanel('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer shadow-2xs" title="Delete Store Account">
+                                                        Delete Store
+                                                    </button>
+                                                </div>
                                             </div>
+
+                                            <!-- Quick Expiry Alert Buttons (Gmail & SMS/WhatsApp) -->
+                                            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/80 text-[11px]">
+                                                <span class="font-semibold text-slate-600">Send Plan Expiry / Renewal Alert:</span>
+                                                <div class="flex items-center gap-2">
+                                                    <button type="button" onclick='sendStoreExpiryAlertToUser(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
+                                                        <i data-lucide="mail" class="w-3 h-3"></i>
+                                                        <span>Gmail Alert</span>
+                                                    </button>
+                                                    <button type="button" onclick='sendStoreExpiryAlertSMS(${JSON.stringify(st).replace(/'/g, "&#39;")})' class="px-2.5 py-1 rounded-lg bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 font-bold flex items-center gap-1 cursor-pointer transition-colors">
+                                                        <i data-lucide="message-square" class="w-3 h-3"></i>
+                                                        <span>SMS / WhatsApp</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
                                             <div>
                                                 <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Allowed App Features:</p>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -6581,6 +7088,7 @@
                 }, 3000);
             }
 
+            loadAdminPaymentConfig();
             loadMultiTenantAuthState();
             loadAppStateFromLocal();
             loadStockTransfersFromLocal();
@@ -6593,7 +7101,7 @@
             renderShiftsScreen();
             setInterval(updateShiftsLiveClock, 1000);
             if (window.lucide) lucide.createIcons();
-            setTimeout(syncInitialDataFromSupabase, 100);
+            setTimeout(() => syncInitialDataFromSupabase(false), 100);
         });
 
         // Auto-save state whenever app goes to background or closes on iPhone
@@ -6624,7 +7132,7 @@
                         resumeOverlay.classList.remove('hidden', 'opacity-0');
                         resumeOverlay.classList.add('flex');
 
-                        syncInitialDataFromSupabase();
+                        syncInitialDataFromSupabase(false);
 
                         setTimeout(() => {
                             resumeOverlay.classList.add('opacity-0');
