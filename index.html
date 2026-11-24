@@ -246,19 +246,19 @@
                         Point of Sale
                     </h4>
                     <nav class="space-y-1">
-                        <button type="button" onclick="handleSidebarNav('Sell Screen')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Sell Screen" onclick="handleSidebarNav('Sell Screen')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="monitor" class="w-4 h-4 text-sky-400"></i>
                             <span>Sell Screen</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Order History')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Order History" onclick="handleSidebarNav('Order History')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="receipt" class="w-4 h-4 text-sky-400"></i>
                             <span>Order History</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Shifts')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Shifts" onclick="handleSidebarNav('Shifts')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="clock" class="w-4 h-4 text-sky-400"></i>
                             <span>Shifts</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Stock Transfer')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Stock Transfer" onclick="handleSidebarNav('Stock Transfer')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="arrow-left-right" class="w-4 h-4 text-sky-400"></i>
                             <span>Stock Transfer</span>
                         </button>
@@ -270,25 +270,29 @@
                         Management
                     </h4>
                     <nav class="space-y-1">
-                        <button type="button" onclick="handleSidebarNav('KS Inventory')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="KS Inventory" onclick="handleSidebarNav('KS Inventory')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="boxes" class="w-4 h-4 text-sky-400"></i>
                             <span>KS Inventory</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Analytics')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Analytics" onclick="handleSidebarNav('Analytics')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-400"></i>
                             <span>Analytics</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Settings')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Settings" onclick="handleSidebarNav('Settings')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="settings" class="w-4 h-4 text-sky-400"></i>
                             <span>Settings</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Dashboard" onclick="handleSidebarNav('Dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="layout-dashboard" class="w-4 h-4 text-sky-400"></i>
                             <span>Dashboard</span>
                         </button>
-                        <button type="button" onclick="handleSidebarNav('Barcode')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
+                        <button type="button" data-feature-key="Barcode" onclick="handleSidebarNav('Barcode')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800/90 hover:text-sky-400 transition-colors cursor-pointer text-left">
                             <i data-lucide="scan-barcode" class="w-4 h-4 text-sky-400"></i>
                             <span>Barcode</span>
+                        </button>
+                        <button type="button" id="sidebarAdminPanelBtn" onclick="handleSidebarNav('Admin Panel')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-amber-300 bg-amber-500/10 border border-amber-400/30 hover:bg-amber-500/20 transition-colors cursor-pointer text-left">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
+                            <span>Admin Panel</span>
                         </button>
                     </nav>
                 </div>
@@ -411,6 +415,12 @@
                         </button>
                     </div>
                 </form>
+
+                <div class="pt-1 flex justify-center">
+                    <button type="button" onclick="navigateTo('plansScreen')" class="text-xs font-bold text-sky-700 hover:text-sky-900 underline underline-offset-4 cursor-pointer">
+                        See Plans &amp; Start 30-Day Free Trial →
+                    </button>
+                </div>
             </div>
 
             <div class="w-full pt-4 border-t border-sky-100 flex items-center justify-center gap-2.5 flex-wrap">
@@ -432,8 +442,9 @@
 
             <div class="w-full my-auto py-4 space-y-5">
                 <div class="text-center space-y-1.5">
+                    <span class="inline-block px-3 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">30-Day Free Trial Included</span>
                     <h2 class="luxury-heading text-xl sm:text-2xl font-semibold tracking-wider text-slate-900">Create register store account</h2>
-                    <p class="text-slate-500 text-xs sm:text-sm">Enter your store details to get started</p>
+                    <p class="text-slate-500 text-xs sm:text-sm">Enter your store details &amp; login credentials to start your 30-day free trial</p>
                 </div>
 
                 <form id="registerForm" onsubmit="handleRegisterSave(event)" class="space-y-3.5">
@@ -445,6 +456,17 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1 ml-1">Owner name</label>
                             <input type="text" id="regOwnerName" required placeholder="e.g. Kishore" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1 ml-1">Username (For Login)</label>
+                            <input type="text" id="regUsername" required placeholder="e.g. mart_store1" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1 ml-1">Password (For Login)</label>
+                            <input type="password" id="regPassword" required placeholder="Create password" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
                         </div>
                     </div>
 
@@ -473,7 +495,7 @@
                     <div class="pt-2">
                         <button type="submit" id="saveRegisterBtn" class="btn-glass-primary w-full py-3.5 px-6 rounded-xl font-semibold text-base tracking-wide flex items-center justify-center gap-2.5 cursor-pointer">
                             <div id="saveRegisterSpinner" class="hidden w-5 h-5 rounded-full border-2 border-sky-600/30 border-t-sky-700 animate-spin"></div>
-                            <span id="saveRegisterText">Save register</span>
+                            <span id="saveRegisterText">Save register &amp; Start 30-Day Free Trial</span>
                         </button>
                     </div>
                 </form>
@@ -494,38 +516,41 @@
                     <span id="dashDefaultKS" class="luxury-heading text-base sm:text-lg font-bold text-sky-600 tracking-wider select-none">KS</span>
                     <img id="dashUploadedLogoImg" src="" alt="KS Logo" class="hidden w-full h-full object-cover">
                 </button>
-                <h1 class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">KS-POS</h1>
+                <span class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wider">KS POS</span>
             </div>
 
-            <div class="w-full flex-1 flex flex-col justify-center items-center py-6 space-y-5">
-                <div class="text-center">
-                    <h2 class="luxury-heading text-2xl sm:text-4xl font-semibold text-slate-900 tracking-wide">Welcome to KS POS</h2>
+            <div class="w-full flex-1 flex flex-col items-center justify-center text-center my-8 space-y-6 px-2">
+                <div class="space-y-3">
+                    <h1 class="luxury-heading text-2xl sm:text-4xl font-semibold tracking-wider text-slate-900">Start Selling</h1>
+                    <p class="text-slate-600 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+                        Launch your point-of-sale counter to process checkouts, scan products, apply discounts, and manage shifts effortlessly.
+                    </p>
                 </div>
 
-                <div class="w-full max-w-xl glass-card-accent rounded-xl px-4 py-2.5 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-7 h-7 rounded-lg bg-white/90 border border-sky-200 flex items-center justify-center text-sky-600 flex-shrink-0">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <p id="dashboardLocationText" class="text-xs sm:text-sm font-semibold text-slate-800 truncate">Hyderabad, Telangana, India</p>
-                    </div>
-                    <button type="button" onclick="refreshStoreLocation()" title="Update Location" class="px-2.5 py-1 rounded-lg bg-white/80 hover:bg-sky-500 text-sky-700 hover:text-white border border-sky-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 flex-shrink-0">
-                        <i data-lucide="navigation" class="w-3 h-3"></i>
-                        <span>Locate</span>
+                <div class="w-full max-w-xs sm:max-w-sm">
+                    <button type="button" onclick="handleStartSelling()" class="btn-glass-primary w-full py-4 px-8 rounded-2xl font-semibold text-base sm:text-lg tracking-wide flex items-center justify-center gap-3 cursor-pointer shadow-lg">
+                        <i data-lucide="shopping-bag" class="w-5 h-5 flex-shrink-0"></i>
+                        <span>Start Selling</span>
                     </button>
                 </div>
 
-                <div class="w-full max-w-xl pt-2">
-                    <div class="w-full rounded-2xl border-2 border-sky-300/90 bg-sky-50/50 backdrop-blur-md shadow-sm overflow-hidden flex items-stretch">
-                        <button type="button" onclick="navigateTo('plansScreen')" class="flex-1 py-3.5 px-3 text-center font-bold text-xs sm:text-base tracking-wide text-sky-800 hover:bg-sky-500 hover:text-white active:bg-sky-600 active:text-white transition-all cursor-pointer whitespace-nowrap">
-                            See the Price
-                        </button>
-                        <div class="w-[1.5px] bg-sky-300/90 my-2"></div>
-                        <button type="button" onclick="handleStartSelling()" class="flex-1 py-3.5 px-3 text-center font-bold text-xs sm:text-base tracking-wide text-sky-800 hover:bg-sky-500 hover:text-white active:bg-sky-600 active:text-white transition-all cursor-pointer whitespace-nowrap">
-                            Start Selling
-                        </button>
-                    </div>
+                <div class="pt-1 flex justify-center">
+                    <button type="button" onclick="navigateTo('plansScreen')" class="px-5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>See the Price</span>
+                    </button>
                 </div>
+            </div>
+
+            <div class="w-full pt-4 pb-2 border-t border-sky-100 flex items-center justify-between text-xs sm:text-sm px-1">
+                <div class="flex items-center gap-2 text-slate-700 font-medium truncate pr-2">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                    <span id="dashboardLocationText" class="truncate">Hyderabad, Telangana, India</span>
+                </div>
+                <button type="button" onclick="refreshStoreLocation()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs transition-all cursor-pointer flex-shrink-0">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>Refresh Location</span>
+                </button>
             </div>
         </main>
 
@@ -578,10 +603,16 @@
                             </p>
                             <ul id="planFeaturesPreviewList" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700"></ul>
                         </div>
-                        <button type="button" onclick="navigateTo('editFeaturesScreen')" class="w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                            <span>Edit</span>
-                        </button>
+                        <div class="space-y-2">
+                            <button type="button" onclick="navigateTo('editFeaturesScreen')" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" onclick="navigateTo('registerScreen')" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                <span>Start Free Trial (30 Days)</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="rounded-2xl border border-sky-200 bg-sky-50/40 p-5 shadow-sm flex flex-col justify-between space-y-4">
@@ -599,10 +630,16 @@
                                 <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-600"></i> Priority 24/7 Cloud Sync</li>
                             </ul>
                         </div>
-                        <button type="button" onclick="navigateTo('editFeaturesScreen')" class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                            <span>Edit</span>
-                        </button>
+                        <div class="space-y-2">
+                            <button type="button" onclick="navigateTo('editFeaturesScreen')" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" onclick="navigateTo('registerScreen')" class="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                <span>Start Free Trial (30 Days)</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -677,12 +714,14 @@
                         <div class="flex items-center gap-1.5 min-w-0">
                             <button type="button" onclick="handleCustomerHeaderClick()" class="flex flex-col text-left py-0.5 px-1 rounded-none hover:bg-sky-50 transition-colors cursor-pointer truncate">
                                 <div class="flex items-center gap-2">
-                                    <i data-lucide="user-plus" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                                    <span id="cartCustomerIconWrap" class="inline-flex items-center justify-center flex-shrink-0 text-sky-600">
+                                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                    </span>
                                     <span id="cartCustomerLabel" class="text-xs sm:text-sm font-bold text-sky-800 truncate">Add Customer</span>
                                 </div>
                                 <span id="cartCustomerSubCredit" class="text-[11px] font-semibold text-emerald-600 truncate ml-6 hidden"></span>
                             </button>
-                            <button type="button" id="removeCartCustomerBtn" onclick="removeCartCustomer()" title="Remove Customer" class="hidden p-1 rounded-lg bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-colors cursor-pointer flex-shrink-0">
+                            <button type="button" id="removeCartCustomerBtn" onclick="removeCartCustomer()" title="Remove" class="hidden p-1 rounded-lg bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-colors cursor-pointer flex-shrink-0">
                                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
                             </button>
                         </div>
@@ -708,7 +747,7 @@
                         </div>
                     </div>
 
-                    <!-- Refund / Exchange Mode Header Toggle (Small, Centered, Below Customer Line) -->
+                    <!-- Refund / Exchange Mode Header Toggle -->
                     <div id="refundExchangeModeHeader" class="hidden w-full py-1.5 px-2 bg-white flex items-center justify-center">
                         <div class="inline-flex rounded-lg bg-sky-100/90 border border-sky-200 p-0.5 shadow-2xs scale-90">
                             <button type="button" id="cartModeRefundBtn" onclick="switchCartMode('refund')" class="py-1 px-3 rounded-md text-[11px] font-bold bg-sky-600 text-white shadow-2xs transition-all cursor-pointer">Refund</button>
@@ -744,29 +783,35 @@
                         </div>
 
                         <div id="cartSummaryDetailsBox" class="space-y-1.5 overflow-hidden transition-all duration-200">
-                            <div class="flex justify-between text-slate-600">
-                                <span>Subtotal</span>
-                                <span id="cartSubtotalText" class="font-semibold text-slate-800">₹0.00</span>
+                            <div id="cartSummaryStandardRows" class="space-y-1.5">
+                                <div class="flex justify-between text-slate-600">
+                                    <span>Subtotal</span>
+                                    <span id="cartSubtotalText" class="font-semibold text-slate-800">₹0.00</span>
+                                </div>
+                                <div onclick="openDiscountModal()" class="flex justify-between items-center text-slate-600 py-1 px-1.5 -mx-1.5 rounded-lg hover:bg-sky-50 cursor-pointer transition-all group">
+                                    <span class="text-sky-700 font-semibold underline decoration-dashed underline-offset-4">Discount</span>
+                                    <span id="cartDiscountText" class="font-semibold text-emerald-600">-₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-500">
+                                    <span>Tax</span>
+                                    <span id="cartTaxText" class="font-medium text-slate-600">₹0.00</span>
+                                </div>
+                                <div id="cartSummaryRefundRow" class="hidden flex justify-between text-slate-700">
+                                    <span id="cartSummaryRefundLabel" class="font-semibold">Total Refund Value</span>
+                                    <span id="cartSummaryRefundAmountText" class="font-bold text-red-600">₹0.00</span>
+                                </div>
+                                <div id="cartSummaryExchangeRow" class="hidden flex justify-between text-slate-700">
+                                    <span id="cartSummaryExchangeLabel" class="font-semibold">Total Exchange Value</span>
+                                    <span id="cartSummaryExchangeAmountText" class="font-bold text-sky-700">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-slate-900 pt-1.5 border-t border-sky-200">
+                                    <span id="cartTotalLabelText">Total</span>
+                                    <span id="cartGrandTotalText" class="text-sky-700">₹0.00</span>
+                                </div>
                             </div>
-                            <div onclick="openDiscountModal()" class="flex justify-between items-center text-slate-600 py-1 px-1.5 -mx-1.5 rounded-lg hover:bg-sky-50 cursor-pointer transition-all group">
-                                <span class="text-sky-700 font-semibold underline decoration-dashed underline-offset-4">Discount</span>
-                                <span id="cartDiscountText" class="font-semibold text-emerald-600">-₹0.00</span>
-                            </div>
-                            <div class="flex justify-between text-slate-500">
-                                <span>Tax</span>
-                                <span id="cartTaxText" class="font-medium text-slate-600">₹0.00</span>
-                            </div>
-                            <div id="cartSummaryRefundRow" class="hidden flex justify-between text-slate-700">
-                                <span id="cartSummaryRefundLabel" class="font-semibold">Total Refund Value</span>
-                                <span id="cartSummaryRefundAmountText" class="font-bold text-red-600">₹0.00</span>
-                            </div>
-                            <div id="cartSummaryExchangeRow" class="hidden flex justify-between text-slate-700">
-                                <span id="cartSummaryExchangeLabel" class="font-semibold">Total Exchange Value</span>
-                                <span id="cartSummaryExchangeAmountText" class="font-bold text-sky-700">₹0.00</span>
-                            </div>
-                            <div class="flex justify-between text-sm font-bold text-slate-900 pt-1.5 border-t border-sky-200">
-                                <span id="cartTotalLabelText">Total</span>
-                                <span id="cartGrandTotalText" class="text-sky-700">₹0.00</span>
+                            <div id="cartSummaryTransferQtyRow" class="hidden flex justify-between text-sm font-bold text-slate-900 pt-0.5">
+                                <span>Total Item Quantity</span>
+                                <span id="cartTransferTotalQtyText" class="text-sky-700">0</span>
                             </div>
                         </div>
 
@@ -987,7 +1032,7 @@
                     </div>
                 </div>
 
-                <!-- Single Clean Order Meta Card with Central Divider and 3-item Left / 3-item Right layout -->
+                <!-- Order Meta Card -->
                 <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div class="space-y-3 md:border-r md:border-sky-200/80 md:pr-4 flex flex-col justify-around">
                         <div class="flex items-center justify-between">
@@ -1101,7 +1146,7 @@
                     </div>
                 </div>
 
-                <!-- Search Bar below Grid View, Apply Filter, Reset Filter & Fulfillment -->
+                <!-- Search Bar -->
                 <div class="w-full pt-3">
                     <div class="relative w-full">
                         <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
@@ -1159,7 +1204,6 @@
         <!-- 11. SHIFTS MANAGEMENT SCREEN -->
         <main id="shiftsScreen" class="page-view page-hidden flex-col justify-between w-full min-h-screen sm:min-h-[85vh] bg-white sm:glass-panel rounded-none sm:rounded-3xl p-0 m-0 sm:my-auto overflow-y-auto scroll-smooth container-padded">
             <div class="w-full space-y-5 pb-8">
-                <!-- Header Bar: Only KS Logo Box (triggers black sidebar) + Shifts Heading -->
                 <div class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
                     <div class="flex items-center gap-2.5">
                         <button type="button" id="shiftsLogoBox" onclick="openSidebarWithRotation(this)" title="Open Menu" class="logo-box-trigger w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-50 border border-sky-200 shadow-xs flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer hover:border-sky-400 active:scale-95">
@@ -1170,7 +1214,6 @@
                     </div>
                 </div>
 
-                <!-- Filter Bar matching reference: Apply Filter & Reset Filter with funnel icon -->
                 <div class="w-full flex flex-wrap items-center justify-end gap-2.5 px-1">
                     <div class="relative">
                         <button type="button" onclick="openShiftsDateCalendar()" class="py-2 px-3.5 rounded-xl bg-sky-100 hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs">
@@ -1186,7 +1229,6 @@
                     </button>
                 </div>
 
-                <!-- Current / Active Shift Card matching reference sketch -->
                 <div id="activeShiftSummaryCard" onclick="openShiftsDetailsScreen()" class="w-full rounded-2xl border border-emerald-300/80 bg-emerald-50/65 backdrop-blur-md p-5 sm:p-6 min-h-[140px] shadow-xs flex items-center justify-between gap-4 cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/90 transition-all">
                     <div class="space-y-2.5 text-xs sm:text-sm">
                         <p class="font-semibold text-slate-700">
@@ -1207,7 +1249,6 @@
                     </div>
                 </div>
 
-                <!-- Closed History Section matching reference sketch -->
                 <div class="w-full space-y-3 pt-1">
                     <div>
                         <span class="inline-block px-4 py-1.5 rounded-xl bg-sky-50 border border-sky-200 text-xs sm:text-sm font-bold text-slate-800 tracking-wide">
@@ -1220,10 +1261,9 @@
             </div>
         </main>
 
-        <!-- 12. SHIFTS DETAILS SCREEN (Matching Reference Sketch) -->
+        <!-- 12. SHIFTS DETAILS SCREEN -->
         <main id="shiftsDetailsScreen" class="page-view page-hidden flex-col justify-between w-full min-h-screen sm:min-h-[85vh] bg-white sm:glass-panel rounded-none sm:rounded-3xl p-0 m-0 sm:my-auto overflow-y-auto scroll-smooth container-padded">
             <div class="w-full space-y-5 pb-8">
-                <!-- Header: KS Logo + SHIFTS DETAILS on Left | DATE & TIME + Opening Cash on Right -->
                 <div class="w-full flex flex-wrap items-start justify-between gap-3 pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
                     <div class="flex items-center gap-2.5">
                         <button type="button" onclick="navigateTo('shiftsScreen')" title="Back to Shifts" class="p-2 rounded-xl bg-sky-50 hover:bg-sky-600 text-slate-700 hover:text-white border border-sky-200 transition-colors cursor-pointer">
@@ -1243,13 +1283,11 @@
                     </div>
                 </div>
 
-                <!-- Centered NET SALES Section -->
                 <div class="w-full text-center pt-3 pb-6">
                     <span class="text-xs sm:text-sm font-bold uppercase tracking-widest text-slate-600 block">Net Sales</span>
                     <span id="sdNetSalesAmountText" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1 block">0.00</span>
                 </div>
 
-                <!-- Payment Mode Table matching sketch -->
                 <div class="w-full mt-6 rounded-2xl border border-sky-200 bg-white overflow-hidden shadow-2xs">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[440px]">
@@ -1285,7 +1323,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom Drawer Box pushed further down with extra vertical gap -->
                 <div class="w-full mt-20 sm:mt-24 rounded-2xl border border-sky-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-stretch justify-between gap-4">
                     <div class="flex-1 flex flex-col justify-between space-y-3 sm:pr-4 sm:border-r sm:border-sky-200">
                         <div>
@@ -1319,7 +1356,7 @@
             </div>
         </main>
 
-        <!-- 13. SIDEBAR MANAGEMENT MODULE SCREEN (Stock Transfer, KS Inventory, Analytics, Settings, Barcode) -->
+        <!-- 13. SIDEBAR MANAGEMENT MODULE SCREEN -->
         <main id="sidebarModuleScreen" class="page-view page-hidden flex-col justify-between w-full min-h-screen sm:min-h-[85vh] bg-white sm:glass-panel rounded-none sm:rounded-3xl p-0 m-0 sm:my-auto overflow-y-auto scroll-smooth container-padded">
             <div class="w-full space-y-5 pb-8">
                 <div class="w-full flex items-center justify-between pb-3 pt-1 px-1 border-b border-sky-200 sticky top-0 bg-white z-10">
@@ -1574,7 +1611,6 @@
         </div>
     </div>
 
-    <!-- MODALS -->
     <!-- Add Customer Modal -->
     <div id="addCustomerModalOverlay" onclick="closeAddCustomerModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm hidden p-4 transition-opacity">
         <div onclick="event.stopPropagation()" class="w-full max-w-sm glass-panel bg-white/95 rounded-3xl p-5 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
@@ -1749,10 +1785,29 @@
     </div>
 
     <!-- Loading & Processing Overlays -->
-    <div id="sellDataLoadingOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-md hidden p-4">
-        <div class="w-full max-w-sm rounded-2xl px-6 py-4 bg-red-50/95 border border-red-300 shadow-2xl flex items-center justify-center gap-3.5">
+    <div id="sellDataLoadingOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-md hidden p-3 sm:p-6">
+        <div class="w-fit max-w-[95vw] rounded-2xl px-5 sm:px-8 py-4 bg-red-50/95 border border-red-300 shadow-2xl flex items-center justify-center gap-3.5">
             <div class="w-6 h-6 rounded-full border-2 border-red-200 border-t-red-600 animate-spin flex-shrink-0"></div>
-            <p class="text-xs sm:text-sm font-bold text-red-700">Please wait while we are loading your data...</p>
+            <p class="text-xs sm:text-sm md:text-base font-bold text-red-700 whitespace-nowrap">Please wait while we are loading your data...</p>
+        </div>
+    </div>
+
+    <!-- Add Location Modal (Stock Transfer Mode) -->
+    <div id="addLocationModalOverlay" onclick="closeAddLocationModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-sm glass-panel bg-white/95 rounded-3xl p-5 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-sky-100">
+                <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Add Location</h3>
+                <button type="button" onclick="closeAddLocationModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600 pointer-events-none"></i>
+                <input type="text" id="transferLocationSearchInput" oninput="filterTransferLocations(this.value)" placeholder="Search branch location..." class="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 placeholder-slate-400">
+            </div>
+
+            <div id="transferLocationsListContainer" class="space-y-2 max-h-56 overflow-y-auto scrollable-pane pr-1"></div>
         </div>
     </div>
 
@@ -1952,53 +2007,147 @@
         let isFirstStartSellingAfterLogin = true;
         let uploadedLogoDataUrl = "";
 
+        // --- SUPER ADMIN & MULTI-TENANT STORE ACCESS CONTROL ---
+        const DEFAULT_ALL_FEATURES = [
+            'Sell Screen',
+            'Order History',
+            'Shifts',
+            'Stock Transfer',
+            'KS Inventory',
+            'Analytics',
+            'Settings',
+            'Dashboard',
+            'Barcode'
+        ];
+
+        let adminCredentials = {
+            username: 'KS POS',
+            password: 'ks@8804',
+            pin: '8804'
+        };
+
+        let isAdminPinUnlocked = false;
+        let currentSessionUser = {
+            role: 'admin',
+            storeId: 'ADMIN',
+            storeName: 'KS POS Super Admin',
+            username: 'KS POS',
+            allowedFeatures: [...DEFAULT_ALL_FEATURES],
+            trialDaysLeft: 30
+        };
+
+        let rentedStoresList = [
+            {
+                storeId: 'ST-001',
+                storeName: 'Sri Lakshmi Retail Mart',
+                ownerName: 'Ramesh Babu',
+                username: 'lakshmi_mart',
+                password: 'store123',
+                phone: '+91 98480 11223',
+                email: 'lakshmi@store.com',
+                location: 'Kukatpally, Hyderabad',
+                pincode: '500072',
+                status: 'Active',
+                trialStartDate: '2026-11-24',
+                trialDays: 30,
+                allowedFeatures: ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+            }
+        ];
+
+        function loadMultiTenantAuthState() {
+            try {
+                const savedCreds = localStorage.getItem('kspos_admin_creds_v1');
+                if (savedCreds) {
+                    const parsed = JSON.parse(savedCreds);
+                    if (parsed && parsed.username && parsed.password) {
+                        if (parsed.username === 'ks_boss') {
+                            parsed.username = 'KS POS';
+                        }
+                        adminCredentials = { ...adminCredentials, ...parsed };
+                        persistMultiTenantAuthState();
+                    }
+                }
+                const savedStores = localStorage.getItem('kspos_rented_stores_v1');
+                if (savedStores) {
+                    const parsedStores = JSON.parse(savedStores);
+                    if (Array.isArray(parsedStores) && parsedStores.length > 0) {
+                        rentedStoresList = parsedStores;
+                    }
+                }
+            } catch (e) {
+                console.warn('Multi-tenant auth load warning:', e);
+            }
+        }
+
+        function persistMultiTenantAuthState() {
+            try {
+                localStorage.setItem('kspos_admin_creds_v1', JSON.stringify(adminCredentials));
+                localStorage.setItem('kspos_rented_stores_v1', JSON.stringify(rentedStoresList));
+            } catch (e) {
+                console.warn('Multi-tenant auth save warning:', e);
+            }
+        }
+
+        function applyRolePermissionsToUI() {
+            const isAdmin = currentSessionUser.role === 'admin';
+            const allowed = isAdmin ? DEFAULT_ALL_FEATURES : (currentSessionUser.allowedFeatures || []);
+
+            const adminBtn = document.getElementById('sidebarAdminPanelBtn');
+            if (adminBtn) {
+                if (isAdmin) adminBtn.classList.remove('hidden');
+                else adminBtn.classList.add('hidden');
+            }
+
+            document.querySelectorAll('.admin-only-control').forEach(el => {
+                if (isAdmin) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+
+            document.querySelectorAll('#appSidebar button[data-feature-key]').forEach(btn => {
+                const feat = btn.getAttribute('data-feature-key');
+                if (isAdmin || allowed.includes(feat)) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            const locText = document.getElementById('sidebarLocationText');
+            if (locText) {
+                if (!isAdmin && currentSessionUser.storeName) {
+                    locText.textContent = `${currentSessionUser.storeName} (${currentSessionUser.trialDaysLeft}d Trial)`;
+                } else {
+                    locText.textContent = 'Hyderabad, Telangana';
+                }
+            }
+        }
+
         function showNotification(message, type = 'success', duration = 3000) {
             const container = document.getElementById('topNotificationBar');
             if (!container) return;
 
             const toast = document.createElement('div');
-            const isWarning = type === 'warning';
-            toast.className = `top-toast-banner ${isWarning ? 'top-toast-warning' : 'top-toast-success'} w-full rounded-xl px-3.5 py-2 flex items-center justify-between gap-2.5 cursor-pointer pointer-events-auto shadow-lg`;
-            toast.style.transform = 'translateY(-16px)';
-            toast.style.opacity = '0';
+            const colorClass = type === 'warning' ? 'top-toast-warning' : 'top-toast-success';
+            const iconName = type === 'warning' ? 'alert-circle' : 'check-circle-2';
 
-            const iconName = isWarning ? 'alert-circle' : 'check-circle-2';
+            toast.className = `top-toast-banner ${colorClass} pointer-events-auto w-full rounded-2xl px-4 py-3 flex items-center justify-between gap-2.5 text-xs font-bold shadow-lg`;
             toast.innerHTML = `
                 <div class="flex items-center gap-2 min-w-0">
                     <i data-lucide="${iconName}" class="w-4 h-4 flex-shrink-0"></i>
-                    <span class="text-xs font-semibold tracking-wide truncate">${message}</span>
+                    <span class="truncate">${message}</span>
                 </div>
-                <button type="button" class="p-0.5 rounded-md opacity-70 hover:opacity-100 flex-shrink-0 cursor-pointer" title="Dismiss">
+                <button type="button" onclick="this.parentElement.remove()" class="p-0.5 opacity-70 hover:opacity-100 cursor-pointer flex-shrink-0">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             `;
-
-            const closeBtn = toast.querySelector('button');
-            const removeToast = () => {
-                if (toast.dataset.dismissing) return;
-                toast.dataset.dismissing = 'true';
-                toast.style.transform = 'translateY(-130%)';
-                toast.style.opacity = '0';
-                setTimeout(() => {
-                    toast.remove();
-                }, 280);
-            };
-
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                removeToast();
-            });
-            toast.addEventListener('click', removeToast);
-
             container.appendChild(toast);
             if (window.lucide) lucide.createIcons();
 
-            requestAnimationFrame(() => {
-                toast.style.transform = 'translateY(0)';
-                toast.style.opacity = '1';
-            });
-
-            setTimeout(removeToast, duration);
+            setTimeout(() => {
+                toast.style.transform = 'translateY(-130%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 260);
+            }, duration);
         }
 
         function dismissNotification() {
@@ -2050,9 +2199,50 @@
                 if (icon) icon.classList.remove('hidden');
                 if (btnText) btnText.textContent = 'Login';
 
-                isFirstStartSellingAfterLogin = true;
-                showNotification('Login successful!', 'success');
-                navigateTo('dashboardScreen');
+                // 1. Check Super Admin Credentials (KS POS / ks@8804)
+                if (usernameVal.toLowerCase() === adminCredentials.username.toLowerCase() && passwordVal === adminCredentials.password) {
+                    isAdminPinUnlocked = false;
+                    currentSessionUser = {
+                        role: 'admin',
+                        storeId: 'ADMIN',
+                        storeName: 'KS POS Super Admin',
+                        username: adminCredentials.username,
+                        allowedFeatures: [...DEFAULT_ALL_FEATURES],
+                        trialDaysLeft: 999
+                    };
+                    applyRolePermissionsToUI();
+                    isFirstStartSellingAfterLogin = true;
+                    showNotification('Welcome KS POS Super Admin (Full Access)!', 'success');
+                    navigateTo('dashboardScreen');
+                    return;
+                }
+
+                // 2. Check Rented Store User Credentials
+                const matchedStore = rentedStoresList.find(
+                    s => s.username.toLowerCase() === usernameVal.toLowerCase() && s.password === passwordVal
+                );
+
+                if (matchedStore) {
+                    if (matchedStore.status === 'Suspended') {
+                        showNotification('Your store subscription is suspended. Contact Admin.', 'warning');
+                        return;
+                    }
+                    currentSessionUser = {
+                        role: 'store',
+                        storeId: matchedStore.storeId,
+                        storeName: matchedStore.storeName,
+                        username: matchedStore.username,
+                        allowedFeatures: matchedStore.allowedFeatures || ['Sell Screen', 'Order History', 'Dashboard'],
+                        trialDaysLeft: matchedStore.trialDays || 30
+                    };
+                    applyRolePermissionsToUI();
+                    isFirstStartSellingAfterLogin = true;
+                    showNotification(`Logged in: ${matchedStore.storeName} (30-Day Free Trial)`, 'success');
+                    navigateTo('dashboardScreen');
+                    return;
+                }
+
+                showNotification('Invalid username or password', 'warning');
             }, 800);
         }
 
@@ -2060,13 +2250,20 @@
             event.preventDefault();
             const storeName = document.getElementById('regStoreName').value.trim();
             const ownerName = document.getElementById('regOwnerName').value.trim();
+            const regUser = document.getElementById('regUsername').value.trim();
+            const regPass = document.getElementById('regPassword').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const location = document.getElementById('regLocation').value.trim();
             const pincode = document.getElementById('regPincode').value.trim();
 
-            if (!storeName || !ownerName || !phone || !email || !location || !pincode) {
+            if (!storeName || !ownerName || !regUser || !regPass || !phone || !email || !location || !pincode) {
                 showNotification('Please fill in all store registration details', 'warning');
+                return;
+            }
+
+            if (regUser.toLowerCase() === adminCredentials.username.toLowerCase() || rentedStoresList.some(s => s.username.toLowerCase() === regUser.toLowerCase())) {
+                showNotification('Username already exists. Please choose another username.', 'warning');
                 return;
             }
 
@@ -2081,20 +2278,97 @@
             setTimeout(() => {
                 btn.disabled = false;
                 spinner.classList.add('hidden');
-                text.textContent = 'Save register';
+                text.textContent = 'Save register & Start 30-Day Free Trial';
+
+                const newStoreObj = {
+                    storeId: `ST-00${rentedStoresList.length + 1}`,
+                    storeName: storeName,
+                    ownerName: ownerName,
+                    username: regUser,
+                    password: regPass,
+                    phone: phone,
+                    email: email,
+                    location: location,
+                    pincode: pincode,
+                    status: 'Active',
+                    trialStartDate: new Date().toISOString().split('T')[0],
+                    trialDays: 30,
+                    allowedFeatures: ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+                };
+
+                rentedStoresList.unshift(newStoreObj);
+                persistMultiTenantAuthState();
 
                 saveRecordToSupabase('stores', {
                     store_name: storeName,
                     owner_name: ownerName,
+                    username: regUser,
                     phone: phone,
                     email: email,
                     location: location,
                     pincode: pincode
                 });
 
-                showNotification('Store registered successfully! Please login.', 'success');
+                document.getElementById('usernameInput').value = regUser;
+                document.getElementById('passwordInput').value = regPass;
+
+                showNotification('Store registered with 30-Day Free Trial! Please login.', 'success');
                 navigateTo('loginScreen');
             }, 1500);
+        }
+
+        function verifyAdminPinLock() {
+            const enteredPin = document.getElementById('adminPinVerifyInput')?.value.trim();
+            if (enteredPin === adminCredentials.pin) {
+                isAdminPinUnlocked = true;
+                openSidebarModuleScreen('Admin Panel');
+                showNotification('Admin PIN verified!', 'success');
+            } else {
+                showNotification('Incorrect Admin PIN!', 'warning');
+            }
+        }
+
+        function saveUpdatedAdminCredentials() {
+            const newUser = document.getElementById('adminNewUsernameInput')?.value.trim();
+            const newPass = document.getElementById('adminNewPasswordInput')?.value.trim();
+            const newPin = document.getElementById('adminNewPinInput')?.value.trim();
+
+            if (!newUser || !newPass || !newPin) {
+                showNotification('Username, Password, and PIN cannot be empty', 'warning');
+                return;
+            }
+            adminCredentials = {
+                username: newUser,
+                password: newPass,
+                pin: newPin
+            };
+            currentSessionUser.username = newUser;
+            persistMultiTenantAuthState();
+            showNotification('Admin Username, Password & PIN updated!', 'success');
+        }
+
+        function toggleStoreFeaturePermission(storeId, featureName) {
+            const store = rentedStoresList.find(s => s.storeId === storeId);
+            if (!store) return;
+            store.allowedFeatures = store.allowedFeatures || [];
+            const idx = store.allowedFeatures.indexOf(featureName);
+            if (idx >= 0) {
+                store.allowedFeatures.splice(idx, 1);
+            } else {
+                store.allowedFeatures.push(featureName);
+            }
+            persistMultiTenantAuthState();
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`Updated ${featureName} access for ${store.storeName}`, 'success');
+        }
+
+        function toggleStoreAccountStatus(storeId) {
+            const store = rentedStoresList.find(s => s.storeId === storeId);
+            if (!store) return;
+            store.status = store.status === 'Active' ? 'Suspended' : 'Active';
+            persistMultiTenantAuthState();
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`${store.storeName} is now ${store.status}`, store.status === 'Active' ? 'success' : 'warning');
         }
 
         function refreshStoreLocation() {
@@ -2132,16 +2406,503 @@
 
         function handleSidebarNav(sectionName) {
             closeSidebar();
+            if (currentSessionUser.role !== 'admin' && sectionName !== 'Admin Panel') {
+                const allowed = currentSessionUser.allowedFeatures || [];
+                if (!allowed.includes(sectionName)) {
+                    showNotification(`Access restricted for ${sectionName}. Contact Admin.`, 'warning');
+                    return;
+                }
+            }
             if (sectionName === 'Dashboard') {
+                exitStockTransferSellMode();
                 navigateTo('dashboardScreen');
             } else if (sectionName === 'Sell Screen') {
+                exitStockTransferSellMode();
                 navigateTo('sellScreen');
             } else if (sectionName === 'Order History') {
+                exitStockTransferSellMode();
                 navigateTo('orderHistoryScreen');
             } else if (sectionName === 'Shifts') {
+                exitStockTransferSellMode();
                 navigateTo('shiftsScreen');
             } else {
+                exitStockTransferSellMode();
                 openSidebarModuleScreen(sectionName);
+            }
+        }
+
+        // --- STOCK TRANSFER WORKFLOW STATE & HANDLERS ---
+        const storeBranchLocations = [
+            { id: 'loc-1', name: 'Hyderabad Main', address: 'Banjara Hills, Hyderabad, Telangana' },
+            { id: 'loc-2', name: 'Vijayawada Store', address: 'MG Road, Vijayawada, Andhra Pradesh' },
+            { id: 'loc-3', name: 'Secunderabad Branch', address: 'SD Road, Secunderabad, Telangana' },
+            { id: 'loc-4', name: 'Gachibowli Outlet', address: 'Financial District, Hyderabad, Telangana' },
+            { id: 'loc-5', name: 'Visakhapatnam Hub', address: 'Dwaraka Nagar, Visakhapatnam, AP' }
+        ];
+
+        let stockTransfersList = [
+            {
+                transferId: '#ST-101',
+                fromBranch: 'Hyderabad Main',
+                toBranch: 'Vijayawada Store',
+                status: 'Completed',
+                createdAt: '23 Nov 2026, 04:15:00 PM',
+                items: [
+                    { id: 1, name: 'Classic Cotton Shirt', variant: 'Standard Size', sku: 'KS-10101010', price: 1299, qty: 8, checked: true },
+                    { id: 3, name: 'Casual Linen Kurta', variant: 'Large', sku: 'KS-10303030', price: 1499, qty: 6, checked: true }
+                ]
+            }
+        ];
+
+        let isStockTransferSellMode = false;
+        let selectedTransferDestination = '';
+        let currentViewedTransferId = null;
+        let isStockTransferGridView = false;
+
+        function toggleStockTransferGridView() {
+            isStockTransferGridView = !isStockTransferGridView;
+            openSidebarModuleScreen('Stock Transfer');
+        }
+
+        function exitStockTransferSellMode() {
+            if (!isStockTransferSellMode) return;
+            isStockTransferSellMode = false;
+            selectedTransferDestination = '';
+            posCart = [];
+            applyStockTransferSellModeUI();
+        }
+
+        function applyStockTransferSellModeUI() {
+            const custLabel = document.getElementById('cartCustomerLabel');
+            const custIconWrap = document.getElementById('cartCustomerIconWrap');
+            const subCreditEl = document.getElementById('cartCustomerSubCredit');
+            const removeBtn = document.getElementById('removeCartCustomerBtn');
+            const proceedBtn = document.querySelector('#sellCartSection button[onclick="openPaymentsScreen()"]');
+
+            if (isStockTransferSellMode) {
+                if (custIconWrap) {
+                    custIconWrap.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i>';
+                }
+                if (custLabel) {
+                    custLabel.textContent = selectedTransferDestination || 'Add Location';
+                }
+                if (subCreditEl) subCreditEl.classList.add('hidden');
+                if (removeBtn) {
+                    if (selectedTransferDestination) {
+                        removeBtn.classList.remove('hidden');
+                    } else {
+                        removeBtn.classList.add('hidden');
+                    }
+                }
+                if (proceedBtn) {
+                    proceedBtn.innerHTML = '<span>Create New Transfer</span>';
+                }
+            } else {
+                if (custIconWrap) {
+                    custIconWrap.innerHTML = '<i data-lucide="user-plus" class="w-4 h-4"></i>';
+                }
+                if (custLabel) {
+                    custLabel.textContent = currentCustomerData?.name || currentCustomerName || 'Add Customer';
+                }
+                if (removeBtn) {
+                    if (currentCustomerData && currentCustomerData.isSaved) {
+                        removeBtn.classList.remove('hidden');
+                    } else {
+                        removeBtn.classList.add('hidden');
+                    }
+                }
+                if (proceedBtn) {
+                    proceedBtn.innerHTML = '<span>Proceed to Pay</span>';
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openAddLocationModal() {
+            const searchInput = document.getElementById('transferLocationSearchInput');
+            if (searchInput) searchInput.value = '';
+            renderTransferLocationsList(storeBranchLocations);
+            document.getElementById('addLocationModalOverlay').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => searchInput?.focus(), 50);
+        }
+
+        function closeAddLocationModal() {
+            document.getElementById('addLocationModalOverlay').classList.add('hidden');
+        }
+
+        function filterTransferLocations(query) {
+            const q = (query || '').toLowerCase().trim();
+            const filtered = storeBranchLocations.filter(loc =>
+                loc.name.toLowerCase().includes(q) || loc.address.toLowerCase().includes(q)
+            );
+            renderTransferLocationsList(filtered);
+        }
+
+        function renderTransferLocationsList(list) {
+            const container = document.getElementById('transferLocationsListContainer');
+            if (!container) return;
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No matching locations found.</p>`;
+                return;
+            }
+            container.innerHTML = list.map(loc => {
+                const isSelected = selectedTransferDestination === loc.name;
+                return `
+                    <div onclick="selectTransferDestinationLocation('${loc.name.replace(/'/g, "\\'")}')" class="p-3 rounded-2xl border ${isSelected ? 'border-sky-500 bg-sky-100/80' : 'border-sky-100 bg-sky-50/60 hover:bg-sky-100'} flex items-center justify-between gap-2 cursor-pointer transition-all">
+                        <div class="min-w-0">
+                            <p class="text-xs sm:text-sm font-bold text-slate-900 truncate">${loc.name}</p>
+                            <p class="text-[11px] text-slate-500 truncate">${loc.address}</p>
+                        </div>
+                        <i data-lucide="${isSelected ? 'check-circle-2' : 'map-pin'}" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                    </div>
+                `;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function selectTransferDestinationLocation(locationName) {
+            selectedTransferDestination = locationName;
+            applyStockTransferSellModeUI();
+            closeAddLocationModal();
+            showNotification(`Destination selected: ${locationName}`, 'success');
+        }
+
+        function startNewStockTransferFlow() {
+            isStockTransferSellMode = true;
+            isRefundExchangeActive = false;
+            selectedTransferDestination = '';
+            posCart = [];
+            refundCartItems = [];
+            exchangeCartItems = [];
+            discountConfig = { type: 'rupees', value: 0 };
+
+            applyStockTransferSellModeUI();
+            navigateTo('sellScreen');
+            switchMobilePOSTab('products');
+            const searchInput = document.getElementById('posProductSearch');
+            if (searchInput) {
+                searchInput.value = '';
+                setTimeout(() => searchInput.focus(), 100);
+            }
+            showNotification('Select destination location & add items to transfer', 'success');
+        }
+
+        function handleCreateNewStockTransfer() {
+            if (!selectedTransferDestination) {
+                showNotification('Please select a destination location first', 'warning');
+                openAddLocationModal();
+                return;
+            }
+            if (posCart.length === 0) {
+                showNotification('Please add at least one product to transfer', 'warning');
+                return;
+            }
+
+            const overlay = document.getElementById('orderProcessingOverlay');
+            const statusText = document.getElementById('orderProcessingStatusText');
+            if (overlay) overlay.classList.remove('hidden');
+            if (statusText) statusText.textContent = 'Creating stock transfer...';
+
+            setTimeout(() => {
+                if (overlay) overlay.classList.add('hidden');
+
+                const nowFmt = formatOrderDateTime(new Date());
+                const nextNum = 101 + stockTransfersList.length;
+                const newTransferId = `#ST-${nextNum}`;
+                const fromBranchName = document.getElementById('sidebarLocationText')?.textContent.trim() || 'Hyderabad Main';
+
+                const newTransferRecord = {
+                    transferId: newTransferId,
+                    fromBranch: fromBranchName,
+                    toBranch: selectedTransferDestination,
+                    status: 'Pending',
+                    createdAt: nowFmt.fullStr,
+                    items: posCart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        variant: item.variant || 'Standard',
+                        sku: item.sku || 'CUSTOM',
+                        price: item.price,
+                        qty: item.qty,
+                        checked: false,
+                        received: false
+                    }))
+                };
+
+                stockTransfersList.unshift(newTransferRecord);
+                persistStockTransfersToLocal();
+
+                isStockTransferSellMode = false;
+                selectedTransferDestination = '';
+                posCart = [];
+                applyStockTransferSellModeUI();
+
+                openSidebarModuleScreen('Stock Transfer');
+                showNotification(`Transfer ${newTransferId} created!`, 'success');
+            }, 3000);
+        }
+
+        function handleCartOpenShift(e) {
+            if (e) e.stopPropagation();
+            const btn = document.getElementById('cartOpenShiftBtn');
+            const spinner = document.getElementById('cartOpenShiftSpinner');
+            const textEl = document.getElementById('cartOpenShiftBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (textEl) textEl.textContent = 'Opening shift...';
+
+            setTimeout(() => {
+                const lastClosed = pastShiftHistory[0];
+                const openingVal = lastClosed ? Number(lastClosed.closingCash || 0) : 0;
+                const nowFmt = formatReferenceDateTime(new Date());
+                const nextNum = 1001 + pastShiftHistory.length;
+
+                viewedShiftRecord = null;
+                activeShiftState = {
+                    shiftId: `#SH-${nextNum}`,
+                    isOpen: true,
+                    cashier: "Kishore Kumar",
+                    openedAt: nowFmt.fullStr,
+                    openingFloat: Math.max(0, openingVal),
+                    cashSales: 0,
+                    cashSaleCount: 0,
+                    cashRefunds: 0,
+                    cashRefundCount: 0,
+                    storeCreditSales: 0,
+                    storeCreditSaleCount: 0,
+                    storeCreditRefunds: 0,
+                    storeCreditRefundCount: 0,
+                    digitalSales: 0,
+                    digitalSaleCount: 0,
+                    adjustments: []
+                };
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (textEl) textEl.textContent = 'Open Shift';
+
+                persistAppStateToLocal();
+                renderShiftsScreen();
+                renderPOSCart();
+                showNotification('Open shift successful', 'success');
+            }, 3000);
+        }
+
+        function openStockTransferDetailsView(transferId) {
+            const record = stockTransfersList.find(t => t.transferId === transferId);
+            if (!record) return;
+            currentViewedTransferId = transferId;
+
+            const titleEl = document.getElementById('sidebarModuleTitleText');
+            const bodyEl = document.getElementById('sidebarModuleBodyContainer');
+            if (titleEl) titleEl.textContent = `Transfer ${record.transferId}`;
+            if (!bodyEl) return;
+
+            const isCompleted = record.status === 'Completed';
+            const isInTransit = record.status === 'In Transit';
+            const badgeClass = isCompleted
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                : (isInTransit
+                    ? 'bg-sky-100 text-sky-800 border border-sky-200'
+                    : 'bg-amber-100 text-amber-800 border border-amber-200');
+
+            const totalTransferQty = (record.items || []).reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
+            const totalTransferPrice = (record.items || []).reduce((sum, i) => sum + ((Number(i.price) || 0) * (Number(i.qty) || 0)), 0);
+
+            bodyEl.innerHTML = `
+                <div class="w-full flex items-center justify-between gap-2">
+                    <button type="button" onclick="openSidebarModuleScreen('Stock Transfer')" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-100 cursor-pointer">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                        <span>Back to Transfers</span>
+                    </button>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeClass}">${isCompleted ? 'Received' : record.status}</span>
+                </div>
+
+                <div class="w-full glass-card-accent rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-700 block">Route</span>
+                        <p class="font-bold text-slate-900">${record.fromBranch} <span class="text-sky-600 mx-1">→</span> ${record.toBranch}</p>
+                    </div>
+                    <div class="sm:text-right space-y-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Created At</span>
+                        <p class="font-semibold text-slate-700">${record.createdAt}</p>
+                    </div>
+                </div>
+
+                <div class="w-full rounded-2xl border border-sky-200 bg-white overflow-hidden shadow-2xs">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[540px]">
+                            <thead>
+                                <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                                    ${isInTransit ? '<th class="py-3 px-3 text-center w-12">Select</th>' : ''}
+                                    <th class="py-3 px-4">Product</th>
+                                    <th class="py-3 px-4">SKU</th>
+                                    <th class="py-3 px-4 text-center">Quantity</th>
+                                    <th class="py-3 px-4 text-right">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800">
+                                ${(record.items || []).map((item, idx) => {
+                                    const cleanSku = String(item.sku || '').replace(/^KS-?/i, '');
+                                    const rowTotal = (Number(item.price) || 0) * (Number(item.qty) || 0);
+                                    const isChecked = item.receiveChecked !== false;
+                                    return `
+                                        <tr ${isInTransit ? `onclick="toggleTransferReceiveItem(${idx})"` : ''} class="hover:bg-sky-50/50 transition-colors ${isInTransit ? 'cursor-pointer' : ''}">
+                                            ${isInTransit ? `
+                                                <td class="py-3.5 px-3 text-center" onclick="event.stopPropagation()">
+                                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTransferReceiveItem(${idx})" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                                </td>
+                                            ` : ''}
+                                            <td class="py-3.5 px-4">
+                                                <p class="font-bold text-slate-900">${item.name}</p>
+                                                <p class="text-[11px] text-slate-500">${item.variant || 'Standard'}</p>
+                                            </td>
+                                            <td class="py-3.5 px-4 text-sky-700 font-medium">${cleanSku}</td>
+                                            <td class="py-3.5 px-4 text-center font-bold text-slate-900">${item.qty}</td>
+                                            <td class="py-3.5 px-4 text-right font-bold text-slate-900">₹${rowTotal.toFixed(2)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-sky-50/80 border-t-2 border-sky-200 text-xs sm:text-sm font-bold text-slate-900">
+                                    <td colspan="${isInTransit ? 3 : 2}" class="py-3 px-4 text-right uppercase tracking-wider text-slate-600">Total</td>
+                                    <td class="py-3 px-4 text-center text-sky-800">${totalTransferQty}</td>
+                                    <td class="py-3 px-4 text-right text-sky-700">₹${totalTransferPrice.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                ${record.status === 'Pending' ? `
+                    <div class="pt-2">
+                        <button type="button" id="sendStockTransferBtn" onclick="handleSendStockTransfer('${record.transferId}')" class="btn-glass-primary w-full py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer">
+                            <div id="sendStockTransferSpinner" class="hidden w-4 h-4 rounded-full border-2 border-sky-600/30 border-t-sky-700 animate-spin"></div>
+                            <span id="sendStockTransferBtnText">Send</span>
+                        </button>
+                    </div>
+                ` : ''}
+
+                ${isInTransit ? `
+                    <div class="pt-2">
+                        <button type="button" id="receiveStockTransferBtn" onclick="handleReceiveStockTransfer('${record.transferId}')" class="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer shadow-sm transition-all">
+                            <div id="receiveStockTransferSpinner" class="hidden w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
+                            <span id="receiveStockTransferBtnText">Receive</span>
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function toggleTransferReceiveItem(idx) {
+            const record = stockTransfersList.find(t => t.transferId === currentViewedTransferId);
+            if (!record || !record.items || !record.items[idx]) return;
+            const currentState = record.items[idx].receiveChecked !== false;
+            record.items[idx].receiveChecked = !currentState;
+            openStockTransferDetailsView(record.transferId);
+        }
+
+        function handleSendStockTransfer(transferId) {
+            const record = stockTransfersList.find(t => t.transferId === transferId);
+            if (!record) return;
+
+            const itemsToSend = record.items || [];
+            if (itemsToSend.length === 0) {
+                showNotification('No products found in this transfer', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('sendStockTransferBtn');
+            const spinner = document.getElementById('sendStockTransferSpinner');
+            const btnText = document.getElementById('sendStockTransferBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Sending...';
+
+            setTimeout(() => {
+                record.status = 'In Transit';
+                itemsToSend.forEach(tItem => {
+                    tItem.receiveChecked = true;
+                    const prod = samplePOSProducts.find(p => p.id === tItem.id || p.sku === tItem.sku);
+                    if (prod && typeof prod.stock === 'number') {
+                        prod.stock = Math.max(0, prod.stock - tItem.qty);
+                    }
+                });
+
+                persistStockTransfersToLocal();
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Send';
+
+                openSidebarModuleScreen('Stock Transfer');
+                showNotification(`Transfer ${record.transferId} sent! Ready to Receive at destination.`, 'success');
+            }, 3000);
+        }
+
+        function handleReceiveStockTransfer(transferId) {
+            const record = stockTransfersList.find(t => t.transferId === transferId);
+            if (!record) return;
+
+            const selectedItems = (record.items || []).filter(i => i.receiveChecked !== false);
+            if (selectedItems.length === 0) {
+                showNotification('Please tick at least one item to receive', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('receiveStockTransferBtn');
+            const spinner = document.getElementById('receiveStockTransferSpinner');
+            const btnText = document.getElementById('receiveStockTransferBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Receiving...';
+
+            setTimeout(() => {
+                record.status = 'Completed';
+                selectedItems.forEach(rItem => {
+                    rItem.received = true;
+                    const prod = samplePOSProducts.find(p => p.id === rItem.id || p.sku === rItem.sku);
+                    if (prod && typeof prod.stock === 'number') {
+                        prod.stock = (prod.stock || 0) + (Number(rItem.qty) || 0);
+                    }
+                });
+
+                persistStockTransfersToLocal();
+
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Receive';
+
+                openSidebarModuleScreen('Stock Transfer');
+                showNotification(`Transfer ${record.transferId} received into ${record.toBranch}!`, 'success');
+            }, 3000);
+        }
+
+        function persistStockTransfersToLocal() {
+            try {
+                localStorage.setItem('kspos_stock_transfers_v1', JSON.stringify(stockTransfersList));
+            } catch (e) {
+                console.warn('Stock transfer save warning:', e);
+            }
+        }
+
+        function loadStockTransfersFromLocal() {
+            try {
+                const raw = localStorage.getItem('kspos_stock_transfers_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        stockTransfersList = parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Stock transfer load warning:', e);
             }
         }
 
@@ -2152,41 +2913,116 @@
 
             if (bodyEl) {
                 if (sectionName === 'Stock Transfer') {
+                    const toggleTrackClass = isStockTransferGridView ? 'bg-sky-500' : 'bg-slate-300';
+                    const toggleThumbClass = isStockTransferGridView ? 'translate-x-5' : 'translate-x-0';
+
+                    const tableHtml = `
+                        <div class="w-full rounded-2xl border border-sky-200 bg-white overflow-hidden shadow-2xs">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse min-w-[820px]">
+                                    <thead>
+                                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                                            <th class="py-3 px-3.5">Transfer ID</th>
+                                            <th class="py-3 px-3.5">From Branch</th>
+                                            <th class="py-3 px-3.5">To Branch</th>
+                                            <th class="py-3 px-3.5">Items</th>
+                                            <th class="py-3 px-3.5">SKU</th>
+                                            <th class="py-3 px-3.5 text-center">Quantity</th>
+                                            <th class="py-3 px-3.5 text-right">Price</th>
+                                            <th class="py-3 px-3.5 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800">
+                                        ${stockTransfersList.map(tr => {
+                                            const itemsList = tr.items || [];
+                                            const totalQty = itemsList.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
+                                            const totalPrice = itemsList.reduce((sum, i) => sum + ((Number(i.price) || 0) * (Number(i.qty) || 0)), 0);
+                                            const itemsSummary = itemsList.map(i => i.name).join(', ') || '-';
+                                            const skuSummary = itemsList.map(i => String(i.sku || '').replace(/^KS-?/i, '')).join(', ') || '-';
+                                            const isCompleted = tr.status === 'Completed';
+                                            const isInTransit = tr.status === 'In Transit';
+                                            const statusBadge = isCompleted
+                                                ? '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Received</span>'
+                                                : (isInTransit
+                                                    ? `<button type="button" onclick="event.stopPropagation(); openStockTransferDetailsView('${tr.transferId}')" class="px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs cursor-pointer transition-all">Receive</button>`
+                                                    : '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Pending</span>');
+                                            return `
+                                                <tr onclick="openStockTransferDetailsView('${tr.transferId}')" class="hover:bg-sky-50/70 cursor-pointer transition-colors">
+                                                    <td class="py-3 px-3.5 font-bold text-sky-700 whitespace-nowrap">${tr.transferId}</td>
+                                                    <td class="py-3 px-3.5 whitespace-nowrap">${tr.fromBranch}</td>
+                                                    <td class="py-3 px-3.5 font-semibold text-slate-900 whitespace-nowrap">${tr.toBranch}</td>
+                                                    <td class="py-3 px-3.5 max-w-[180px] truncate" title="${itemsSummary}">${itemsSummary}</td>
+                                                    <td class="py-3 px-3.5 text-sky-700 font-medium whitespace-nowrap">${skuSummary}</td>
+                                                    <td class="py-3 px-3.5 text-center font-bold">${totalQty}</td>
+                                                    <td class="py-3 px-3.5 text-right font-bold text-slate-900 whitespace-nowrap">₹${totalPrice.toFixed(2)}</td>
+                                                    <td class="py-3 px-3.5 text-center whitespace-nowrap">${statusBadge}</td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                    const gridHtml = `
+                        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            ${stockTransfersList.map(tr => {
+                                const itemsList = tr.items || [];
+                                const totalQty = itemsList.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
+                                const totalPrice = itemsList.reduce((sum, i) => sum + ((Number(i.price) || 0) * (Number(i.qty) || 0)), 0);
+                                const itemsSummary = itemsList.map(i => i.name).join(', ') || '-';
+                                const skuSummary = itemsList.map(i => String(i.sku || '').replace(/^KS-?/i, '')).join(', ') || '-';
+                                const isCompleted = tr.status === 'Completed';
+                                const isInTransit = tr.status === 'In Transit';
+                                const statusBadge = isCompleted
+                                    ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Received</span>'
+                                    : (isInTransit
+                                        ? `<button type="button" onclick="event.stopPropagation(); openStockTransferDetailsView('${tr.transferId}')" class="px-3 py-1 rounded-xl text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs cursor-pointer transition-all">Receive</button>`
+                                        : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Pending</span>');
+                                return `
+                                    <div onclick="openStockTransferDetailsView('${tr.transferId}')" class="rounded-2xl border border-sky-200 bg-white p-4 space-y-2.5 hover:border-sky-500 cursor-pointer transition-all shadow-2xs">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-bold text-sky-700">${tr.transferId}</span>
+                                            ${statusBadge}
+                                        </div>
+                                        <div class="text-xs space-y-1">
+                                            <p class="font-bold text-slate-900">${tr.fromBranch} → ${tr.toBranch}</p>
+                                            <p class="text-slate-600 truncate">Items: ${itemsSummary}</p>
+                                            <p class="text-[11px] text-sky-700 font-medium truncate">SKU: ${skuSummary}</p>
+                                        </div>
+                                        <div class="pt-2 border-t border-sky-100 flex items-center justify-between text-xs font-bold">
+                                            <span class="text-slate-700">Qty: ${totalQty}</span>
+                                            <span class="text-slate-900">₹${totalPrice.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+
                     bodyEl.innerHTML = `
                         <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/50 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <h3 class="text-sm sm:text-base font-bold text-slate-900">Branch Stock Transfers</h3>
                                 <p class="text-xs text-slate-600 mt-0.5">Move inventory items across store branches</p>
                             </div>
-                            <button type="button" onclick="showNotification('New stock transfer initiated', 'success')" class="btn-glass-primary py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+                            <button type="button" onclick="startNewStockTransferFlow()" class="btn-glass-primary py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                                 <span>New Transfer</span>
                             </button>
                         </div>
-                        <div class="w-full rounded-2xl border border-sky-200 bg-white overflow-hidden shadow-2xs">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse min-w-[560px]">
-                                    <thead>
-                                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700">
-                                            <th class="py-3 px-4">Transfer ID</th>
-                                            <th class="py-3 px-4">From Branch</th>
-                                            <th class="py-3 px-4">To Branch</th>
-                                            <th class="py-3 px-4 text-center">Items</th>
-                                            <th class="py-3 px-4 text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800">
-                                        <tr class="hover:bg-sky-50/60">
-                                            <td class="py-3 px-4 font-bold text-sky-700">#ST-101</td>
-                                            <td class="py-3 px-4">Hyderabad Main</td>
-                                            <td class="py-3 px-4">Vijayawada Store</td>
-                                            <td class="py-3 px-4 text-center font-bold">14</td>
-                                            <td class="py-3 px-4 text-center"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Completed</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                        <div class="w-full flex items-center justify-between px-1 py-1">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-xs sm:text-sm font-bold text-slate-800">Grid View</span>
+                                <button type="button" onclick="toggleStockTransferGridView()" aria-pressed="${isStockTransferGridView}" class="toggle-track w-11 h-6 rounded-full ${toggleTrackClass} p-0.5 flex items-center cursor-pointer">
+                                    <span class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform ${toggleThumbClass}"></span>
+                                </button>
                             </div>
                         </div>
+
+                        ${isStockTransferGridView ? gridHtml : tableHtml}
                     `;
                 } else if (sectionName === 'KS Inventory') {
                     bodyEl.innerHTML = `
@@ -2238,6 +3074,104 @@
                             </div>
                         </div>
                     `;
+                } else if (sectionName === 'Admin Panel') {
+                    if (currentSessionUser.role !== 'admin') {
+                        bodyEl.innerHTML = `<div class="p-6 text-center text-red-600 font-bold">Unauthorized Access</div>`;
+                    } else if (!isAdminPinUnlocked) {
+                        bodyEl.innerHTML = `
+                            <div class="w-full max-w-sm mx-auto rounded-3xl border border-amber-300 bg-amber-50/60 p-6 text-center space-y-4 shadow-sm my-6">
+                                <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800">
+                                    <i data-lucide="key-round" class="w-6 h-6"></i>
+                                </div>
+                                <div class="space-y-1">
+                                    <h3 class="text-base font-bold text-slate-900">Admin PIN Verification</h3>
+                                    <p class="text-xs text-slate-600">Enter your 4-digit Admin PIN to manage rented stores &amp; security settings</p>
+                                </div>
+                                <input type="password" id="adminPinVerifyInput" maxlength="8" placeholder="Enter PIN" class="glass-input w-full px-4 py-3 rounded-xl text-center text-base font-bold tracking-widest text-slate-900">
+                                <button type="button" onclick="verifyAdminPinLock()" class="btn-glass-primary w-full py-3 px-5 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer">
+                                    Unlock Admin Panel
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        bodyEl.innerHTML = `
+                            <!-- Admin Credentials & PIN Change Card -->
+                            <div class="w-full rounded-2xl border border-amber-300 bg-amber-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="shield-check" class="w-5 h-5 text-amber-600"></i>
+                                        <h3 class="text-sm sm:text-base font-bold text-slate-900">Super Admin Security &amp; PIN Settings</h3>
+                                    </div>
+                                    <button type="button" onclick="isAdminPinUnlocked=false; openSidebarModuleScreen('Admin Panel');" class="px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">Lock PIN</button>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Admin Username</label>
+                                        <input type="text" id="adminNewUsernameInput" value="${adminCredentials.username}" class="glass-input w-full px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-900">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Admin Password</label>
+                                        <input type="text" id="adminNewPasswordInput" value="${adminCredentials.password}" class="glass-input w-full px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-900">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Admin Panel PIN</label>
+                                        <input type="text" id="adminNewPinInput" value="${adminCredentials.pin}" class="glass-input w-full px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-900">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" onclick="saveUpdatedAdminCredentials()" class="btn-glass-primary py-2.5 px-5 rounded-xl font-bold text-xs uppercase tracking-wider cursor-pointer">
+                                        Update Credentials &amp; PIN
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Rented Stores & Feature Permissions Control -->
+                            <div class="w-full space-y-3 pt-2">
+                                <div class="flex items-center justify-between px-1">
+                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Rented Stores &amp; Feature Access (${rentedStoresList.length})</h3>
+                                    <span class="text-xs font-semibold text-sky-700">Toggle features per store</span>
+                                </div>
+                                ${rentedStoresList.map(st => {
+                                    const isActive = st.status === 'Active';
+                                    return `
+                                        <div class="w-full rounded-2xl border border-sky-200 bg-white p-4 sm:p-5 space-y-3 shadow-2xs">
+                                            <div class="flex flex-wrap items-start justify-between gap-2 pb-2.5 border-b border-sky-100">
+                                                <div class="space-y-0.5">
+                                                    <div class="flex items-center gap-2">
+                                                        <h4 class="text-sm sm:text-base font-bold text-slate-900">${st.storeName}</h4>
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">${st.status}</span>
+                                                    </div>
+                                                    <p class="text-xs text-slate-600">Owner: <b>${st.ownerName}</b> • User: <b class="text-sky-700">${st.username}</b> • Pass: <b>${st.password}</b></p>
+                                                    <p class="text-[11px] text-slate-500">${st.phone} • ${st.location} • <b>${st.trialDays} Days Free Trial</b></p>
+                                                </div>
+                                                <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white'} transition-colors cursor-pointer">
+                                                    ${isActive ? 'Suspend Store' : 'Activate Store'}
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Allowed App Features:</p>
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                                                    ${DEFAULT_ALL_FEATURES.map(feat => {
+                                                        const enabled = (st.allowedFeatures || []).includes(feat);
+                                                        const trackClass = enabled ? 'bg-sky-500' : 'bg-slate-300';
+                                                        const thumbClass = enabled ? 'translate-x-5' : 'translate-x-0';
+                                                        return `
+                                                            <div onclick="toggleStoreFeaturePermission('${st.storeId}', '${feat}')" class="px-3.5 py-2.5 rounded-xl border ${enabled ? 'border-sky-300 bg-sky-50/70' : 'border-slate-200 bg-slate-50/60'} flex items-center justify-between gap-3 cursor-pointer hover:border-sky-400 transition-all select-none">
+                                                                <span class="text-xs font-bold ${enabled ? 'text-slate-900' : 'text-slate-500'} truncate">${feat}</span>
+                                                                <button type="button" aria-pressed="${enabled}" class="toggle-track w-11 h-6 rounded-full ${trackClass} p-0.5 flex items-center flex-shrink-0 cursor-pointer">
+                                                                    <span class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform ${thumbClass}"></span>
+                                                                </button>
+                                                            </div>
+                                                        `;
+                                                    }).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                    }
                 } else {
                     bodyEl.innerHTML = `
                         <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/50 p-6 text-center space-y-2">
@@ -2457,6 +3391,7 @@
         let activeRefundOrderReference = null;
 
         function handleStartSelling() {
+            exitStockTransferSellMode();
             navigateTo('sellScreen');
             switchMobilePOSTab('products');
 
@@ -2679,6 +3614,10 @@
         }
 
         function handleCustomerHeaderClick() {
+            if (isStockTransferSellMode) {
+                openAddLocationModal();
+                return;
+            }
             if (currentCustomerData && currentCustomerData.isSaved) {
                 openCustomerProfileModal('contact');
             } else {
@@ -2865,6 +3804,7 @@
             if (currentCustomerData.phone) {
                 registeredCustomersDatabase[currentCustomerData.phone] = currentCustomerData;
             }
+            persistAppStateToLocal();
             input.value = '';
             const availableCreditBalance = Math.max(0, currentCustomerData.creditGiven - (currentCustomerData.creditUsed || 0));
             document.getElementById('custCreditGivenText').textContent = `₹${availableCreditBalance.toFixed(2)}`;
@@ -2945,6 +3885,7 @@
                     note: noteVal
                 };
                 registeredCustomersDatabase[phoneVal] = currentCustomerData;
+                persistAppStateToLocal();
 
                 saveRecordToSupabase('customers', {
                     name: nameVal,
@@ -2955,7 +3896,6 @@
                     credit_given: currentCustomerData.creditGiven || 0,
                     credit_used: currentCustomerData.creditUsed || 0
                 });
-                persistAppStateToLocal();
 
                 updateCustomerCartDisplay();
 
@@ -2966,6 +3906,12 @@
         }
 
         function removeCartCustomer() {
+            if (isStockTransferSellMode) {
+                selectedTransferDestination = '';
+                applyStockTransferSellModeUI();
+                showNotification("Destination location removed", "warning");
+                return;
+            }
             currentCustomerName = "";
             currentCustomerPhone = "";
             currentCustomerData = {
@@ -3279,17 +4225,12 @@
             } else {
                 const lockOverlay = document.getElementById('noActiveShiftCartOverlay');
                 const lastClosingEl = document.getElementById('cartNoShiftLastClosingText');
-                if (!activeShiftState.isOpen) {
+                if (!activeShiftState.isOpen && !isStockTransferSellMode) {
                     const lastClosed = pastShiftHistory[0];
                     const lastClosingAmt = lastClosed ? Number(lastClosed.closingCash || 0).toFixed(2) : '0.00';
                     if (lastClosingEl) lastClosingEl.textContent = `₹${lastClosingAmt}`;
-                    if (!isOpeningCartShift) {
-                        resetCartOpenShiftBtnState();
-                    }
                     if (lockOverlay) lockOverlay.classList.remove('hidden');
                 } else {
-                    isOpeningCartShift = false;
-                    resetCartOpenShiftBtnState();
                     if (lockOverlay) lockOverlay.classList.add('hidden');
                 }
 
@@ -3405,6 +4346,19 @@
             document.getElementById('cartSubtotalText').textContent = `₹${subtotal.toFixed(2)}`;
             document.getElementById('cartDiscountText').textContent = `-₹${discountAmount.toFixed(2)}`;
             document.getElementById('cartTaxText').textContent = `₹${displayTax.toFixed(2)}`;
+
+            const standardSummaryRows = document.getElementById('cartSummaryStandardRows');
+            const transferQtyRow = document.getElementById('cartSummaryTransferQtyRow');
+            const transferTotalQtyText = document.getElementById('cartTransferTotalQtyText');
+
+            if (isStockTransferSellMode) {
+                if (standardSummaryRows) standardSummaryRows.classList.add('hidden');
+                if (transferQtyRow) transferQtyRow.classList.remove('hidden');
+                if (transferTotalQtyText) transferTotalQtyText.textContent = String(totalQty);
+            } else {
+                if (standardSummaryRows) standardSummaryRows.classList.remove('hidden');
+                if (transferQtyRow) transferQtyRow.classList.add('hidden');
+            }
             
             const totalValEl = document.getElementById('cartGrandTotalText');
             if (isRefundExchangeActive) {
@@ -3565,6 +4519,10 @@
         let appliedStoreCreditDeduction = 0;
 
         function openPaymentsScreen() {
+            if (isStockTransferSellMode) {
+                handleCreateNewStockTransfer();
+                return;
+            }
             let hasItems = false;
             if (isRefundExchangeActive) {
                 const selRefund = refundCartItems.filter(i => i.isRefundSelected);
@@ -3971,8 +4929,7 @@
             };
 
             allCompletedOrders.unshift(newOrder);
-            currentViewedOrder = newOrder;
-            orderDetailsReturnScreen = 'sellScreen';
+            persistAppStateToLocal();
 
             saveRecordToSupabase('orders', {
                 order_id: newOrder.orderId,
@@ -4003,7 +4960,9 @@
                 total_exchange_value: newOrder.totalExchangeValue,
                 total: newOrder.total
             });
-            persistAppStateToLocal();
+
+            currentViewedOrder = newOrder;
+            orderDetailsReturnScreen = 'sellScreen';
 
             posCart = [];
             refundCartItems = [];
@@ -4611,7 +5570,6 @@
             const salesEl = document.getElementById('shiftRefSalesText');
             const openCashEl = document.getElementById('shiftRefOpeningCashText');
             const openedLabelEl = document.getElementById('shiftRefOpenedLabel');
-            const dtEl = document.getElementById('shiftRefDateTimeText');
             const statusBadge = document.getElementById('shiftRefStatusBadge');
             const sidebarDot = document.getElementById('sidebarShiftDot');
             const sidebarBadge = document.getElementById('sidebarShiftBadge');
@@ -4852,8 +5810,8 @@
                 dateTime: nowFmt.fullStr,
                 user: activeUser
             });
-            closeAdjustCashModal();
             persistAppStateToLocal();
+            closeAdjustCashModal();
             renderShiftsDetailsScreen();
             showNotification('Cash drawer adjusted successfully', 'success');
         }
@@ -5216,15 +6174,12 @@
                 activeShiftState.adjustments = [];
 
                 persistAppStateToLocal();
-                isOpeningCartShift = false;
-                resetCartOpenShiftBtnState();
 
                 if (btn) btn.disabled = false;
                 if (spinner) spinner.classList.add('hidden');
                 if (textEl) textEl.textContent = 'Confirm Close Shift';
 
                 closeShiftActionModal();
-                renderPOSCart();
                 navigateTo('shiftsScreen');
                 showNotification('Shift closed & added to Closed History', 'success');
             }, 3000);
@@ -5236,8 +6191,6 @@
             const nextNum = 1001 + pastShiftHistory.length;
 
             viewedShiftRecord = null;
-            isOpeningCartShift = false;
-            resetCartOpenShiftBtnState();
             activeShiftState = {
                 shiftId: `#SH-${nextNum}`,
                 isOpen: true,
@@ -5259,68 +6212,8 @@
 
             persistAppStateToLocal();
             closeShiftActionModal();
-            renderPOSCart();
             navigateTo('shiftsScreen');
             showNotification('Open shift successful', 'success');
-        }
-
-        let isOpeningCartShift = false;
-
-        function resetCartOpenShiftBtnState() {
-            const btn = document.getElementById('cartOpenShiftBtn');
-            const spinner = document.getElementById('cartOpenShiftSpinner');
-            const textEl = document.getElementById('cartOpenShiftBtnText');
-            if (btn) btn.disabled = false;
-            if (spinner) spinner.classList.add('hidden');
-            if (textEl) textEl.textContent = 'Open Shift';
-        }
-
-        function handleCartOpenShift(e) {
-            if (e) e.stopPropagation();
-            if (isOpeningCartShift || activeShiftState.isOpen) return;
-            isOpeningCartShift = true;
-
-            const btn = document.getElementById('cartOpenShiftBtn');
-            const spinner = document.getElementById('cartOpenShiftSpinner');
-            const textEl = document.getElementById('cartOpenShiftBtnText');
-
-            if (btn) btn.disabled = true;
-            if (spinner) spinner.classList.remove('hidden');
-            if (textEl) textEl.textContent = 'Opening shift...';
-
-            setTimeout(() => {
-                const lastClosed = pastShiftHistory[0];
-                const openingVal = lastClosed ? Number(lastClosed.closingCash || 0) : 0;
-                const nowFmt = formatReferenceDateTime(new Date());
-                const nextNum = 1001 + pastShiftHistory.length;
-
-                viewedShiftRecord = null;
-                activeShiftState = {
-                    shiftId: `#SH-${nextNum}`,
-                    isOpen: true,
-                    cashier: "Kishore Kumar",
-                    openedAt: nowFmt.fullStr,
-                    openingFloat: Math.max(0, openingVal),
-                    cashSales: 0,
-                    cashSaleCount: 0,
-                    cashRefunds: 0,
-                    cashRefundCount: 0,
-                    storeCreditSales: 0,
-                    storeCreditSaleCount: 0,
-                    storeCreditRefunds: 0,
-                    storeCreditRefundCount: 0,
-                    digitalSales: 0,
-                    digitalSaleCount: 0,
-                    adjustments: []
-                };
-
-                persistAppStateToLocal();
-                isOpeningCartShift = false;
-                resetCartOpenShiftBtnState();
-                renderShiftsScreen();
-                renderPOSCart();
-                showNotification('Open shift successful', 'success');
-            }, 3000);
         }
 
         function navigateTo(screenId) {
@@ -5384,7 +6277,10 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadMultiTenantAuthState();
             loadAppStateFromLocal();
+            loadStockTransfersFromLocal();
+            applyRolePermissionsToUI();
             renderPlanFeaturesPreview();
             renderPOSProducts();
             renderPOSCart();
