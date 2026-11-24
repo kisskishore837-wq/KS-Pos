@@ -1952,13 +1952,66 @@
 
         async function syncInitialDataFromSupabase(showToastOnComplete = false) {
             const client = getSupabaseClient();
-            if (!client) return;
             try {
-                // 1. Sync Real-Time Registered Stores & Locations from Cloud
-                const { data: storesData, error: storesErr } = await client
-                    .from('stores')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                // 1. First push any unsynced local stores to Supabase Cloud
+                if (Array.isArray(rentedStoresList) && rentedStoresList.length > 0) {
+                    for (const st of rentedStoresList) {
+                        if (!st || !st.username) continue;
+                        await pushStoreToSupabaseCloud({
+                            store_id: st.storeId,
+                            store_name: st.storeName,
+                            owner_name: st.ownerName,
+                            username: st.username,
+                            password: st.password,
+                            phone: st.phone,
+                            email: st.email,
+                            location: st.location,
+                            pincode: st.pincode,
+                            status: st.status || 'Active',
+                            trial_start_date: st.trialStartDate,
+                            trial_days: st.trialDays || 30,
+                            allowed_features: st.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+                        });
+                    }
+                }
+
+                // 2. Fetch all Real-Time Registered Stores & Locations directly from Supabase Cloud
+                let storesData = null;
+                let storesErr = null;
+
+                if (client) {
+                    const res = await client
+                        .from('stores')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    storesData = res.data;
+                    storesErr = res.error;
+                }
+
+                // Direct REST API fallback if SDK is still loading on mobile
+                if ((!storesData || storesErr)) {
+                    try {
+                        const restResp = await fetch(`${SUPABASE_URL}/rest/v1/stores?select=*&order=created_at.desc`, {
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                            }
+                        });
+                        if (restResp.ok) {
+                            storesData = await restResp.json();
+                            storesErr = null;
+                        } else {
+                            storesErr = { message: `HTTP ${restResp.status}` };
+                        }
+                    } catch (fetchErr) {
+                        storesErr = fetchErr;
+                    }
+                }
+
+                if (storesErr && showToastOnComplete) {
+                    showNotification('Cloud table not ready! Run Supabase SQL once.', 'warning', 4500);
+                }
+
                 if (!storesErr && Array.isArray(storesData)) {
                     const localByUser = {};
                     rentedStoresList.forEach(st => {
@@ -1975,7 +2028,7 @@
                             : (localByUser[key]?.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']);
 
                         cloudStores.push({
-                            storeId: row.store_id || localByUser[key]?.storeId || `ST-${100 + idx}`,
+                            storeId: row.store_id || localByUser[key]?.storeId || `ST-${String(idx + 1).padStart(3, '0')}`,
                             storeName: row.store_name || localByUser[key]?.storeName || 'Registered Store',
                             ownerName: row.owner_name || localByUser[key]?.ownerName || 'Owner',
                             username: uname,
@@ -1994,7 +2047,7 @@
                         });
                     });
 
-                    // Merge cloud stores with any local stores not yet pushed
+                    // Merge cloud stores with any local stores
                     const cloudUserSet = new Set(cloudStores.map(s => s.username.toLowerCase()));
                     const localOnlyStores = rentedStoresList.filter(s => s.username && !cloudUserSet.has(s.username.toLowerCase()));
                     rentedStoresList = [...cloudStores, ...localOnlyStores];
@@ -2015,163 +2068,273 @@
                 }
 
                 // 2. Sync Products
-                const { data: prodData, error: prodErr } = await client.from('products').select('*');
-                if (!prodErr && Array.isArray(prodData) && prodData.length > 0 && samplePOSProducts.length === 0) {
-                    prodData.forEach((p, i) => {
-                        samplePOSProducts.push({
-                            id: p.id || (i + 1),
-                            name: p.name || 'Product',
-                            variant: p.variant || 'Standard',
-                            sku: p.sku || `KS-${1000 + i}`,
-                            price: Number(p.price || 0),
-                            stock: Number(p.stock ?? 10)
+                if (client) {
+                    const { data: prodData, error: prodErr } = await client.from('products').select('*');
+                    if (!prodErr && Array.isArray(prodData) && prodData.length > 0 && samplePOSProducts.length === 0) {
+                        prodData.forEach((p, i) => {
+                            samplePOSProducts.push({
+                                id: p.id || (i + 1),
+                                name: p.name || 'Product',
+                                variant: p.variant || 'Standard',
+                                sku: p.sku || `KS-${1000 + i}`,
+                                price: Number(p.price || 0),
+                                stock: Number(p.stock ?? 10)
+                            });
                         });
-                    });
-                    persistAppStateToLocal();
-                    renderPOSProducts();
-                }
+                        persistAppStateToLocal();
+                        renderPOSProducts();
+                    }
 
-                // 3. Sync Customers
-                const { data: custData, error: custErr } = await client.from('customers').select('*');
-                if (!custErr && Array.isArray(custData) && custData.length > 0) {
-                    custData.forEach(c => {
-                        if (c.phone && !registeredCustomersDatabase[c.phone]) {
-                            registeredCustomersDatabase[c.phone] = {
-                                isSaved: true,
-                                name: c.name || '',
-                                phone: c.phone,
-                                email: c.email || '',
-                                address: c.address || '',
-                                note: c.note || '',
-                                creditGiven: Number(c.credit_given || 0),
-                                creditUsed: Number(c.credit_used || 0),
-                                orders: []
-                            };
-                        }
-                    });
-                }
+                    // 3. Sync Customers
+                    const { data: custData, error: custErr } = await client.from('customers').select('*');
+                    if (!custErr && Array.isArray(custData) && custData.length > 0) {
+                        custData.forEach(c => {
+                            if (c.phone && !registeredCustomersDatabase[c.phone]) {
+                                registeredCustomersDatabase[c.phone] = {
+                                    isSaved: true,
+                                    name: c.name || '',
+                                    phone: c.phone,
+                                    email: c.email || '',
+                                    address: c.address || '',
+                                    note: c.note || '',
+                                    creditGiven: Number(c.credit_given || 0),
+                                    creditUsed: Number(c.credit_used || 0),
+                                    orders: []
+                                };
+                            }
+                        });
+                    }
 
-                // 4. Sync Orders
-                const { data: ordData, error: ordErr } = await client.from('orders').select('*').order('created_at', { ascending: false });
-                if (!ordErr && Array.isArray(ordData) && ordData.length > 0) {
-                    const existingOrderIds = new Set(allCompletedOrders.map(o => o.orderId));
-                    ordData.forEach(o => {
-                        const oid = o.order_id || o.id;
-                        if (oid && !existingOrderIds.has(oid)) {
-                            allCompletedOrders.push({
-                                orderId: oid,
-                                dateStr: o.date_str || '',
-                                timeStr: o.time_str || '',
-                                isoDate: o.iso_date || '',
-                                dateTime: o.date_time || '',
-                                customerName: o.customer_name || 'Walk-in Customer',
-                                customerPhone: o.customer_phone || 'N/A',
-                                userEmail: o.user_email || 'owner@kspos.com',
-                                location: o.location || 'Hyderabad, Telangana, India',
-                                staff: o.staff || 'Store Staff',
-                                paymentMode: o.payment_mode || 'Cash',
-                                paymentStatus: o.payment_status || 'Paid',
-                                fulfillmentStatus: o.fulfillment_status || 'Fulfilled',
-                                items: Array.isArray(o.items) ? o.items : [],
-                                itemCount: Number(o.item_count || 0),
-                                subtotal: Number(o.subtotal || 0),
-                                discount: Number(o.discount || 0),
-                                tax: Number(o.tax || 0),
-                                storeCreditUsed: Number(o.store_credit_used || 0),
-                                storeCreditGiven: Number(o.store_credit_given || 0),
-                                isRefundExchange: Boolean(o.is_refund_exchange),
-                                originOrderId: o.origin_order_id || '',
-                                refundItemCount: Number(o.refund_item_count || 0),
-                                exchangeItemCount: Number(o.exchange_item_count || 0),
-                                totalRefundValue: Number(o.total_refund_value || 0),
-                                totalExchangeValue: Number(o.total_exchange_value || 0),
-                                total: Number(o.total || 0)
-                            });
-                        }
-                    });
-                    persistAppStateToLocal();
-                    renderOrderHistoryScreen();
-                }
+                    // 4. Sync Orders
+                    const { data: ordData, error: ordErr } = await client.from('orders').select('*').order('created_at', { ascending: false });
+                    if (!ordErr && Array.isArray(ordData) && ordData.length > 0) {
+                        const existingOrderIds = new Set(allCompletedOrders.map(o => o.orderId));
+                        ordData.forEach(o => {
+                            const oid = o.order_id || o.id;
+                            if (oid && !existingOrderIds.has(oid)) {
+                                allCompletedOrders.push({
+                                    orderId: oid,
+                                    dateStr: o.date_str || '',
+                                    timeStr: o.time_str || '',
+                                    isoDate: o.iso_date || '',
+                                    dateTime: o.date_time || '',
+                                    customerName: o.customer_name || 'Walk-in Customer',
+                                    customerPhone: o.customer_phone || 'N/A',
+                                    userEmail: o.user_email || 'owner@kspos.com',
+                                    location: o.location || 'Hyderabad, Telangana, India',
+                                    staff: o.staff || 'Store Staff',
+                                    paymentMode: o.payment_mode || 'Cash',
+                                    paymentStatus: o.payment_status || 'Paid',
+                                    fulfillmentStatus: o.fulfillment_status || 'Fulfilled',
+                                    items: Array.isArray(o.items) ? o.items : [],
+                                    itemCount: Number(o.item_count || 0),
+                                    subtotal: Number(o.subtotal || 0),
+                                    discount: Number(o.discount || 0),
+                                    tax: Number(o.tax || 0),
+                                    storeCreditUsed: Number(o.store_credit_used || 0),
+                                    storeCreditGiven: Number(o.store_credit_given || 0),
+                                    isRefundExchange: Boolean(o.is_refund_exchange),
+                                    originOrderId: o.origin_order_id || '',
+                                    refundItemCount: Number(o.refund_item_count || 0),
+                                    exchangeItemCount: Number(o.exchange_item_count || 0),
+                                    totalRefundValue: Number(o.total_refund_value || 0),
+                                    totalExchangeValue: Number(o.total_exchange_value || 0),
+                                    total: Number(o.total || 0)
+                                });
+                            }
+                        });
+                        persistAppStateToLocal();
+                        renderOrderHistoryScreen();
+                    }
 
-                // 5. Sync Shifts
-                const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
-                if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
-                    const existingShiftIds = new Set(pastShiftHistory.map(s => s.shiftId));
-                    shiftData.filter(s => s.status === 'closed').forEach(s => {
-                        const sid = s.shift_id || s.id;
-                        if (sid && !existingShiftIds.has(sid)) {
-                            pastShiftHistory.push({
-                                shiftId: sid,
-                                isoDate: s.iso_date || '',
-                                openedAt: s.opened_at || '',
-                                closedAt: s.closed_at || '',
-                                dateStr: s.date_str || '',
-                                timeStr: s.time_str || '',
-                                sales: Number(s.sales || 0),
-                                openingCash: Number(s.opening_cash || 0),
-                                closingCash: Number(s.closing_cash || 0),
-                                difference: Number(s.difference || 0),
-                                reason: s.reason || '',
-                                cashSales: Number(s.cash_sales || 0),
-                                cashSaleCount: Number(s.cash_sale_count || 0),
-                                cashRefunds: Number(s.cash_refunds || 0),
-                                cashRefundCount: Number(s.cash_refund_count || 0),
-                                storeCreditSales: Number(s.store_credit_sales || 0),
-                                storeCreditSaleCount: Number(s.store_credit_sale_count || 0),
-                                storeCreditRefunds: Number(s.store_credit_refunds || 0),
-                                storeCreditRefundCount: Number(s.store_credit_refund_count || 0),
-                                digitalSales: Number(s.digital_sales || 0),
-                                digitalSaleCount: Number(s.digital_sale_count || 0),
-                                expectedDrawerCash: Number(s.expected_drawer_cash || 0),
-                                adjustments: Array.isArray(s.adjustments) ? s.adjustments : []
-                            });
-                        }
-                    });
-                    persistAppStateToLocal();
-                    renderShiftsScreen();
-                }
+                    // 5. Sync Shifts
+                    const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
+                    if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
+                        const existingShiftIds = new Set(pastShiftHistory.map(s => s.shiftId));
+                        shiftData.filter(s => s.status === 'closed').forEach(s => {
+                            const sid = s.shift_id || s.id;
+                            if (sid && !existingShiftIds.has(sid)) {
+                                pastShiftHistory.push({
+                                    shiftId: sid,
+                                    isoDate: s.iso_date || '',
+                                    openedAt: s.opened_at || '',
+                                    closedAt: s.closed_at || '',
+                                    dateStr: s.date_str || '',
+                                    timeStr: s.time_str || '',
+                                    sales: Number(s.sales || 0),
+                                    openingCash: Number(s.opening_cash || 0),
+                                    closingCash: Number(s.closing_cash || 0),
+                                    difference: Number(s.difference || 0),
+                                    reason: s.reason || '',
+                                    cashSales: Number(s.cash_sales || 0),
+                                    cashSaleCount: Number(s.cash_sale_count || 0),
+                                    cashRefunds: Number(s.cash_refunds || 0),
+                                    cashRefundCount: Number(s.cash_refund_count || 0),
+                                    storeCreditSales: Number(s.store_credit_sales || 0),
+                                    storeCreditSaleCount: Number(s.store_credit_sale_count || 0),
+                                    storeCreditRefunds: Number(s.store_credit_refunds || 0),
+                                    storeCreditRefundCount: Number(s.store_credit_refund_count || 0),
+                                    digitalSales: Number(s.digital_sales || 0),
+                                    digitalSaleCount: Number(s.digital_sale_count || 0),
+                                    expectedDrawerCash: Number(s.expected_drawer_cash || 0),
+                                    adjustments: Array.isArray(s.adjustments) ? s.adjustments : []
+                                });
+                            }
+                        });
+                        persistAppStateToLocal();
+                        renderShiftsScreen();
+                    }
 
-                // 6. Sync Official App Brand Logo & Admin Payment QR from Supabase
-                const { data: brandData, error: brandErr } = await client
-                    .from('app_settings')
-                    .select('setting_key, setting_value')
-                    .in('setting_key', ['official_brand_logo', 'admin_payment_qr', 'admin_payment_upi', 'admin_notify_email']);
-                if (!brandErr && Array.isArray(brandData) && brandData.length > 0) {
-                    brandData.forEach(row => {
-                        if (row.setting_key === 'official_brand_logo' && row.setting_value) {
-                            applyGlobalBrandLogo(row.setting_value, true);
-                        } else if (row.setting_key === 'admin_payment_qr' && row.setting_value) {
-                            adminPaymentConfig.qrDataUrl = row.setting_value;
-                            persistAdminPaymentConfig();
-                        } else if (row.setting_key === 'admin_payment_upi' && row.setting_value) {
-                            adminPaymentConfig.upiId = row.setting_value;
-                            persistAdminPaymentConfig();
-                        } else if (row.setting_key === 'admin_notify_email' && row.setting_value) {
-                            adminPaymentConfig.adminEmail = row.setting_value;
-                            persistAdminPaymentConfig();
-                        }
-                    });
+                    // 6. Sync Official App Brand Logo & Admin Payment QR from Supabase
+                    const { data: brandData, error: brandErr } = await client
+                        .from('app_settings')
+                        .select('setting_key, setting_value')
+                        .in('setting_key', ['official_brand_logo', 'admin_payment_qr', 'admin_payment_upi', 'admin_notify_email']);
+                    if (!brandErr && Array.isArray(brandData) && brandData.length > 0) {
+                        brandData.forEach(row => {
+                            if (row.setting_key === 'official_brand_logo' && row.setting_value) {
+                                applyGlobalBrandLogo(row.setting_value, true);
+                            } else if (row.setting_key === 'admin_payment_qr' && row.setting_value) {
+                                adminPaymentConfig.qrDataUrl = row.setting_value;
+                                persistAdminPaymentConfig();
+                            } else if (row.setting_key === 'admin_payment_upi' && row.setting_value) {
+                                adminPaymentConfig.upiId = row.setting_value;
+                                persistAdminPaymentConfig();
+                            } else if (row.setting_key === 'admin_notify_email' && row.setting_value) {
+                                adminPaymentConfig.adminEmail = row.setting_value;
+                                persistAdminPaymentConfig();
+                            }
+                        });
+                    }
                 }
 
                 if (showToastOnComplete) {
-                    showNotification('Registered stores & locations synced!', 'success');
+                    showNotification(`Synced ${rentedStoresList.length} registered store(s) & locations!`, 'success');
                 }
             } catch (e) {
                 console.warn('Supabase background sync skipped:', e);
             }
         }
 
-        function persistAppStateToLocal() {
+        async function pushStoreToSupabaseCloud(storePayload) {
+            const client = getSupabaseClient();
             try {
-                localStorage.setItem('kspos_active_shift_v1', JSON.stringify(activeShiftState));
-                localStorage.setItem('kspos_past_shifts_v1', JSON.stringify(pastShiftHistory));
-                localStorage.setItem('kspos_orders_v1', JSON.stringify(allCompletedOrders));
-                localStorage.setItem('kspos_customers_v1', JSON.stringify(registeredCustomersDatabase));
-                localStorage.setItem('kspos_products_v1', JSON.stringify(samplePOSProducts));
-                localStorage.setItem('kspos_session_user_v1', JSON.stringify(currentSessionUser));
+                if (client) {
+                    const { error } = await client
+                        .from('stores')
+                        .upsert([storePayload], { onConflict: 'username' });
+                    if (!error) return { ok: true };
+                }
+                const resp = await fetch(`${SUPABASE_URL}/rest/v1/stores?on_conflict=username`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'resolution=merge-duplicates,return=minimal'
+                    },
+                    body: JSON.stringify(storePayload)
+                });
+                return { ok: resp.ok, status: resp.status };
             } catch (err) {
-                console.warn('Local storage save warning:', err);
+                return { ok: false, error: err };
             }
+        }
+
+        function setupSupabaseRealtimeStoresListener() {
+            const client = getSupabaseClient();
+            if (!client || window.__ksStoresRealtimeSubscribed) return;
+            try {
+                window.__ksStoresRealtimeSubscribed = true;
+                client
+                    .channel('public:stores-realtime')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'stores' }, () => {
+                        syncInitialDataFromSupabase(false);
+                    })
+                    .subscribe();
+            } catch (e) {
+                window.__ksStoresRealtimeSubscribed = false;
+            }
+        }
+
+        async function handleRegisterSave(event) {
+            event.preventDefault();
+            const storeName = document.getElementById('regStoreName').value.trim();
+            const ownerName = document.getElementById('regOwnerName').value.trim();
+            const regUser = document.getElementById('regUsername').value.trim();
+            const regPass = document.getElementById('regPassword').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const location = document.getElementById('regLocation').value.trim();
+            const pincode = document.getElementById('regPincode').value.trim();
+
+            if (!storeName || !ownerName || !regUser || !regPass || !phone || !email || !location || !pincode) {
+                showNotification('Please fill in all store registration details', 'warning');
+                return;
+            }
+
+            if (regUser.toLowerCase() === adminCredentials.username.toLowerCase() || rentedStoresList.some(s => s.username.toLowerCase() === regUser.toLowerCase())) {
+                showNotification('Username already exists. Please choose another username.', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('saveRegisterBtn');
+            const spinner = document.getElementById('saveRegisterSpinner');
+            const text = document.getElementById('saveRegisterText');
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            text.textContent = 'Saving to cloud...';
+
+            const defaultAllowed = ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'];
+            const newStoreObj = {
+                storeId: `ST-${String(rentedStoresList.length + 1).padStart(3, '0')}`,
+                storeName: storeName,
+                ownerName: ownerName,
+                username: regUser,
+                password: regPass,
+                phone: phone,
+                email: email,
+                location: location,
+                pincode: pincode,
+                status: 'Active',
+                trialStartDate: new Date().toISOString().split('T')[0],
+                trialDays: 30,
+                allowedFeatures: defaultAllowed
+            };
+
+            rentedStoresList.unshift(newStoreObj);
+            persistMultiTenantAuthState();
+
+            const cloudRes = await pushStoreToSupabaseCloud({
+                store_id: newStoreObj.storeId,
+                store_name: storeName,
+                owner_name: ownerName,
+                username: regUser,
+                password: regPass,
+                phone: phone,
+                email: email,
+                location: location,
+                pincode: pincode,
+                status: 'Active',
+                trial_start_date: newStoreObj.trialStartDate,
+                trial_days: 30,
+                allowed_features: defaultAllowed
+            });
+
+            btn.disabled = false;
+            spinner.classList.add('hidden');
+            text.textContent = 'Save register & Start 30-Day Free Trial';
+
+            document.getElementById('usernameInput').value = regUser;
+            document.getElementById('passwordInput').value = regPass;
+
+            if (cloudRes && cloudRes.ok) {
+                showNotification('Store & Location synced to Cloud! Please login.', 'success', 4000);
+            } else {
+                showNotification('Saved locally! Run Supabase SQL so other devices can sync.', 'warning', 5000);
+            }
+            navigateTo('loginScreen');
         }
 
         function loadAppStateFromLocal() {
@@ -7184,7 +7347,10 @@
             renderShiftsScreen();
             setInterval(updateShiftsLiveClock, 1000);
             if (window.lucide) lucide.createIcons();
-            setTimeout(() => syncInitialDataFromSupabase(false), 100);
+            setTimeout(() => {
+                syncInitialDataFromSupabase(false);
+                setupSupabaseRealtimeStoresListener();
+            }, 150);
         });
 
         // Auto-save state whenever app goes to background or closes on iPhone
