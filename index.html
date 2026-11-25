@@ -4216,29 +4216,28 @@
                                                 <i data-lucide="upload" class="w-3.5 h-3.5"></i>
                                                 <span>Choose Photo</span>
                                             </button>
-        function updateDeleteOrderButtonVisibility() {
-            const delBtn = document.getElementById('odDeleteOrderBtn');
-            if (!delBtn) return;
-            const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
-            const canDeleteOrder = (isMainSuperAdmin || isAdminImpersonatingStore) && isDeleteOrderEnabled;
-            if (canDeleteOrder) {
-                delBtn.disabled = false;
-                delBtn.className = "py-2 px-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white border border-red-600 font-bold text-xs whitespace-nowrap flex-shrink-0 transition-all cursor-pointer shadow-2xs";
-            } else {
-                delBtn.disabled = true;
-                delBtn.className = "py-2 px-3.5 rounded-xl bg-red-50/70 text-red-300 border border-red-200/70 font-bold text-xs whitespace-nowrap flex-shrink-0 opacity-65 cursor-not-allowed pointer-events-none select-none";
-            }
-        }
+                                            <button type="button" id="saveAdminBrandLogoBtn" onclick="saveOfficialBrandLogo()" class="btn-glass-primary py-2 px-5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+                                                <div id="saveAdminLogoSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-sky-600/30 border-t-sky-700 animate-spin"></div>
+                                                <span id="saveAdminLogoBtnText">Save Logo</span>
+                                            </button>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500">Only Admin can upload &amp; update the app logo. Once saved, all store users will automatically see this logo.</p>
+                                    </div>
+                                </div>
+                            </div>
 
-        function openDeleteOrderModal() {
-            const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
-            if ((!isMainSuperAdmin && !isAdminImpersonatingStore) || !isDeleteOrderEnabled || !currentViewedOrder) return;
-            const input = document.getElementById('deleteOrderReasonInput');
-            if (input) input.value = '';
-            document.getElementById('deleteOrderModalOverlay').classList.remove('hidden');
-            if (window.lucide) lucide.createIcons();
-            setTimeout(() => input?.focus(), 50);
-        }
+                            <!-- Admin Payment QR & Renewal Alerts Configuration -->
+                            <div class="w-full rounded-2xl border border-emerald-200 bg-emerald-50/35 p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="qr-code" class="w-5 h-5 text-emerald-600"></i>
+                                    <h3 class="text-sm sm:text-base font-bold text-slate-900">Admin Payment QR &amp; Renewal Notifications</h3>
+                                </div>
+                                <div class="flex flex-wrap items-start gap-4">
+                                    <div class="w-24 h-24 rounded-2xl bg-white border border-emerald-200 shadow-2xs flex items-center justify-center overflow-hidden flex-shrink-0 p-1">
+                                        ${qrPreviewSrc
+                                            ? `<img src="${qrPreviewSrc}" alt="Admin QR" class="w-full h-full object-contain">`
+                                            : `<div class="text-center text-slate-400"><i data-lucide="qr-code" class="w-8 h-8 mx-auto"></i><span class="text-[10px] block mt-1">No QR</span></div>`
+                                        }
                                     </div>
                                     <div class="flex-1 min-w-[220px] space-y-2.5">
                                         <input type="file" id="adminPaymentQrInput" accept="image/*" class="hidden" onchange="handleAdminQrFileSelect(event)">
