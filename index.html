@@ -319,7 +319,7 @@
                             <i data-lucide="scan-barcode" class="w-4 h-4 text-sky-400"></i>
                             <span>Barcode</span>
                         </button>
-                        <button type="button" id="sidebarAdminPanelBtn" onclick="handleSidebarNav('Admin Panel')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-amber-300 bg-amber-500/10 border border-amber-400/30 hover:bg-amber-500/20 transition-colors cursor-pointer text-left">
+                        <button type="button" id="sidebarAdminPanelBtn" onclick="handleSidebarNav('Admin Panel')" class="hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-amber-300 bg-amber-500/10 border border-amber-400/30 hover:bg-amber-500/20 transition-colors cursor-pointer text-left">
                             <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
                             <span>Admin Panel</span>
                         </button>
@@ -2229,13 +2229,14 @@
             }
         }
 
-        async function pushStoreToSupabaseCloud(payload) {
+        async function pushStoreToSupabaseCloud(storePayload) {
+            if (!storePayload || !storePayload.username) return false;
             const client = getSupabaseClient();
             if (client) {
                 try {
                     const { error } = await client
                         .from('stores')
-                        .upsert([payload], { onConflict: 'username' });
+                        .upsert([storePayload], { onConflict: 'username' });
                     if (!error) return true;
                 } catch (e) {}
             }
@@ -2248,7 +2249,7 @@
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'Prefer': 'resolution=merge-duplicates,return=minimal'
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(storePayload)
                 });
                 return resp.ok;
             } catch (e) {
@@ -2256,26 +2257,56 @@
             }
         }
 
+        let supabaseRealtimeStoresChannel = null;
         function setupSupabaseRealtimeStoresListener() {
             const client = getSupabaseClient();
-            if (!client || window.__ksStoresRealtimeSubscribed) return;
+            if (!client || supabaseRealtimeStoresChannel) return;
             try {
-                window.__ksStoresRealtimeSubscribed = true;
-                client
-                    .channel('public:stores')
+                supabaseRealtimeStoresChannel = client
+                    .channel('public:stores-realtime')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'stores' }, () => {
                         syncInitialDataFromSupabase(false);
                     })
                     .subscribe();
             } catch (e) {
-                console.warn('Realtime subscription skipped:', e);
+                console.warn('Realtime listener skipped:', e);
             }
+        }
+
+        function getStoreStorageSuffix() {
+            const uname = (currentSessionUser && currentSessionUser.username)
+                ? String(currentSessionUser.username).trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_')
+                : 'default';
+            return uname || 'default';
+        }
+
+        function createDefaultClosedShiftState(cashierName = "Store Cashier") {
+            return {
+                shiftId: "#SH-1001",
+                isOpen: false,
+                cashier: cashierName,
+                openedAt: "",
+                closedAt: "",
+                openingFloat: 0,
+                cashSales: 0,
+                cashSaleCount: 0,
+                cashRefunds: 0,
+                cashRefundCount: 0,
+                storeCreditSales: 0,
+                storeCreditSaleCount: 0,
+                storeCreditRefunds: 0,
+                storeCreditRefundCount: 0,
+                digitalSales: 0,
+                digitalSaleCount: 0,
+                adjustments: []
+            };
         }
 
         function persistAppStateToLocal() {
             try {
-                localStorage.setItem('kspos_active_shift_v1', JSON.stringify(activeShiftState));
-                localStorage.setItem('kspos_past_shifts_v1', JSON.stringify(pastShiftHistory));
+                const suffix = getStoreStorageSuffix();
+                localStorage.setItem(`kspos_active_shift_v2_${suffix}`, JSON.stringify(activeShiftState));
+                localStorage.setItem(`kspos_past_shifts_v2_${suffix}`, JSON.stringify(pastShiftHistory));
                 localStorage.setItem('kspos_orders_v1', JSON.stringify(allCompletedOrders));
                 localStorage.setItem('kspos_customers_v1', JSON.stringify(registeredCustomersDatabase));
                 localStorage.setItem('kspos_products_v1', JSON.stringify(samplePOSProducts));
@@ -2285,22 +2316,45 @@
             }
         }
 
-        function loadAppStateFromLocal() {
+        function loadStoreScopedShiftState() {
             try {
-                const savedActiveShift = localStorage.getItem('kspos_active_shift_v1');
+                const suffix = getStoreStorageSuffix();
+                const cashierLabel = currentSessionUser?.storeName || currentSessionUser?.username || "Store Cashier";
+                const savedActiveShift = localStorage.getItem(`kspos_active_shift_v2_${suffix}`);
                 if (savedActiveShift) {
                     const parsed = JSON.parse(savedActiveShift);
                     if (parsed && typeof parsed === 'object') {
-                        activeShiftState = { ...activeShiftState, ...parsed };
+                        activeShiftState = { ...createDefaultClosedShiftState(cashierLabel), ...parsed };
+                    } else {
+                        activeShiftState = createDefaultClosedShiftState(cashierLabel);
                     }
+                } else {
+                    // Every new store user starts with No Active Shift (isOpen: false) just like Admin
+                    activeShiftState = createDefaultClosedShiftState(cashierLabel);
                 }
-                const savedPastShifts = localStorage.getItem('kspos_past_shifts_v1');
+
+                const savedPastShifts = localStorage.getItem(`kspos_past_shifts_v2_${suffix}`);
                 if (savedPastShifts) {
                     const parsedPast = JSON.parse(savedPastShifts);
-                    if (Array.isArray(parsedPast)) {
-                        pastShiftHistory = parsedPast;
+                    pastShiftHistory = Array.isArray(parsedPast) ? parsedPast : [];
+                } else {
+                    pastShiftHistory = [];
+                }
+            } catch (err) {
+                console.warn('Store shift load warning:', err);
+            }
+        }
+
+        function loadAppStateFromLocal() {
+            try {
+                const savedSession = localStorage.getItem('kspos_session_user_v1');
+                if (savedSession) {
+                    const parsedSession = JSON.parse(savedSession);
+                    if (parsedSession && parsedSession.username) {
+                        currentSessionUser = { ...currentSessionUser, ...parsedSession };
                     }
                 }
+                loadStoreScopedShiftState();
                 const savedOrders = localStorage.getItem('kspos_orders_v1');
                 if (savedOrders) {
                     const parsedOrders = JSON.parse(savedOrders);
@@ -2321,13 +2375,6 @@
                     if (Array.isArray(parsedProds) && parsedProds.length > 0) {
                         samplePOSProducts.length = 0;
                         parsedProds.forEach(p => samplePOSProducts.push(p));
-                    }
-                }
-                const savedSession = localStorage.getItem('kspos_session_user_v1');
-                if (savedSession) {
-                    const parsedSession = JSON.parse(savedSession);
-                    if (parsedSession && parsedSession.username) {
-                        currentSessionUser = { ...currentSessionUser, ...parsedSession };
                     }
                 }
             } catch (err) {
@@ -2712,26 +2759,30 @@
                 storeId: store.storeId,
                 storeName: store.storeName,
                 username: store.username,
-                allowedFeatures: store.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'],
+                // Grant full access across the entire store app while Admin is inspecting/managing it
+                allowedFeatures: [...DEFAULT_ALL_FEATURES],
                 trialDaysLeft: remainingDays
             };
 
-            const dashLoc = document.getElementById('dashboardLocationText');
-            if (dashLoc && store.location) {
-                dashLoc.textContent = `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`;
-            }
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderPOSCart();
 
-            const banner = document.getElementById('adminStoreImpersonationBanner');
-            const bannerStoreText = document.getElementById('adminPreviewStoreNameText');
-            if (bannerStoreText) {
-                bannerStoreText.textContent = `${store.storeName} (${store.username})`;
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc) {
+                dashLoc.textContent = store.location
+                    ? `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`
+                    : 'Hyderabad, Telangana, India';
             }
-            if (banner) banner.classList.remove('hidden');
 
             applyRolePermissionsToUI();
-            isFirstStartSellingAfterLogin = false;
+            const banner = document.getElementById('adminStoreImpersonationBanner');
+            const previewTitle = document.getElementById('adminPreviewStoreNameText');
+            if (previewTitle) previewTitle.textContent = `${store.storeName} (Full Control)`;
+            if (banner) banner.classList.remove('hidden');
+
             navigateTo('dashboardScreen');
-            showNotification(`Opened Store App: ${store.storeName}`, 'success', 3500);
+            showNotification(`Full Control Opened: ${store.storeName}`, 'success', 2500);
         }
 
         function exitStoreImpersonationToAdmin() {
@@ -2746,11 +2797,39 @@
                 trialDaysLeft: 999
             };
 
-            const banner = document.getElementById('adminStoreImpersonationBanner');
-            if (banner) banner.classList.add('hidden');
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderPOSCart();
 
             const dashLoc = document.getElementById('dashboardLocationText');
             if (dashLoc) dashLoc.textContent = 'Hyderabad, Telangana, India';
+
+            const banner = document.getElementById('adminStoreImpersonationBanner');
+            if (banner) banner.classList.add('hidden');
+
+            applyRolePermissionsToUI();
+            openSidebarModuleScreen('Admin Panel');
+            showNotification('Returned to Super Admin Panel', 'success', 2000);
+        }
+
+        function exitStoreImpersonationToAdmin() {
+            isAdminImpersonatingStore = false;
+            isAdminPinUnlocked = true;
+            currentSessionUser = {
+                role: 'admin',
+                storeId: 'ADMIN',
+                storeName: 'KS POS Super Admin',
+                username: adminCredentials.username || 'KS POS',
+                allowedFeatures: [...DEFAULT_ALL_FEATURES],
+                trialDaysLeft: 999
+            };
+
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderPOSCart();
+
+            const banner = document.getElementById('adminStoreImpersonationBanner');
+            if (banner) banner.classList.add('hidden');
 
             applyRolePermissionsToUI();
             openSidebarModuleScreen('Admin Panel');
@@ -2797,23 +2876,29 @@
         }
 
         function applyRolePermissionsToUI() {
-            const isAdmin = currentSessionUser.role === 'admin';
-            const allowed = isAdmin ? DEFAULT_ALL_FEATURES : (currentSessionUser.allowedFeatures || []);
+            const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
+            const hasFullFeatureAccess = isMainSuperAdmin || isAdminImpersonatingStore;
+            const allowed = hasFullFeatureAccess ? DEFAULT_ALL_FEATURES : (currentSessionUser.allowedFeatures || []);
 
             const adminBtn = document.getElementById('sidebarAdminPanelBtn');
             if (adminBtn) {
-                if (isAdmin) adminBtn.classList.remove('hidden');
-                else adminBtn.classList.add('hidden');
+                if (isMainSuperAdmin) {
+                    adminBtn.classList.remove('hidden');
+                    adminBtn.style.display = 'flex';
+                } else {
+                    adminBtn.classList.add('hidden');
+                    adminBtn.style.display = 'none';
+                }
             }
 
             document.querySelectorAll('.admin-only-control').forEach(el => {
-                if (isAdmin) el.classList.remove('hidden');
+                if (hasFullFeatureAccess) el.classList.remove('hidden');
                 else el.classList.add('hidden');
             });
 
             document.querySelectorAll('#appSidebar button[data-feature-key]').forEach(btn => {
                 const feat = btn.getAttribute('data-feature-key');
-                if (isAdmin || allowed.includes(feat)) {
+                if (hasFullFeatureAccess || allowed.includes(feat)) {
                     btn.classList.remove('hidden');
                 } else {
                     btn.classList.add('hidden');
@@ -2822,7 +2907,7 @@
 
             const locText = document.getElementById('sidebarLocationText');
             if (locText) {
-                if (!isAdmin && currentSessionUser.storeName) {
+                if (currentSessionUser.role === 'store' && currentSessionUser.storeName) {
                     locText.textContent = `${currentSessionUser.storeName} (${currentSessionUser.trialDaysLeft}d Trial)`;
                 } else {
                     locText.textContent = 'Hyderabad, Telangana';
@@ -2940,6 +3025,9 @@
                             allowedFeatures: [...DEFAULT_ALL_FEATURES],
                             trialDaysLeft: 999
                         };
+                        loadStoreScopedShiftState();
+                        renderShiftsScreen();
+                        renderPOSCart();
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         try { persistAppStateToLocal(); } catch (e) {}
@@ -2979,6 +3067,9 @@
                             allowedFeatures: matchedStore.allowedFeatures || ['Sell Screen', 'Order History', 'Dashboard'],
                             trialDaysLeft: remainingDays
                         };
+                        loadStoreScopedShiftState();
+                        renderShiftsScreen();
+                        renderPOSCart();
                         const dashLoc = document.getElementById('dashboardLocationText');
                         if (dashLoc && matchedStore.location) {
                             dashLoc.textContent = `${matchedStore.location}${matchedStore.pincode ? ' - ' + matchedStore.pincode : ''}`;
@@ -3511,6 +3602,10 @@
         }
 
         function openSidebarModuleScreen(sectionName) {
+            if (sectionName === 'Admin Panel' && (currentSessionUser.role !== 'admin' || isAdminImpersonatingStore)) {
+                showNotification('Access restricted to Super Admin only', 'warning');
+                return;
+            }
             const titleEl = document.getElementById('sidebarModuleTitleText');
             const bodyEl = document.getElementById('sidebarModuleBodyContainer');
             if (titleEl) titleEl.textContent = sectionName;
@@ -4157,7 +4252,12 @@
         function handleStartSelling() {
             exitStockTransferSellMode();
             navigateTo('sellScreen');
-            switchMobilePOSTab('products');
+            // On mobile, if shift is closed, show the Cart tab so the user immediately sees the "No Active Shift -> Open Shift" lock card just like Admin
+            if (!activeShiftState.isOpen && window.innerWidth < 768) {
+                switchMobilePOSTab('cart');
+            } else {
+                switchMobilePOSTab('products');
+            }
 
             if (isFirstStartSellingAfterLogin) {
                 isFirstStartSellingAfterLogin = false;
@@ -4166,7 +4266,11 @@
 
                 setTimeout(() => {
                     overlay.classList.add('hidden');
-                    showNotification('Your data loaded successfully', 'success');
+                    if (!activeShiftState.isOpen) {
+                        showNotification('Please open a shift to start billing', 'warning');
+                    } else {
+                        showNotification('Your data loaded successfully', 'success');
+                    }
                 }, 3000);
             }
         }
@@ -5611,6 +5715,10 @@
 
         function handleSidebarNav(menuName) {
             closeSidebar();
+            if (menuName === 'Admin Panel' && (currentSessionUser.role !== 'admin' || isAdminImpersonatingStore)) {
+                showNotification('Access restricted to Super Admin only', 'warning');
+                return;
+            }
             if (menuName === 'Sell Screen') {
                 exitStockTransferSellMode();
                 navigateTo('sellScreen');
