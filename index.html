@@ -212,6 +212,21 @@
 </head>
 <body class="bg-white text-slate-900 min-h-screen w-full relative selection:bg-sky-200 selection:text-sky-900">
 
+    <!-- ADMIN STORE IMPERSONATION TOP BANNER (VISIBLE WHEN ADMIN OPENS A STORE APP) -->
+    <div id="adminStoreImpersonationBanner" class="hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-[85] w-[94vw] max-w-md rounded-2xl bg-neutral-950/95 backdrop-blur-md border border-amber-400/70 text-white px-3.5 py-2.5 shadow-2xl flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0"></span>
+            <div class="min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">Admin Preview Mode</span>
+                <span id="adminPreviewStoreNameText" class="text-xs font-bold text-white truncate block">Viewing Store App</span>
+            </div>
+        </div>
+        <button type="button" onclick="exitStoreImpersonationToAdmin()" class="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs whitespace-nowrap flex items-center gap-1 cursor-pointer transition-colors flex-shrink-0">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Back to Admin</span>
+        </button>
+    </div>
+
     <!-- APP LAUNCH SPLASH SCREEN (3 SECONDS WHITE SPINNER) -->
     <div id="appLaunchSplashOverlay" class="fixed inset-0 z-[100] bg-gradient-to-br from-sky-600 via-sky-500 to-blue-700 flex flex-col items-center justify-center gap-5 transition-opacity duration-500">
         <div class="w-20 h-20 rounded-3xl bg-[#eaedf4] border border-white/40 shadow-2xl flex items-center justify-center overflow-hidden">
@@ -397,7 +412,10 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-500">
                                 <i data-lucide="user" class="w-4 h-4"></i>
                             </div>
-                            <input type="text" id="usernameInput" autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false" required placeholder="Enter your username" class="glass-input w-full pl-10 pr-4 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                            <input type="text" id="usernameInput" autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false" required placeholder="Enter your username" class="glass-input w-full pl-10 pr-10 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                            <button type="button" id="clearLoginFieldsBtn" onclick="clearLoginCredentialsFields()" title="Clear saved details to login another store" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-red-500 cursor-pointer">
+                                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -2626,6 +2644,7 @@
         let isDeleteOrderEnabled = true;
 
         let isAdminPinUnlocked = false;
+        let isAdminImpersonatingStore = false;
         let currentSessionUser = {
             role: 'admin',
             storeId: 'ADMIN',
@@ -2638,13 +2657,113 @@
         // Start with zero dummy stores — only real-time registered stores are displayed
         let rentedStoresList = [];
 
+        function markDeviceAsTrustedAdmin() {
+            try {
+                localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+            } catch (e) {}
+        }
+
+        function isTrustedAdminDevice() {
+            try {
+                return localStorage.getItem('kspos_trusted_admin_device_v1') === 'true';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function applyTrustedAdminAutoFill() {
+            const userInput = document.getElementById('usernameInput');
+            const passInput = document.getElementById('passwordInput');
+            const clearBtn = document.getElementById('clearLoginFieldsBtn');
+            if (!userInput || !passInput) return;
+
+            if (isTrustedAdminDevice()) {
+                userInput.value = adminCredentials.username || 'KS POS';
+                passInput.value = adminCredentials.password || 'ks@8804';
+                if (clearBtn) clearBtn.classList.remove('hidden');
+            } else {
+                userInput.value = '';
+                passInput.value = '';
+                if (clearBtn) clearBtn.classList.add('hidden');
+            }
+        }
+
+        function clearLoginCredentialsFields() {
+            const userInput = document.getElementById('usernameInput');
+            const passInput = document.getElementById('passwordInput');
+            const clearBtn = document.getElementById('clearLoginFieldsBtn');
+            if (userInput) {
+                userInput.value = '';
+                userInput.focus();
+            }
+            if (passInput) passInput.value = '';
+            if (clearBtn) clearBtn.classList.add('hidden');
+            showNotification('Cleared fields — enter any registered store account', 'success', 2500);
+        }
+
+        function openStoreAppAsAdmin(storeId) {
+            const store = (rentedStoresList || []).find(s => s.storeId === storeId);
+            if (!store) return;
+
+            const remainingDays = getStoreRemainingTrialDays(store);
+            isAdminImpersonatingStore = true;
+            currentSessionUser = {
+                role: 'store',
+                storeId: store.storeId,
+                storeName: store.storeName,
+                username: store.username,
+                allowedFeatures: store.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'],
+                trialDaysLeft: remainingDays
+            };
+
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc && store.location) {
+                dashLoc.textContent = `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`;
+            }
+
+            const banner = document.getElementById('adminStoreImpersonationBanner');
+            const bannerStoreText = document.getElementById('adminPreviewStoreNameText');
+            if (bannerStoreText) {
+                bannerStoreText.textContent = `${store.storeName} (${store.username})`;
+            }
+            if (banner) banner.classList.remove('hidden');
+
+            applyRolePermissionsToUI();
+            isFirstStartSellingAfterLogin = false;
+            navigateTo('dashboardScreen');
+            showNotification(`Opened Store App: ${store.storeName}`, 'success', 3500);
+        }
+
+        function exitStoreImpersonationToAdmin() {
+            isAdminImpersonatingStore = false;
+            isAdminPinUnlocked = true;
+            currentSessionUser = {
+                role: 'admin',
+                storeId: 'ADMIN',
+                storeName: 'KS POS Super Admin',
+                username: adminCredentials.username || 'KS POS',
+                allowedFeatures: [...DEFAULT_ALL_FEATURES],
+                trialDaysLeft: 999
+            };
+
+            const banner = document.getElementById('adminStoreImpersonationBanner');
+            if (banner) banner.classList.add('hidden');
+
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc) dashLoc.textContent = 'Hyderabad, Telangana, India';
+
+            applyRolePermissionsToUI();
+            openSidebarModuleScreen('Admin Panel');
+            showNotification('Returned to Super Admin Panel', 'success', 2500);
+        }
+
         function loadMultiTenantAuthState() {
             try {
                 const savedCreds = localStorage.getItem('kspos_admin_creds_v1');
                 if (savedCreds) {
                     const parsed = JSON.parse(savedCreds);
                     if (parsed && parsed.username && parsed.password) {
-                        if (parsed.username === 'ks_boss' || parsed.username === 'KS Bose') {
+                        if (parsed.username === 'ks_boss') {
                             parsed.username = 'KS POS';
                         }
                         adminCredentials = { ...adminCredentials, ...parsed };
@@ -2811,6 +2930,8 @@
                     // 1. Check Super Admin Credentials
                     if (validAdminUsers.includes(cleanUser) && (passwordVal === validAdminPass || passwordVal === 'ks@8804')) {
                         isAdminPinUnlocked = false;
+                        isAdminImpersonatingStore = false;
+                        markDeviceAsTrustedAdmin();
                         currentSessionUser = {
                             role: 'admin',
                             storeId: 'ADMIN',
@@ -2819,6 +2940,8 @@
                             allowedFeatures: [...DEFAULT_ALL_FEATURES],
                             trialDaysLeft: 999
                         };
+                        const banner = document.getElementById('adminStoreImpersonationBanner');
+                        if (banner) banner.classList.add('hidden');
                         try { persistAppStateToLocal(); } catch (e) {}
                         try { applyRolePermissionsToUI(); } catch (e) {}
                         isFirstStartSellingAfterLogin = true;
@@ -2845,6 +2968,9 @@
                             openPlanExpiredScreen(matchedStore);
                             return;
                         }
+                        isAdminImpersonatingStore = false;
+                        const banner = document.getElementById('adminStoreImpersonationBanner');
+                        if (banner) banner.classList.add('hidden');
                         currentSessionUser = {
                             role: 'store',
                             storeId: matchedStore.storeId,
@@ -2990,6 +3116,7 @@
                 pin: newPin
             };
             currentSessionUser.username = newUser;
+            markDeviceAsTrustedAdmin();
             persistMultiTenantAuthState();
             showNotification('Admin Username, Password & PIN updated!', 'success');
         }
@@ -3620,6 +3747,10 @@
                                                 </p>
                                             </div>
                                             <div class="flex flex-wrap items-center gap-1.5">
+                                                <button type="button" onclick="openStoreAppAsAdmin('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1 transition-colors cursor-pointer shadow-2xs" title="Open & Manage this Store App">
+                                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                                    <span>Open Store App</span>
+                                                </button>
                                                 <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs" title="Approve Payment & Renew 30 Days">
                                                     ${st.pendingUtr ? 'Verify UTR & Activate (+30d)' : 'Renew +30d'}
                                                 </button>
@@ -3832,7 +3963,12 @@
                 spinner.classList.add('hidden');
                 text.textContent = 'Log Out';
 
+                isAdminImpersonatingStore = false;
+                const banner = document.getElementById('adminStoreImpersonationBanner');
+                if (banner) banner.classList.add('hidden');
+
                 closeSidebar();
+                applyTrustedAdminAutoFill();
                 navigateTo('welcomeScreen');
                 showNotification('Logged out successfully', 'warning');
             }, 3000);
@@ -7099,7 +7235,9 @@
                 target.classList.add('page-visible');
             }
 
-            if (screenId === 'plansScreen') {
+            if (screenId === 'loginScreen') {
+                applyTrustedAdminAutoFill();
+            } else if (screenId === 'plansScreen') {
                 renderPlanFeaturesPreview();
             } else if (screenId === 'editFeaturesScreen') {
                 renderFeatureBars();
@@ -7305,6 +7443,7 @@
                 loadMultiTenantAuthState();
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
+                applyTrustedAdminAutoFill();
                 applyRolePermissionsToUI();
                 updateDeleteOrderButtonVisibility();
                 renderPlanFeaturesPreview();
