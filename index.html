@@ -692,7 +692,7 @@
                             <ul id="planFeaturesPreviewList" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700"></ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="openEditPlanFeaturesScreen()" class="admin-only-control hidden w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen()" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -719,7 +719,7 @@
                             </ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="openEditPlanFeaturesScreen()" class="admin-only-control hidden w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen()" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -3111,8 +3111,13 @@
             }
 
             document.querySelectorAll('.admin-only-control').forEach(el => {
-                if (isMainSuperAdmin) el.classList.remove('hidden');
-                else el.classList.add('hidden');
+                if (isMainSuperAdmin) {
+                    el.classList.remove('hidden');
+                    el.style.display = 'flex';
+                } else {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                }
             });
 
             document.querySelectorAll('#appSidebar button[data-feature-key]').forEach(btn => {
@@ -7956,6 +7961,17 @@
                 await restoreStoresFromIndexedDBVault();
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
+                // Always start in guest mode on welcome/login screen so public visitors never inherit cached admin privileges
+                isAdminImpersonatingStore = false;
+                isAdminPinUnlocked = false;
+                currentSessionUser = {
+                    role: 'guest',
+                    storeId: '',
+                    storeName: '',
+                    username: '',
+                    allowedFeatures: [],
+                    trialDaysLeft: 0
+                };
                 applyTrustedAdminAutoFill();
                 applyRolePermissionsToUI();
                 updateDeleteOrderButtonVisibility();
