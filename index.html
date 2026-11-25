@@ -645,7 +645,7 @@
         <!-- 5. PLANS SCREEN -->
         <main id="plansScreen" class="page-view page-hidden flex-col justify-between w-full max-w-3xl min-h-[85vh] glass-panel rounded-3xl p-5 sm:p-8 my-auto overflow-y-auto">
             <div class="w-full flex items-center justify-between pb-4 border-b border-sky-100">
-                <button type="button" onclick="navigateTo('dashboardScreen')" class="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-100 cursor-pointer">
+                <button type="button" onclick="handlePlansScreenBack()" class="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-100 cursor-pointer">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span>Back</span>
                 </button>
@@ -692,7 +692,7 @@
                             <ul id="planFeaturesPreviewList" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700"></ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="navigateTo('editFeaturesScreen')" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen()" class="admin-only-control hidden w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -719,7 +719,7 @@
                             </ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="navigateTo('editFeaturesScreen')" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen()" class="admin-only-control hidden w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -2911,12 +2911,12 @@
         let isAdminPinUnlocked = false;
         let isAdminImpersonatingStore = false;
         let currentSessionUser = {
-            role: 'admin',
-            storeId: 'ADMIN',
-            storeName: 'KS POS Super Admin',
-            username: 'KS POS',
-            allowedFeatures: [...DEFAULT_ALL_FEATURES],
-            trialDaysLeft: 30
+            role: 'guest',
+            storeId: '',
+            storeName: '',
+            username: '',
+            allowedFeatures: [],
+            trialDaysLeft: 0
         };
 
         let rentedStoresList = [];
@@ -3111,7 +3111,7 @@
             }
 
             document.querySelectorAll('.admin-only-control').forEach(el => {
-                if (hasFullFeatureAccess) el.classList.remove('hidden');
+                if (isMainSuperAdmin) el.classList.remove('hidden');
                 else el.classList.add('hidden');
             });
 
@@ -4359,6 +4359,20 @@
                 text.textContent = 'Log Out';
 
                 isAdminImpersonatingStore = false;
+                isAdminPinUnlocked = false;
+                currentSessionUser = {
+                    role: 'guest',
+                    storeId: '',
+                    storeName: '',
+                    username: '',
+                    allowedFeatures: [],
+                    trialDaysLeft: 0
+                };
+                try {
+                    localStorage.removeItem('kspos_session_user_v1');
+                } catch (e) {}
+                applyRolePermissionsToUI();
+
                 const banner = document.getElementById('adminStoreImpersonationBanner');
                 if (banner) banner.classList.add('hidden');
 
@@ -4367,6 +4381,23 @@
                 navigateTo('welcomeScreen');
                 showNotification('Logged out successfully', 'warning');
             }, 3000);
+        }
+
+        function handlePlansScreenBack() {
+            if (currentSessionUser.role === 'admin' || currentSessionUser.role === 'store') {
+                navigateTo('dashboardScreen');
+            } else {
+                navigateTo('loginScreen');
+            }
+        }
+
+        function openEditPlanFeaturesScreen() {
+            const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
+            if (!isMainSuperAdmin) {
+                showNotification('Only Super Admin can edit plan features', 'warning');
+                return;
+            }
+            navigateTo('editFeaturesScreen');
         }
 
         let isPerYearOn = false;
@@ -4379,6 +4410,7 @@
         ];
 
         function renderPlanFeaturesPreview() {
+            applyRolePermissionsToUI();
             const listEl = document.getElementById('planFeaturesPreviewList');
             if (!listEl) return;
             listEl.innerHTML = planFeatures.map(feat => `
