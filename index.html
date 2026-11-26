@@ -3591,8 +3591,10 @@
 
         function applyRolePermissionsToUI() {
             const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
-            const hasFullFeatureAccess = isMainSuperAdmin || isAdminImpersonatingStore;
-            const allowed = hasFullFeatureAccess ? DEFAULT_ALL_FEATURES : (currentSessionUser.allowedFeatures || []);
+            const defaultFourFeatures = ['Dashboard', 'Sell Screen', 'Order History', 'Shifts'];
+            const allowed = isMainSuperAdmin
+                ? DEFAULT_ALL_FEATURES
+                : (Array.isArray(currentSessionUser.allowedFeatures) ? currentSessionUser.allowedFeatures : defaultFourFeatures);
 
             const adminBtn = document.getElementById('sidebarAdminPanelBtn');
             if (adminBtn) {
@@ -3617,7 +3619,7 @@
 
             document.querySelectorAll('#appSidebar button[data-feature-key]').forEach(btn => {
                 const feat = btn.getAttribute('data-feature-key');
-                if (hasFullFeatureAccess || allowed.includes(feat)) {
+                if (isMainSuperAdmin || allowed.includes(feat)) {
                     btn.classList.remove('hidden');
                 } else {
                     btn.classList.add('hidden');
@@ -3828,13 +3830,16 @@
             if (!store) return;
 
             const remainingDays = getStoreRemainingTrialDays(store);
+            const storeSavedFeatures = Array.isArray(store.allowedFeatures)
+                ? [...store.allowedFeatures]
+                : ['Dashboard', 'Sell Screen', 'Order History', 'Shifts'];
             isAdminImpersonatingStore = true;
             currentSessionUser = {
                 role: 'store',
                 storeId: store.storeId,
                 storeName: store.storeName,
                 username: store.username,
-                allowedFeatures: [...DEFAULT_ALL_FEATURES],
+                allowedFeatures: storeSavedFeatures,
                 trialDaysLeft: remainingDays
             };
 
@@ -3856,11 +3861,11 @@
             applyRolePermissionsToUI();
             const banner = document.getElementById('adminStoreImpersonationBanner');
             const previewTitle = document.getElementById('adminPreviewStoreNameText');
-            if (previewTitle) previewTitle.textContent = `${store.storeName} (Full Control)`;
+            if (previewTitle) previewTitle.textContent = `${store.storeName} (Saved Features View)`;
             if (banner) banner.classList.remove('hidden');
 
             navigateTo('dashboardScreen');
-            showNotification(`See Store: ${store.storeName} (Full Control)`, 'success', 2500);
+            showNotification(`See Store: ${store.storeName} (${storeSavedFeatures.length} Enabled Features)`, 'success', 2500);
         }
 
         function exitStoreImpersonationToAdmin() {
@@ -5602,7 +5607,6 @@
             setTimeout(() => {
                 try {
                     loadAdminPaymentConfig();
-                    loadMultiTenantAuthState();
                     loadStoreScopedShiftState();
                     if (currentSessionUser.role === 'store' && currentSessionUser.username) {
                         const latestStore = rentedStoresList.find(s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase());
