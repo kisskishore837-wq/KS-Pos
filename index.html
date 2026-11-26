@@ -3732,12 +3732,47 @@
             document.getElementById('usernameInput').value = regUser;
             document.getElementById('passwordInput').value = regPass;
 
-            if (savedToCloud) {
-                showNotification('Store registered & permanently saved to cloud! Please login.', 'success', 4000);
-            } else {
-                showNotification('Store registered & saved! Please login.', 'success', 4000);
+            // Automatically log in the newly registered store & save persistent session so browser refresh keeps them logged in
+            isAdminImpersonatingStore = false;
+            isAdminPinUnlocked = false;
+            isRenewalPlanSelectionMode = false;
+            currentSessionUser = {
+                role: 'store',
+                storeId: newStoreObj.storeId,
+                storeName: newStoreObj.storeName,
+                username: newStoreObj.username,
+                allowedFeatures: defaultAllowed,
+                trialDaysLeft: 30
+            };
+
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderOrderHistoryScreen();
+            renderPOSProducts();
+            renderPOSCart();
+            updateCustomerCartDisplay();
+            updateDeleteOrderButtonVisibility();
+
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc) {
+                dashLoc.textContent = `${location}${pincode ? ' - ' + pincode : ''}`;
             }
-            navigateTo('loginScreen');
+
+            persistAppStateToLocal();
+            applyRolePermissionsToUI();
+            isFirstStartSellingAfterLogin = true;
+
+            // Broadcast across open tabs/windows so Admin Panel updates in real time
+            try {
+                localStorage.setItem('kspos_last_store_sync_ping', String(Date.now()));
+            } catch (e) {}
+
+            if (savedToCloud) {
+                showNotification('Store registered & synced to Admin Panel! 30-Day Free Trial started.', 'success', 4000);
+            } else {
+                showNotification('Store registered & saved! 30-Day Free Trial started.', 'success', 4000);
+            }
+            navigateTo('dashboardScreen');
         }
 
         function verifyAdminPinLock() {
@@ -8224,10 +8259,22 @@
         }
 
         // Guaranteed immediate splash dismiss timers so app NEVER gets stuck on white spinner
-        setTimeout(dismissSplashScreenSafely, 2000);
+        setTimeout(dismissSplashScreenSafely, 900);
+
+        // Listen for instant cross-tab / cross-window store registrations & updates
+        window.addEventListener('storage', (e) => {
+            if (e && (e.key === 'kspos_rented_stores_v2' || e.key === 'kspos_last_store_sync_ping')) {
+                loadMultiTenantAuthState();
+                const modTitle = document.getElementById('sidebarModuleTitleText')?.textContent;
+                const modScreen = document.getElementById('sidebarModuleScreen');
+                if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden') && !isSyncingStoresNow) {
+                    openSidebarModuleScreen('Admin Panel');
+                }
+            }
+        });
 
         window.addEventListener('DOMContentLoaded', async () => {
-            setTimeout(dismissSplashScreenSafely, 2000);
+            setTimeout(dismissSplashScreenSafely, 900);
 
             try {
                 const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
@@ -8242,41 +8289,93 @@
                 await restoreStoresFromIndexedDBVault();
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
-                // Always start in guest mode on welcome/login screen so public visitors never inherit cached admin privileges
-                isAdminImpersonatingStore = false;
-                isAdminPinUnlocked = false;
-                currentSessionUser = {
-                    role: 'guest',
-                    storeId: '',
-                    storeName: '',
-                    username: '',
-                    allowedFeatures: [],
-                    trialDaysLeft: 0
-                };
-                applyTrustedAdminAutoFill();
-                applyRolePermissionsToUI();
-                updateDeleteOrderButtonVisibility();
-                renderPlanFeaturesPreview();
-                renderPOSProducts();
-                renderPOSCart();
-                renderOrderHistoryScreen();
-                renderShiftsScreen();
+
+                // Restore active logged-in session across browser refreshes (only Log Out clears it)
+                if (currentSessionUser && currentSessionUser.role === 'admin' && currentSessionUser.username) {
+                    isAdminImpersonatingStore = false;
+                    isAdminPinUnlocked = false;
+                    applyRolePermissionsToUI();
+                    updateDeleteOrderButtonVisibility();
+                    renderPlanFeaturesPreview();
+                    renderPOSProducts();
+                    renderPOSCart();
+                    renderOrderHistoryScreen();
+                    renderShiftsScreen();
+                    navigateTo('dashboardScreen');
+                } else if (currentSessionUser && currentSessionUser.role === 'store' && currentSessionUser.username) {
+                    const matchedStore = (rentedStoresList || []).find(
+                        s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase()
+                    );
+                    if (matchedStore) {
+                        const remDays = getStoreRemainingTrialDays(matchedStore);
+                        if (matchedStore.status === 'Suspended' || matchedStore.status === 'Expired' || remDays <= 0) {
+                            openPlanExpiredScreen(matchedStore, 'warning');
+                        } else if (matchedStore.justRenewedBanner) {
+                            openPlanExpiredScreen(matchedStore, 'renewed');
+                        } else {
+                            currentSessionUser.allowedFeatures = matchedStore.allowedFeatures || currentSessionUser.allowedFeatures;
+                            currentSessionUser.trialDaysLeft = remDays;
+                            const dashLoc = document.getElementById('dashboardLocationText');
+                            if (dashLoc && matchedStore.location) {
+                                dashLoc.textContent = `${matchedStore.location}${matchedStore.pincode ? ' - ' + matchedStore.pincode : ''}`;
+                            }
+                            applyRolePermissionsToUI();
+                            updateDeleteOrderButtonVisibility();
+                            renderPlanFeaturesPreview();
+                            renderPOSProducts();
+                            renderPOSCart();
+                            renderOrderHistoryScreen();
+                            renderShiftsScreen();
+                            navigateTo('dashboardScreen');
+                        }
+                    } else {
+                        // Store exists in saved session even before cloud finishes syncing
+                        applyRolePermissionsToUI();
+                        updateDeleteOrderButtonVisibility();
+                        renderPlanFeaturesPreview();
+                        renderPOSProducts();
+                        renderPOSCart();
+                        renderOrderHistoryScreen();
+                        renderShiftsScreen();
+                        navigateTo('dashboardScreen');
+                    }
+                } else {
+                    isAdminImpersonatingStore = false;
+                    isAdminPinUnlocked = false;
+                    currentSessionUser = {
+                        role: 'guest',
+                        storeId: '',
+                        storeName: '',
+                        username: '',
+                        allowedFeatures: [],
+                        trialDaysLeft: 0
+                    };
+                    applyTrustedAdminAutoFill();
+                    applyRolePermissionsToUI();
+                    updateDeleteOrderButtonVisibility();
+                    renderPlanFeaturesPreview();
+                    renderPOSProducts();
+                    renderPOSCart();
+                    renderOrderHistoryScreen();
+                    renderShiftsScreen();
+                }
+
                 setInterval(updateShiftsLiveClock, 1000);
                 if (window.lucide) lucide.createIcons();
             } catch (initErr) {
                 console.warn('Init error:', initErr);
             }
 
-            // Immediate Cloud Sync on App Launch / Reopen so all Registered Stores & Locations appear right away
+            // Immediate non-blocking Cloud Sync on App Launch / Reopen
             syncInitialDataFromSupabase(false);
             setupSupabaseRealtimeStoresListener();
 
-            // Periodic background sync every 25s while app is open
+            // Fast 3-second live sync when Admin Panel is open, 12-second sync otherwise
             setInterval(() => {
                 if (!document.hidden) {
                     syncInitialDataFromSupabase(false);
                 }
-            }, 25000);
+            }, 3500);
         });
 
         window.addEventListener('pageshow', () => {
@@ -8286,7 +8385,7 @@
         });
 
         window.addEventListener('load', () => {
-            setTimeout(dismissSplashScreenSafely, 2600);
+            setTimeout(dismissSplashScreenSafely, 1200);
         });
 
         window.addEventListener('pagehide', () => {
