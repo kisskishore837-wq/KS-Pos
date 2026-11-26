@@ -765,7 +765,7 @@
                             <ul id="planFeaturesPreviewList" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700"></ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="openEditPlanFeaturesScreen()" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen('Standard')" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -785,14 +785,14 @@
                             <p id="proPlanPriceDisplay" class="text-2xl sm:text-3xl font-bold text-sky-700 mt-2">
                                 ₹1,999 <span class="text-xs font-normal text-slate-500">/ month</span>
                             </p>
-                            <ul class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700">
+                            <ul id="proPlanFeaturesPreviewList" class="mt-4 space-y-2 text-xs sm:text-sm text-slate-700">
                                 <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-600"></i> Unlimited Branches &amp; Staff</li>
                                 <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-600"></i> Multi-Warehouse Stock Transfer</li>
                                 <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-600"></i> Priority 24/7 Cloud Sync</li>
                             </ul>
                         </div>
                         <div class="space-y-2">
-                            <button type="button" onclick="openEditPlanFeaturesScreen()" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
+                            <button type="button" onclick="openEditPlanFeaturesScreen('Pro')" style="display: none;" class="admin-only-control w-full py-2.5 px-4 rounded-xl bg-white hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm items-center justify-center gap-2 transition-all cursor-pointer">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
@@ -813,19 +813,40 @@
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span>Back</span>
                 </button>
-                <h2 class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">Edit Plan Features</h2>
+                <h2 id="editPlanModalHeading" class="luxury-heading text-base sm:text-xl font-bold tracking-wider text-slate-900">Edit Plan Details</h2>
                 <div class="w-12 sm:w-16"></div>
             </div>
 
-            <div class="w-full flex-1 py-6 space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs sm:text-sm font-semibold text-slate-600">Manage Included Features</span>
-                    <button type="button" onclick="addNewFeatureBar()" class="py-2 px-4 rounded-xl bg-sky-100 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                        <span>Add Features</span>
-                    </button>
+            <div class="w-full flex-1 py-5 space-y-5">
+                <!-- Price, Discount & Optional Note Card -->
+                <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/50 p-4 space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label for="editPlanMonthlyPriceInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Price (₹ / Month)</label>
+                            <input type="number" id="editPlanMonthlyPriceInput" min="0" step="any" placeholder="e.g. 999" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-900">
+                        </div>
+                        <div>
+                            <label for="editPlanDiscountInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Discount (% or ₹ Offer)</label>
+                            <input type="text" id="editPlanDiscountInput" placeholder="e.g. Save 20% or ₹200 OFF" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-900">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="editPlanOptionalNoteInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Optional Note</label>
+                        <input type="text" id="editPlanOptionalNoteInput" placeholder="Enter optional offer note (e.g. Best for single retail counter)..." class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm text-slate-900">
+                    </div>
                 </div>
-                <div id="featureBarsContainer" class="space-y-2.5 max-h-[45vh] overflow-y-auto pr-1"></div>
+
+                <!-- Included Features List -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs sm:text-sm font-semibold text-slate-600">Manage Included Features</span>
+                        <button type="button" onclick="addNewFeatureBar()" class="py-2 px-4 rounded-xl bg-sky-100 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Features</span>
+                        </button>
+                    </div>
+                    <div id="featureBarsContainer" class="space-y-2.5 max-h-[38vh] overflow-y-auto pr-1"></div>
+                </div>
             </div>
 
             <div class="w-full pt-3 border-t border-sky-100">
@@ -2302,7 +2323,7 @@
 
                     const modTitle = document.getElementById('sidebarModuleTitleText')?.textContent;
                     const modScreen = document.getElementById('sidebarModuleScreen');
-                    if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden') && !isSyncingStoresNow) {
+                    if (showToastOnComplete && modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden')) {
                         openSidebarModuleScreen('Admin Panel');
                     }
                 }
@@ -2350,10 +2371,12 @@
                     if (!ordErr && Array.isArray(ordData) && ordData.length > 0) {
                         const activeStoreTag = getStoreStorageSuffix();
                         const existingOrderIds = new Set(allCompletedOrders.map(o => o.orderId));
+                        let hasNewCloudOrders = false;
                         ordData.forEach(o => {
                             const rowStoreTag = (o.store_username || 'admin').toLowerCase();
                             const oid = o.order_id || o.id;
                             if (rowStoreTag === activeStoreTag && oid && !existingOrderIds.has(oid)) {
+                                hasNewCloudOrders = true;
                                 allCompletedOrders.push({
                                     orderId: oid,
                                     dateStr: o.date_str || '',
@@ -2385,18 +2408,22 @@
                                 });
                             }
                         });
-                        persistAppStateToLocal();
-                        renderOrderHistoryScreen();
+                        if (hasNewCloudOrders) {
+                            persistAppStateToLocal();
+                            renderOrderHistoryScreen();
+                        }
                     }
 
                     const { data: shiftData, error: shiftErr } = await client.from('shifts').select('*').order('created_at', { ascending: false });
                     if (!shiftErr && Array.isArray(shiftData) && shiftData.length > 0) {
                         const activeStoreTag = getStoreStorageSuffix();
                         const existingShiftIds = new Set(pastShiftHistory.map(s => s.shiftId));
+                        let hasNewCloudShifts = false;
                         shiftData.filter(s => s.status === 'closed').forEach(s => {
                             const rowStoreTag = (s.store_username || 'admin').toLowerCase();
                             const sid = s.shift_id || s.id;
                             if (rowStoreTag === activeStoreTag && sid && !existingShiftIds.has(sid)) {
+                                hasNewCloudShifts = true;
                                 pastShiftHistory.push({
                                     shiftId: sid,
                                     isoDate: s.iso_date || '',
@@ -2424,8 +2451,10 @@
                                 });
                             }
                         });
-                        persistAppStateToLocal();
-                        renderShiftsScreen();
+                        if (hasNewCloudShifts) {
+                            persistAppStateToLocal();
+                            renderShiftsScreen();
+                        }
                     }
 
                     const { data: brandData, error: brandErr } = await client
@@ -2463,8 +2492,6 @@
         async function pushStoreToSupabaseCloud(storePayload, maxRetries = 3) {
             if (!storePayload || !storePayload.username) return false;
             const client = getSupabaseClient();
-
-            // Core schema-safe payload so insert/upsert succeeds even if optional columns aren't added yet
             const corePayload = {
                 store_id: storePayload.store_id,
                 store_name: storePayload.store_name,
@@ -2477,30 +2504,20 @@
                 pincode: storePayload.pincode,
                 status: storePayload.status || 'Active',
                 trial_start_date: storePayload.trial_start_date,
-                trial_days: storePayload.trial_days || 30,
+                trial_days: Number(storePayload.trial_days ?? 30),
                 allowed_features: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
             };
 
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                // Method A1: Full payload via Supabase JS Client Upsert
                 if (client) {
                     try {
                         const { error } = await client
                             .from('stores')
-                            .upsert([storePayload], { onConflict: 'username' });
-                        if (!error) return true;
-                    } catch (e) {}
-
-                    // Method A2: Core payload via Supabase JS Client Upsert
-                    try {
-                        const { error: coreErr } = await client
-                            .from('stores')
                             .upsert([corePayload], { onConflict: 'username' });
-                        if (!coreErr) return true;
+                        if (!error) return true;
                     } catch (e) {}
                 }
 
-                // Method B: Direct Supabase REST Upsert (Full then Core)
                 try {
                     const resp = await fetch(`${SUPABASE_URL}/rest/v1/stores?on_conflict=username`, {
                         method: 'POST',
@@ -2510,24 +2527,11 @@
                             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                             'Prefer': 'resolution=merge-duplicates,return=minimal'
                         },
-                        body: JSON.stringify(storePayload)
-                    });
-                    if (resp.ok) return true;
-
-                    const coreResp = await fetch(`${SUPABASE_URL}/rest/v1/stores?on_conflict=username`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'Prefer': 'resolution=merge-duplicates,return=minimal'
-                        },
                         body: JSON.stringify(corePayload)
                     });
-                    if (coreResp.ok) return true;
+                    if (resp.ok) return true;
                 } catch (e) {}
 
-                // Method C: Plain REST Insert if on_conflict constraint isn't created yet
                 try {
                     const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/stores`, {
                         method: 'POST',
@@ -2547,22 +2551,6 @@
                 }
             }
             return false;
-        }
-
-        let supabaseRealtimeStoresChannel = null;
-        function setupSupabaseRealtimeStoresListener() {
-            const client = getSupabaseClient();
-            if (!client || supabaseRealtimeStoresChannel) return;
-            try {
-                supabaseRealtimeStoresChannel = client
-                    .channel('public:stores-realtime')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'stores' }, () => {
-                        syncInitialDataFromSupabase(false);
-                    })
-                    .subscribe();
-            } catch (e) {
-                console.warn('Realtime listener skipped:', e);
-            }
         }
 
         function getStoreStorageSuffix() {
@@ -2608,40 +2596,6 @@
             };
         }
 
-        function resetInMemoryStoreDataForNewAccount(storeLabel = "Store Cashier") {
-            activeShiftState = createDefaultClosedShiftState(storeLabel);
-            pastShiftHistory = [];
-            allCompletedOrders = [];
-            registeredCustomersDatabase = {};
-            stockTransfersList = [];
-            customBranchLocations = [];
-            samplePOSProducts.length = 0;
-            getDefaultSampleProducts().forEach(p => samplePOSProducts.push(p));
-
-            posCart = [];
-            heldCart = null;
-            heldCustomerName = "";
-            heldCustomerPhone = "";
-            currentCustomerName = "";
-            currentCustomerPhone = "";
-            currentCustomerData = {
-                isSaved: false,
-                name: "",
-                phone: "",
-                email: "",
-                address: "",
-                note: "",
-                creditGiven: 0,
-                creditUsed: 0,
-                orders: []
-            };
-            discountConfig = { type: 'rupees', value: 0 };
-            isRefundExchangeActive = false;
-            refundCartItems = [];
-            exchangeCartItems = [];
-            activeRefundOrderReference = null;
-        }
-
         function persistAppStateToLocal() {
             try {
                 const suffix = getStoreStorageSuffix();
@@ -2663,7 +2617,6 @@
                 const suffix = getStoreStorageSuffix();
                 const cashierLabel = currentSessionUser?.storeName || currentSessionUser?.username || "Store Cashier";
 
-                // 1. Store-Scoped Active & Past Shifts
                 const savedActiveShift = localStorage.getItem(`kspos_active_shift_v2_${suffix}`);
                 if (savedActiveShift) {
                     const parsed = JSON.parse(savedActiveShift);
@@ -2684,7 +2637,6 @@
                     pastShiftHistory = [];
                 }
 
-                // 2. Store-Scoped Orders (Completely isolated per store account)
                 const savedOrders = localStorage.getItem(`kspos_orders_v2_${suffix}`);
                 if (savedOrders) {
                     const parsedOrders = JSON.parse(savedOrders);
@@ -2696,7 +2648,6 @@
                     allCompletedOrders = [];
                 }
 
-                // 3. Store-Scoped Customers & Store Credit (Completely isolated per store account)
                 const savedCustomers = localStorage.getItem(`kspos_customers_v2_${suffix}`);
                 if (savedCustomers) {
                     const parsedCust = JSON.parse(savedCustomers);
@@ -2708,7 +2659,6 @@
                     registeredCustomersDatabase = {};
                 }
 
-                // 4. Store-Scoped Products / Inventory
                 const savedProducts = localStorage.getItem(`kspos_products_v2_${suffix}`);
                 samplePOSProducts.length = 0;
                 if (savedProducts) {
@@ -2722,14 +2672,12 @@
                     getDefaultSampleProducts().forEach(p => samplePOSProducts.push(p));
                 }
 
-                // 5. Store-Scoped Stock Transfers & Custom Branch Locations
                 const savedTransfers = localStorage.getItem(`kspos_stock_transfers_v2_${suffix}`);
                 stockTransfersList = savedTransfers ? (JSON.parse(savedTransfers) || []) : [];
 
                 const savedLocs = localStorage.getItem(`kspos_custom_branch_locations_v2_${suffix}`);
                 customBranchLocations = savedLocs ? (JSON.parse(savedLocs) || []) : [];
 
-                // Reset active cart & selected customer when switching store sessions
                 posCart = [];
                 heldCart = null;
                 currentCustomerName = "";
@@ -2791,11 +2739,11 @@
         let currentExpiredStoreObj = null;
         let isRenewalPlanSelectionMode = false;
         let selectedRenewalPlanDetails = {
-            planName: "KS POS Standard (Monthly)",
+            planName: "Standard",
+            billingCycle: "Monthly",
             amount: 999,
             days: 30
         };
-        let renewalApprovalPollInterval = null;
 
         function loadAdminPaymentConfig() {
             try {
@@ -2872,192 +2820,53 @@
         }
 
         function showExpiredScreenStep(stepName) {
-            const steps = {
-                warning: document.getElementById('expiredStepWarningBox'),
-                qr: document.getElementById('expiredStepQrPaymentBox'),
-                waiting: document.getElementById('expiredStepWaitingApprovalBox'),
-                renewed: document.getElementById('expiredStepRenewedSuccessBox')
-            };
-            Object.keys(steps).forEach(k => {
-                if (steps[k]) {
-                    if (k === stepName) steps[k].classList.remove('hidden');
-                    else steps[k].classList.add('hidden');
-                }
+            const stepWarning = document.getElementById('expiredStepWarningBox');
+            const stepQr = document.getElementById('expiredStepQrPaymentBox');
+            const stepWaiting = document.getElementById('expiredStepWaitingApprovalBox');
+            const stepRenewed = document.getElementById('expiredStepRenewedSuccessBox');
+            const topBadge = document.getElementById('expiredScreenTopBadge');
+
+            [stepWarning, stepQr, stepWaiting, stepRenewed].forEach(el => {
+                if (el) el.classList.add('hidden');
             });
 
-            const badge = document.getElementById('expiredScreenTopBadge');
-            if (badge) {
-                if (stepName === 'renewed') {
-                    badge.textContent = 'Plan Renewed';
-                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
-                } else if (stepName === 'waiting') {
-                    badge.textContent = 'Pending Admin Approval';
-                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300';
-                } else if (stepName === 'qr') {
-                    badge.textContent = 'Scan & Pay QR';
-                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-300';
-                } else {
-                    badge.textContent = 'Plan Expired';
-                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200';
+            if (stepName === 'qr') {
+                if (stepQr) stepQr.classList.remove('hidden');
+                if (topBadge) {
+                    topBadge.textContent = 'Renewal Payment';
+                    topBadge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200';
+                }
+            } else if (stepName === 'waiting') {
+                if (stepWaiting) stepWaiting.classList.remove('hidden');
+                if (topBadge) {
+                    topBadge.textContent = 'Awaiting Admin Approval';
+                    topBadge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200';
+                }
+            } else if (stepName === 'renewed') {
+                if (stepRenewed) stepRenewed.classList.remove('hidden');
+                if (topBadge) {
+                    topBadge.textContent = 'Plan Renewed';
+                    topBadge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+                }
+            } else {
+                if (stepWarning) stepWarning.classList.remove('hidden');
+                if (topBadge) {
+                    topBadge.textContent = 'License Locked';
+                    topBadge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200';
                 }
             }
             if (window.lucide) lucide.createIcons();
         }
 
-        function startRenewalApprovalPolling() {
-            stopRenewalApprovalPolling();
-            renewalApprovalPollInterval = setInterval(async () => {
-                if (!currentExpiredStoreObj) {
-                    stopRenewalApprovalPolling();
-                    return;
-                }
-                await syncInitialDataFromSupabase(false);
-                const latestStore = (rentedStoresList || []).find(
-                    s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase()
-                );
-                if (latestStore) {
-                    currentExpiredStoreObj = latestStore;
-                    const rem = getStoreRemainingTrialDays(latestStore);
-                    if (latestStore.status === 'Active' && rem > 0) {
-                        stopRenewalApprovalPolling();
-                        showExpiredScreenStep('renewed');
-                        showNotification('Your Plan is Renewed! Tap to activate.', 'success', 4500);
-                    }
-                }
-            }, 4000);
-        }
-
-        function stopRenewalApprovalPolling() {
-            if (renewalApprovalPollInterval) {
-                clearInterval(renewalApprovalPollInterval);
-                renewalApprovalPollInterval = null;
-            }
-        }
-
-        function exitExpiredFlowToLogin() {
-            stopRenewalApprovalPolling();
-            isRenewalPlanSelectionMode = false;
-            currentExpiredStoreObj = null;
-            navigateTo('loginScreen');
-        }
-
-        function proceedToRenewalPlansSelection() {
-            isRenewalPlanSelectionMode = true;
-            navigateTo('plansScreen');
-        }
-
-        function handlePlanCardAction(tierName) {
-            if (!isRenewalPlanSelectionMode || !currentExpiredStoreObj) {
-                navigateTo('registerScreen');
-                return;
-            }
-
-            const baseMonthly = tierName === 'Pro' ? 1999 : 999;
-            let monthsCount = 1;
-            let billingLabel = 'Monthly (30 Days)';
-
-            if (isCustomMonthsOn) {
-                const enteredMos = parseInt(document.getElementById('customMonthsInput')?.value || '1', 10);
-                monthsCount = (!isNaN(enteredMos) && enteredMos > 0) ? enteredMos : 1;
-                billingLabel = `${monthsCount} Month${monthsCount > 1 ? 's' : ''}`;
-            } else if (isPerYearOn) {
-                monthsCount = 12;
-                billingLabel = 'Yearly (365 Days)';
-            }
-
-            const totalPayable = isPerYearOn && !isCustomMonthsOn
-                ? (tierName === 'Pro' ? 19190 : 9590)
-                : (baseMonthly * monthsCount);
-            const totalDays = isPerYearOn && !isCustomMonthsOn ? 365 : (monthsCount * 30);
-
-            selectedRenewalPlanDetails = {
-                planName: `KS POS ${tierName} - ${billingLabel}`,
-                amount: totalPayable,
-                days: totalDays
-            };
-
-            const planBadge = document.getElementById('selectedRenewalPlanBadge');
-            const amtText = document.getElementById('renewalPayableAmountText');
-            if (planBadge) planBadge.textContent = `${selectedRenewalPlanDetails.planName} (${totalDays} Days)`;
-            if (amtText) amtText.textContent = `₹${totalPayable.toLocaleString()}`;
-
-            navigateTo('planExpiredScreen');
-            showExpiredScreenStep('qr');
-        }
-
-        async function checkRenewalApprovalNow() {
-            if (!currentExpiredStoreObj) return;
-            await syncInitialDataFromSupabase(false);
-            const latestStore = (rentedStoresList || []).find(
-                s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase()
-            );
-            if (latestStore) {
-                currentExpiredStoreObj = latestStore;
-                const rem = getStoreRemainingTrialDays(latestStore);
-                if (latestStore.status === 'Active' && rem > 0) {
-                    stopRenewalApprovalPolling();
-                    showExpiredScreenStep('renewed');
-                    showNotification('Your Plan is Renewed!', 'success');
-                    return;
-                }
-            }
-            showNotification('Still waiting for Admin acceptance...', 'warning');
-        }
-
-        function activateRenewedStoreAndEnterApp() {
-            if (!currentExpiredStoreObj) return;
-            const store = currentExpiredStoreObj;
-            const remainingDays = getStoreRemainingTrialDays(store);
-
-            if (store.status !== 'Active' || remainingDays <= 0) {
-                showNotification('Waiting for Admin approval before activation', 'warning');
-                return;
-            }
-
-            store.justRenewedBanner = false;
-            persistMultiTenantAuthState();
-
-            stopRenewalApprovalPolling();
-            isRenewalPlanSelectionMode = false;
-            isAdminImpersonatingStore = false;
-
-            currentSessionUser = {
-                role: 'store',
-                storeId: store.storeId,
-                storeName: store.storeName,
-                username: store.username,
-                allowedFeatures: store.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'],
-                trialDaysLeft: remainingDays
-            };
-
-            loadStoreScopedShiftState();
-            renderShiftsScreen();
-            renderOrderHistoryScreen();
-            renderPOSProducts();
-            renderPOSCart();
-            updateCustomerCartDisplay();
-            updateDeleteOrderButtonVisibility();
-
-            const dashLoc = document.getElementById('dashboardLocationText');
-            if (dashLoc && store.location) {
-                dashLoc.textContent = `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`;
-            }
-
-            persistAppStateToLocal();
-            applyRolePermissionsToUI();
-            isFirstStartSellingAfterLogin = true;
-            currentExpiredStoreObj = null;
-
-            navigateTo('dashboardScreen');
-            showNotification('Plan Activated! Welcome back to KS POS.', 'success', 4500);
-        }
-
-        function openPlanExpiredScreen(store, initialStep = null) {
+        function openPlanExpiredScreen(store, initialStep = 'warning') {
             currentExpiredStoreObj = store;
-            const subEl = document.getElementById('expiredStoreSubtitleText');
-            if (subEl) {
-                subEl.textContent = `${store.storeName} (${store.username})`;
+            isRenewalPlanSelectionMode = false;
+
+            const subTitleEl = document.getElementById('expiredStoreSubtitleText');
+            if (subTitleEl) {
+                subTitleEl.textContent = `${store.storeName} (${store.username})`;
             }
+
             const qrImg = document.getElementById('renewalAdminQrImg');
             const qrPlaceholder = document.getElementById('renewalNoQrPlaceholder');
             const upiText = document.getElementById('renewalAdminUpiText');
@@ -3074,26 +2883,76 @@
 
             const utrInput = document.getElementById('renewalPaymentUtrInput');
             if (utrInput) utrInput.value = store.pendingUtr || '';
+            const waitUtr = document.getElementById('waitingApprovalUtrText');
+            if (waitUtr) waitUtr.textContent = store.pendingUtr || '-';
 
             const remDays = getStoreRemainingTrialDays(store);
-            let targetStep = initialStep;
-            if (!targetStep) {
-                if (store.status === 'Active' && remDays > 0 && store.justRenewedBanner) {
-                    targetStep = 'renewed';
-                } else if (store.pendingUtr) {
-                    targetStep = 'waiting';
-                    const waitUtr = document.getElementById('waitingApprovalUtrText');
-                    if (waitUtr) waitUtr.textContent = store.pendingUtr;
-                } else {
-                    targetStep = 'warning';
-                }
+            if (store.status === 'Active' && remDays > 0 && store.justRenewedBanner) {
+                showExpiredScreenStep('renewed');
+            } else if (initialStep === 'qr') {
+                showExpiredScreenStep('qr');
+            } else if (store.pendingUtr && initialStep === 'warning') {
+                showExpiredScreenStep('waiting');
+            } else {
+                showExpiredScreenStep(initialStep);
             }
 
             navigateTo('planExpiredScreen');
-            showExpiredScreenStep(targetStep);
-            if (targetStep === 'waiting') {
-                startRenewalApprovalPolling();
+        }
+
+        function proceedToRenewalPlansSelection() {
+            isRenewalPlanSelectionMode = true;
+            navigateTo('plansScreen');
+        }
+
+        function handlePlanCardAction(planTier) {
+            if (!isRenewalPlanSelectionMode && !currentExpiredStoreObj) {
+                navigateTo('registerScreen');
+                return;
             }
+
+            const planCfg = subscriptionPlansConfig[planTier] || subscriptionPlansConfig.Standard;
+            const basePrice = Number(planCfg.monthlyPrice) || (planTier === 'Pro' ? 1999 : 999);
+            let totalAmount = basePrice;
+            let days = 30;
+            let cycleLabel = 'Monthly';
+
+            if (isPerYearOn) {
+                totalAmount = Math.round(basePrice * 12 * 0.8);
+                days = 365;
+                cycleLabel = 'Yearly (365 Days)';
+            } else if (isCustomMonthsOn) {
+                const customMos = parseInt(document.getElementById('customMonthsInput')?.value || '0', 10);
+                if (!customMos || customMos <= 0) {
+                    showNotification('Please enter & save valid custom months first', 'warning');
+                    return;
+                }
+                totalAmount = basePrice * customMos;
+                days = customMos * 30;
+                cycleLabel = `${customMos} Months (${days} Days)`;
+            }
+
+            selectedRenewalPlanDetails = {
+                planName: `KS POS ${planTier}`,
+                billingCycle: cycleLabel,
+                amount: totalAmount,
+                days: days
+            };
+
+            const planBadge = document.getElementById('selectedRenewalPlanBadge');
+            const payAmtEl = document.getElementById('renewalPayableAmountText');
+            if (planBadge) planBadge.textContent = `${selectedRenewalPlanDetails.planName} • ${cycleLabel}`;
+            if (payAmtEl) payAmtEl.textContent = `₹${totalAmount.toLocaleString()}`;
+
+            isRenewalPlanSelectionMode = false;
+            openPlanExpiredScreen(currentExpiredStoreObj, 'qr');
+            showNotification(`Selected ${selectedRenewalPlanDetails.planName} (₹${totalAmount.toLocaleString()})`, 'success');
+        }
+
+        function exitExpiredFlowToLogin() {
+            isRenewalPlanSelectionMode = false;
+            currentExpiredStoreObj = null;
+            navigateTo('loginScreen');
         }
 
         function submitStoreRenewalPayment() {
@@ -3116,7 +2975,7 @@
                 const nowStr = new Date().toLocaleString();
                 currentExpiredStoreObj.pendingUtr = utrVal;
                 currentExpiredStoreObj.paymentSubmittedAt = nowStr;
-                currentExpiredStoreObj.pendingPlanName = selectedRenewalPlanDetails.planName;
+                currentExpiredStoreObj.pendingPlanName = `${selectedRenewalPlanDetails.planName} (${selectedRenewalPlanDetails.billingCycle})`;
                 currentExpiredStoreObj.pendingPlanAmount = selectedRenewalPlanDetails.amount;
                 currentExpiredStoreObj.pendingPlanDays = selectedRenewalPlanDetails.days;
                 persistMultiTenantAuthState();
@@ -3126,10 +2985,7 @@
                     try {
                         client.from('stores').update({
                             pending_utr: utrVal,
-                            payment_submitted_at: nowStr,
-                            pending_plan_name: selectedRenewalPlanDetails.planName,
-                            pending_plan_amount: selectedRenewalPlanDetails.amount,
-                            pending_plan_days: selectedRenewalPlanDetails.days
+                            payment_submitted_at: nowStr
                         }).eq('username', currentExpiredStoreObj.username).then(() => {});
                     } catch (e) {}
                 }
@@ -3142,16 +2998,74 @@
                 if (waitUtr) waitUtr.textContent = utrVal;
 
                 showExpiredScreenStep('waiting');
-                startRenewalApprovalPolling();
-                showNotification('Payment submitted! Waiting for Admin acceptance.', 'success', 4500);
-            }, 1200);
+                showNotification('Payment submitted! Admin notified via SMS/WhatsApp & Gmail.', 'success', 4500);
+            }, 1500);
+        }
+
+        async function checkRenewalApprovalNow() {
+            if (!currentExpiredStoreObj) return;
+            await syncInitialDataFromSupabase(false);
+            const refreshed = rentedStoresList.find(s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase());
+            if (refreshed) {
+                currentExpiredStoreObj = refreshed;
+                const rem = getStoreRemainingTrialDays(refreshed);
+                if (refreshed.status === 'Active' && rem > 0) {
+                    showExpiredScreenStep('renewed');
+                    showNotification('Admin accepted your payment! Your Plan is Renewed.', 'success', 4000);
+                    return;
+                }
+            }
+            showNotification('Still awaiting Admin acceptance. Please check again shortly.', 'warning');
+        }
+
+        function activateRenewedStoreAndEnterApp() {
+            if (!currentExpiredStoreObj) return;
+            const store = currentExpiredStoreObj;
+            const remainingDays = getStoreRemainingTrialDays(store);
+            if (store.status !== 'Active' || remainingDays <= 0) {
+                showNotification('Please wait for Admin to accept your renewal payment', 'warning');
+                return;
+            }
+
+            store.justRenewedBanner = false;
+            persistMultiTenantAuthState();
+
+            isAdminImpersonatingStore = false;
+            currentSessionUser = {
+                role: 'store',
+                storeId: store.storeId,
+                storeName: store.storeName,
+                username: store.username,
+                allowedFeatures: store.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'],
+                trialDaysLeft: remainingDays
+            };
+            currentExpiredStoreObj = null;
+            isRenewalPlanSelectionMode = false;
+
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderOrderHistoryScreen();
+            renderPOSProducts();
+            renderPOSCart();
+            updateCustomerCartDisplay();
+            updateDeleteOrderButtonVisibility();
+
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc && store.location) {
+                dashLoc.textContent = `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`;
+            }
+
+            persistAppStateToLocal();
+            applyRolePermissionsToUI();
+            isFirstStartSellingAfterLogin = true;
+            navigateTo('dashboardScreen');
+            showNotification('Plan Activated! Welcome back to KS POS.', 'success', 4500);
         }
 
         function sendRenewalAlertViaGmail() {
             if (!currentExpiredStoreObj) return;
             const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || currentExpiredStoreObj.pendingUtr || 'Pending';
-            const planLabel = selectedRenewalPlanDetails?.planName || currentExpiredStoreObj.pendingPlanName || 'KS POS Plan';
-            const amountLabel = selectedRenewalPlanDetails?.amount || currentExpiredStoreObj.pendingPlanAmount || 999;
+            const planInfo = `${selectedRenewalPlanDetails.planName} (${selectedRenewalPlanDetails.billingCycle}) - ₹${selectedRenewalPlanDetails.amount}`;
             const subject = encodeURIComponent(`KS POS Plan Renewal Payment Completed - ${currentExpiredStoreObj.storeName}`);
             const body = encodeURIComponent(
                 `Hello KS POS Admin,\n\n` +
@@ -3159,9 +3073,9 @@
                 `Owner: ${currentExpiredStoreObj.ownerName}\n` +
                 `Username: ${currentExpiredStoreObj.username}\n` +
                 `Phone: ${currentExpiredStoreObj.phone}\n` +
-                `Selected Plan: ${planLabel} (₹${amountLabel})\n` +
+                `Selected Plan: ${planInfo}\n` +
                 `Payment UTR / Transaction ID: ${utrVal}\n\n` +
-                `Please verify the payment and click Accept in Admin Panel to activate our KS POS plan.`
+                `Please verify and click Accept in Admin Panel to activate our plan.`
             );
             window.open(`mailto:${adminPaymentConfig.adminEmail}?subject=${subject}&body=${body}`, '_blank');
         }
@@ -3169,26 +3083,47 @@
         function sendRenewalAlertViaWhatsApp() {
             if (!currentExpiredStoreObj) return;
             const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || currentExpiredStoreObj.pendingUtr || 'Pending';
-            const planLabel = selectedRenewalPlanDetails?.planName || currentExpiredStoreObj.pendingPlanName || 'KS POS Plan';
-            const amountLabel = selectedRenewalPlanDetails?.amount || currentExpiredStoreObj.pendingPlanAmount || 999;
+            const planInfo = `${selectedRenewalPlanDetails.planName} (₹${selectedRenewalPlanDetails.amount})`;
             const cleanPhone = String(adminPaymentConfig.adminPhone || '').replace(/[^0-9]/g, '');
             const msg = encodeURIComponent(
-                `Hello KS POS Admin, Renewal Payment Completed for *${currentExpiredStoreObj.storeName}* (User: ${currentExpiredStoreObj.username}). Plan: *${planLabel}* (₹${amountLabel}). UTR ID: *${utrVal}*. Please click Accept to activate.`
+                `Hello KS POS Admin, Payment Completed for *${currentExpiredStoreObj.storeName}* (User: ${currentExpiredStoreObj.username}). Plan: *${planInfo}*. UTR ID: *${utrVal}*. Please click Accept to activate.`
             );
             window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
         }
+
+        function sendStoreExpiryAlertToUser(store) {
+            if (!store) return;
+            const subject = encodeURIComponent(`Your License / Plan is Expired - Please Renewal Plan`);
+            const body = encodeURIComponent(
+                `Hello ${store.ownerName},\n\n` +
+                `Your License / Plan for "${store.storeName}" (Username: ${store.username}) is expired.\n` +
+                `Please login to KS POS, click "Renewal Plan", select your plan, and scan the Admin Payment QR to renew.\n\n` +
+                `Thank you,\nKS POS Team`
+            );
+            window.open(`mailto:${store.email}?cc=${adminPaymentConfig.adminEmail}&subject=${subject}&body=${body}`, '_blank');
+        }
+
+        function sendStoreExpiryAlertSMS(store) {
+            if (!store) return;
+            const cleanPhone = String(store.phone || '').replace(/[^0-9]/g, '');
+            const msg = encodeURIComponent(
+                `Hello ${store.ownerName}, your KS POS License / Plan for ${store.storeName} is expired. Please renewal plan by logging into KS POS.`
+            );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+        }
+
         function approveAndActivateStorePlan(storeId, defaultDays = 30) {
             const store = rentedStoresList.find(s => s.storeId === storeId);
             if (!store) return;
-            const daysToAdd = Number(store.pendingPlanDays) > 0 ? Number(store.pendingPlanDays) : defaultDays;
+            const daysToGrant = Number(store.pendingPlanDays || defaultDays || 30);
             store.status = 'Active';
             store.trialStartDate = new Date().toISOString().split('T')[0];
-            store.trialDays = daysToAdd;
+            store.trialDays = daysToGrant;
             store.pendingUtr = '';
             store.paymentSubmittedAt = '';
             store.pendingPlanName = '';
             store.pendingPlanAmount = 0;
-            store.pendingPlanDays = 0;
+            store.pendingPlanDays = 30;
             store.justRenewedBanner = true;
             persistMultiTenantAuthState();
 
@@ -3198,40 +3133,15 @@
                     client.from('stores').update({
                         status: 'Active',
                         trial_start_date: store.trialStartDate,
-                        trial_days: daysToAdd,
+                        trial_days: daysToGrant,
                         pending_utr: '',
-                        payment_submitted_at: '',
-                        pending_plan_name: '',
-                        pending_plan_amount: 0,
-                        pending_plan_days: 0,
-                        just_renewed_banner: true
+                        payment_submitted_at: ''
                     }).eq('username', store.username).then(() => {});
                 } catch (e) {}
             }
 
             openSidebarModuleScreen('Admin Panel');
-            showNotification(`Accepted! ${store.storeName} renewed for ${daysToAdd} days.`, 'success');
-        }
-
-        function sendStoreExpiryAlertSMS(store) {
-            if (!store) return;
-            const cleanPhone = String(store.phone || '').replace(/[^0-9]/g, '');
-            const msg = encodeURIComponent(
-                `Hello ${store.ownerName}, your KS POS plan for ${store.storeName} is expired. Please renew the plan to continue using KS POS.`
-            );
-            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
-        }
-
-        function sendStoreExpiryAlertToUser(store) {
-            if (!store) return;
-            const subject = encodeURIComponent(`Your KS POS Plan is Expired - Please Renew`);
-            const body = encodeURIComponent(
-                `Hello ${store.ownerName},\n\n` +
-                `Your plan for "${store.storeName}" (Username: ${store.username}) is expired.\n` +
-                `Please renew the plan by logging into KS POS and scanning the Admin Payment QR.\n\n` +
-                `Thank you,\nKS POS Team`
-            );
-            window.open(`mailto:${store.email}?cc=${adminPaymentConfig.adminEmail}&subject=${subject}&body=${body}`, '_blank');
+            showNotification(`Accepted! ${store.storeName} renewed for ${daysToGrant} days.`, 'success', 4000);
         }
 
         function deleteStoreFromAdminPanel(storeId) {
@@ -3418,7 +3328,6 @@
                 localStorage.setItem('kspos_admin_creds_v1', JSON.stringify(adminCredentials));
                 localStorage.setItem('kspos_rented_stores_v2', JSON.stringify(rentedStoresList));
                 localStorage.setItem('kspos_delete_order_enabled_v1', String(isDeleteOrderEnabled));
-                // Dual-persist to IndexedDB so iPhone PWA force-close/reopen never loses stores
                 saveToIndexedDBVault('rented_stores_vault', rentedStoresList);
                 saveToIndexedDBVault('admin_creds_vault', adminCredentials);
             } catch (e) {
@@ -3619,7 +3528,6 @@
                             return;
                         }
                         isAdminImpersonatingStore = false;
-                        isRenewalPlanSelectionMode = false;
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         currentSessionUser = {
@@ -3780,7 +3688,11 @@
             rentedStoresList.unshift(newStoreObj);
             persistMultiTenantAuthState();
 
-            const savedToCloud = await pushStoreToSupabaseCloud({
+            try {
+                localStorage.setItem('kspos_last_store_sync_ping', String(Date.now()));
+            } catch (e) {}
+
+            await pushStoreToSupabaseCloud({
                 store_id: newStoreObj.storeId,
                 store_name: storeName,
                 owner_name: ownerName,
@@ -3803,10 +3715,8 @@
             document.getElementById('usernameInput').value = regUser;
             document.getElementById('passwordInput').value = regPass;
 
-            // Automatically log in the newly registered store & save persistent session so browser refresh keeps them logged in
             isAdminImpersonatingStore = false;
             isAdminPinUnlocked = false;
-            isRenewalPlanSelectionMode = false;
             currentSessionUser = {
                 role: 'store',
                 storeId: newStoreObj.storeId,
@@ -3816,9 +3726,7 @@
                 trialDaysLeft: 30
             };
 
-            // Strictly isolate this new store's data with default "No Active Shift"
-            resetInMemoryStoreDataForNewAccount(newStoreObj.ownerName || newStoreObj.storeName);
-            persistAppStateToLocal();
+            loadStoreScopedShiftState();
             renderShiftsScreen();
             renderOrderHistoryScreen();
             renderPOSProducts();
@@ -3831,19 +3739,11 @@
                 dashLoc.textContent = `${location}${pincode ? ' - ' + pincode : ''}`;
             }
 
+            persistAppStateToLocal();
             applyRolePermissionsToUI();
             isFirstStartSellingAfterLogin = true;
 
-            // Broadcast across open tabs/windows so Admin Panel updates in real time
-            try {
-                localStorage.setItem('kspos_last_store_sync_ping', String(Date.now()));
-            } catch (e) {}
-
-            if (savedToCloud) {
-                showNotification('Store registered & synced to Admin Panel! 30-Day Free Trial started.', 'success', 4000);
-            } else {
-                showNotification('Store registered & saved! 30-Day Free Trial started.', 'success', 4000);
-            }
+            showNotification('Store registered & 30-Day Free Trial started!', 'success', 4000);
             navigateTo('dashboardScreen');
         }
 
@@ -4514,7 +4414,7 @@
                                                 <div class="flex items-center gap-2 flex-wrap">
                                                     <h4 class="text-sm sm:text-base font-bold text-slate-900">${st.storeName}</h4>
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadgeClass}">${statusLabel}</span>
-                                                    ${st.pendingUtr ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">Payment UTR: ${st.pendingUtr}</span>` : ''}
+                                                    ${st.pendingUtr ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">UTR: ${st.pendingUtr}${st.pendingPlanName ? ' • ' + st.pendingPlanName : ''}${st.pendingPlanAmount ? ' (₹' + st.pendingPlanAmount + ')' : ''}</span>` : ''}
                                                 </div>
                                                 <p class="text-xs text-slate-600">Owner: <b>${st.ownerName}</b> • User: <b class="text-sky-700">${st.username}</b> • Pass: <b>${st.password}</b></p>
                                                 <p class="text-[11px] text-slate-500">${st.phone} • ${st.email} • <b>${remDays} Days Left</b></p>
@@ -4528,8 +4428,9 @@
                                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                                     <span>See Store</span>
                                                 </button>
-                                                <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold ${st.pendingUtr ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-300 animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'} text-white transition-colors cursor-pointer shadow-2xs" title="Accept Payment & Renew Plan">
-                                                    ${st.pendingUtr ? `Accept Payment (+${st.pendingPlanDays || 30}d)` : 'Renew +30d'}
+                                                <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold ${st.pendingUtr ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-300' : 'bg-emerald-600 hover:bg-emerald-700'} text-white transition-colors cursor-pointer shadow-2xs flex items-center gap-1" title="Accept Payment & Renew Plan">
+                                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                                                    <span>${st.pendingUtr ? `Accept Payment (+${st.pendingPlanDays || 30}d)` : 'Accept / Renew +30d'}</span>
                                                 </button>
                                                 <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-600 hover:text-white' : 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-600 hover:text-white'} transition-colors cursor-pointer">
                                                     ${isActive ? 'Suspend' : 'Activate'}
@@ -4540,7 +4441,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Quick Expiry Alert Buttons (Gmail & SMS/WhatsApp) -->
                                         <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/80 text-[11px]">
                                             <span class="font-semibold text-slate-600">Send Plan Expiry / Renewal Alert:</span>
                                             <div class="flex items-center gap-2">
@@ -4578,7 +4478,6 @@
                             }).join('');
 
                         bodyEl.innerHTML = `
-                            <!-- Official App Brand Logo Control (Admin Only) -->
                             <div class="w-full rounded-2xl border border-sky-200 bg-sky-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -4608,7 +4507,6 @@
                                 </div>
                             </div>
 
-                            <!-- Admin Payment QR & Renewal Alerts Configuration -->
                             <div class="w-full rounded-2xl border border-emerald-200 bg-emerald-50/35 p-4 sm:p-5 space-y-3.5 shadow-2xs">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="qr-code" class="w-5 h-5 text-emerald-600"></i>
@@ -4650,7 +4548,6 @@
                                 </div>
                             </div>
 
-                            <!-- Admin Credentials & PIN Change Card -->
                             <div class="w-full rounded-2xl border border-amber-300 bg-amber-50/40 p-4 sm:p-5 space-y-3.5 shadow-2xs">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -4683,7 +4580,6 @@
                                 </div>
                             </div>
 
-                            <!-- Real-Time Rented Stores & Locations Control -->
                             <div class="w-full space-y-3 pt-2">
                                 <div class="flex flex-wrap items-center justify-between gap-2 px-1">
                                     <h3 class="text-sm sm:text-base font-bold text-slate-900">Registered Stores &amp; Locations (${rentedStoresList.length})</h3>
@@ -4696,7 +4592,6 @@
                                 ${storesListHtml}
                             </div>
 
-                            <!-- Delete Order Button Visibility Toggle Control -->
                             <div class="w-full rounded-2xl border border-red-200 bg-red-50/40 p-4 sm:p-5 flex items-center justify-between gap-3 shadow-2xs mt-2">
                                 <div>
                                     <h3 class="text-sm sm:text-base font-bold text-slate-900">Delete Order</h3>
@@ -4769,8 +4664,8 @@
 
         function handlePlansScreenBack() {
             if (isRenewalPlanSelectionMode && currentExpiredStoreObj) {
-                navigateTo('planExpiredScreen');
-                showExpiredScreenStep('warning');
+                isRenewalPlanSelectionMode = false;
+                openPlanExpiredScreen(currentExpiredStoreObj, 'warning');
                 return;
             }
             if (currentSessionUser.role === 'admin' || currentSessionUser.role === 'store') {
@@ -4780,43 +4675,157 @@
             }
         }
 
-        function openEditPlanFeaturesScreen() {
+        function openEditPlanFeaturesScreen(planTier = 'Standard') {
             const isMainSuperAdmin = currentSessionUser.role === 'admin' && !isAdminImpersonatingStore;
             if (!isMainSuperAdmin) {
                 showNotification('Only Super Admin can edit plan features', 'warning');
                 return;
             }
+            currentlyEditingPlanTier = planTier === 'Pro' ? 'Pro' : 'Standard';
+            const cfg = subscriptionPlansConfig[currentlyEditingPlanTier];
+            const heading = document.getElementById('editPlanModalHeading');
+            if (heading) heading.textContent = `Edit KS POS ${currentlyEditingPlanTier}`;
+
+            const priceInput = document.getElementById('editPlanMonthlyPriceInput');
+            const discInput = document.getElementById('editPlanDiscountInput');
+            const noteInput = document.getElementById('editPlanOptionalNoteInput');
+            if (priceInput) priceInput.value = cfg.monthlyPrice;
+            if (discInput) discInput.value = cfg.discountText || '';
+            if (noteInput) noteInput.value = cfg.optionalNote || '';
+
+            planFeatures = [...(cfg.features || [])];
             navigateTo('editFeaturesScreen');
         }
 
         let isPerYearOn = false;
         let isCustomMonthsOn = false;
-        let planFeatures = [
-            "Unlimited Fast POS Billing",
-            "Discounts & Store Credits",
-            "Barcoding & Print Labels",
-            "Real-time Inventory & Shift Reports"
-        ];
+        let currentlyEditingPlanTier = 'Standard';
+        let subscriptionPlansConfig = {
+            Standard: {
+                monthlyPrice: 999,
+                discountText: "",
+                optionalNote: "",
+                features: [
+                    "Unlimited Fast POS Billing",
+                    "Discounts & Store Credits",
+                    "Barcoding & Print Labels",
+                    "Real-time Inventory & Shift Reports"
+                ]
+            },
+            Pro: {
+                monthlyPrice: 1999,
+                discountText: "",
+                optionalNote: "",
+                features: [
+                    "Unlimited Branches & Staff",
+                    "Multi-Warehouse Stock Transfer",
+                    "Priority 24/7 Cloud Sync"
+                ]
+            }
+        };
+        let planFeatures = [...subscriptionPlansConfig.Standard.features];
+
+        function loadSubscriptionPlansConfig() {
+            try {
+                const raw = localStorage.getItem('kspos_subscription_plans_cfg_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.Standard && parsed.Pro) {
+                        subscriptionPlansConfig = parsed;
+                        planFeatures = [...(subscriptionPlansConfig.Standard.features || [])];
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function persistSubscriptionPlansConfig() {
+            try {
+                localStorage.setItem('kspos_subscription_plans_cfg_v1', JSON.stringify(subscriptionPlansConfig));
+            } catch (e) {}
+        }
+
+        function updatePlanPricesUI() {
+            const badge = document.getElementById('planBillingBadge');
+            const stdPrice = document.getElementById('planPriceDisplay');
+            const proPrice = document.getElementById('proPlanPriceDisplay');
+            const stdBase = Number(subscriptionPlansConfig.Standard.monthlyPrice) || 999;
+            const proBase = Number(subscriptionPlansConfig.Pro.monthlyPrice) || 1999;
+
+            if (isPerYearOn) {
+                const stdYr = Math.round(stdBase * 12 * 0.8);
+                const proYr = Math.round(proBase * 12 * 0.8);
+                if (badge) badge.textContent = subscriptionPlansConfig.Standard.discountText || 'Yearly (Save 20%)';
+                if (stdPrice) stdPrice.innerHTML = `₹${stdYr.toLocaleString()} <span class="text-xs font-normal text-slate-500">/ year</span>`;
+                if (proPrice) proPrice.innerHTML = `₹${proYr.toLocaleString()} <span class="text-xs font-normal text-slate-500">/ year</span>`;
+            } else if (isCustomMonthsOn && Number(document.getElementById('customMonthsInput')?.value) > 0) {
+                const mos = Number(document.getElementById('customMonthsInput').value);
+                if (badge) badge.textContent = `${mos} Months Custom`;
+                if (stdPrice) stdPrice.innerHTML = `₹${(mos * stdBase).toLocaleString()} <span class="text-xs font-normal text-slate-500">/ ${mos} mos</span>`;
+                if (proPrice) proPrice.innerHTML = `₹${(mos * proBase).toLocaleString()} <span class="text-xs font-normal text-slate-500">/ ${mos} mos</span>`;
+            } else {
+                if (badge) badge.textContent = subscriptionPlansConfig.Standard.discountText || 'Monthly';
+                if (stdPrice) stdPrice.innerHTML = `₹${stdBase.toLocaleString()} <span class="text-xs font-normal text-slate-500">/ month</span>`;
+                if (proPrice) proPrice.innerHTML = `₹${proBase.toLocaleString()} <span class="text-xs font-normal text-slate-500">/ month</span>`;
+            }
+        }
 
         function renderPlanFeaturesPreview() {
             applyRolePermissionsToUI();
+            updatePlanPricesUI();
+
+            const stdBtn = document.getElementById('stdPlanActionBtn');
             const stdBtnText = document.getElementById('stdPlanActionBtnText');
+            const proBtn = document.getElementById('proPlanActionBtn');
             const proBtnText = document.getElementById('proPlanActionBtnText');
-            if (isRenewalPlanSelectionMode) {
+
+            if (isRenewalPlanSelectionMode || currentExpiredStoreObj) {
                 if (stdBtnText) stdBtnText.textContent = 'Select Plan';
                 if (proBtnText) proBtnText.textContent = 'Select Plan';
+                if (stdBtn) stdBtn.className = "w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs";
+                if (proBtn) proBtn.className = "w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs";
             } else {
                 if (stdBtnText) stdBtnText.textContent = 'Start Free Trial (30 Days)';
                 if (proBtnText) proBtnText.textContent = 'Start Free Trial (30 Days)';
+                if (stdBtn) stdBtn.className = "w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs";
+                if (proBtn) proBtn.className = "w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs";
             }
-            const listEl = document.getElementById('planFeaturesPreviewList');
-            if (!listEl) return;
-            listEl.innerHTML = planFeatures.map(feat => `
-                <li class="flex items-center gap-2">
-                    <i data-lucide="check" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
-                    <span>${feat}</span>
-                </li>
-            `).join('');
+
+            const stdListEl = document.getElementById('planFeaturesPreviewList');
+            if (stdListEl) {
+                const stdCfg = subscriptionPlansConfig.Standard;
+                let stdHtml = (stdCfg.features || []).map(feat => `
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                        <span>${feat}</span>
+                    </li>
+                `).join('');
+                if (stdCfg.discountText) {
+                    stdHtml += `<li class="pt-1"><span class="inline-block px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">Offer: ${stdCfg.discountText}</span></li>`;
+                }
+                if (stdCfg.optionalNote) {
+                    stdHtml += `<li class="text-xs italic text-slate-500 pt-0.5">Note: ${stdCfg.optionalNote}</li>`;
+                }
+                stdListEl.innerHTML = stdHtml;
+            }
+
+            const proListEl = document.getElementById('proPlanFeaturesPreviewList');
+            if (proListEl) {
+                const proCfg = subscriptionPlansConfig.Pro;
+                let proHtml = (proCfg.features || []).map(feat => `
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="check" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                        <span>${feat}</span>
+                    </li>
+                `).join('');
+                if (proCfg.discountText) {
+                    proHtml += `<li class="pt-1"><span class="inline-block px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">Offer: ${proCfg.discountText}</span></li>`;
+                }
+                if (proCfg.optionalNote) {
+                    proHtml += `<li class="text-xs italic text-slate-500 pt-0.5">Note: ${proCfg.optionalNote}</li>`;
+                }
+                proListEl.innerHTML = proHtml;
+            }
+
             if (window.lucide) lucide.createIcons();
         }
 
@@ -4824,23 +4833,15 @@
             isPerYearOn = !isPerYearOn;
             const btn = document.getElementById('perYearToggleBtn');
             const thumb = document.getElementById('perYearToggleThumb');
-            const badge = document.getElementById('planBillingBadge');
-            const stdPrice = document.getElementById('planPriceDisplay');
-            const proPrice = document.getElementById('proPlanPriceDisplay');
 
             if (isPerYearOn) {
                 btn.classList.replace('bg-slate-300', 'bg-sky-500');
                 thumb.classList.replace('translate-x-0', 'translate-x-6');
-                badge.textContent = 'Yearly (Save 20%)';
-                stdPrice.innerHTML = '₹9,590 <span class="text-xs font-normal text-slate-500">/ year</span>';
-                proPrice.innerHTML = '₹19,190 <span class="text-xs font-normal text-slate-500">/ year</span>';
             } else {
                 btn.classList.replace('bg-sky-500', 'bg-slate-300');
                 thumb.classList.replace('translate-x-6', 'translate-x-0');
-                badge.textContent = 'Monthly';
-                stdPrice.innerHTML = '₹999 <span class="text-xs font-normal text-slate-500">/ month</span>';
-                proPrice.innerHTML = '₹1,999 <span class="text-xs font-normal text-slate-500">/ month</span>';
             }
+            updatePlanPricesUI();
         }
 
         function toggleCustomMonthsSwitch() {
@@ -4858,6 +4859,7 @@
                 thumb.classList.replace('translate-x-6', 'translate-x-0');
                 bar.classList.add('hidden');
             }
+            updatePlanPricesUI();
         }
 
         function saveCustomMonths() {
@@ -4881,11 +4883,7 @@
                 spinner.classList.add('hidden');
                 text.textContent = 'Save';
 
-                const badge = document.getElementById('planBillingBadge');
-                const stdPrice = document.getElementById('planPriceDisplay');
-                badge.textContent = `${monthsVal} Months Custom`;
-                stdPrice.innerHTML = `₹${(Number(monthsVal) * 999).toLocaleString()} <span class="text-xs font-normal text-slate-500">/ ${monthsVal} mos</span>`;
-
+                updatePlanPricesUI();
                 showNotification('Saved', 'success');
             }, 3000);
         }
@@ -4915,7 +4913,16 @@
         }
 
         function saveEditedFeatures() {
-            planFeatures = planFeatures.map(f => f.trim()).filter(f => f.length > 0);
+            const cleanedFeatures = planFeatures.map(f => f.trim()).filter(f => f.length > 0);
+            const rawPrice = parseFloat(document.getElementById('editPlanMonthlyPriceInput')?.value || '0');
+            const discountText = (document.getElementById('editPlanDiscountInput')?.value || '').trim();
+            const optionalNote = (document.getElementById('editPlanOptionalNoteInput')?.value || '').trim();
+
+            if (isNaN(rawPrice) || rawPrice <= 0) {
+                showNotification('Please enter a valid monthly price', 'warning');
+                return;
+            }
+
             const btn = document.getElementById('savePlanFeaturesBtn');
             const spinner = document.getElementById('saveFeaturesSpinner');
             const text = document.getElementById('saveFeaturesText');
@@ -4931,8 +4938,16 @@
                 spinner.classList.add('hidden');
                 text.textContent = 'Save';
 
+                subscriptionPlansConfig[currentlyEditingPlanTier] = {
+                    monthlyPrice: rawPrice,
+                    discountText: discountText,
+                    optionalNote: optionalNote,
+                    features: cleanedFeatures
+                };
+                persistSubscriptionPlansConfig();
+
                 renderPlanFeaturesPreview();
-                showNotification('Saved successfully!', 'success');
+                showNotification(`KS POS ${currentlyEditingPlanTier} plan saved!`, 'success');
                 navigateTo('plansScreen');
             }, 3000);
         }
@@ -5202,6 +5217,7 @@
             if (menu) menu.classList.add('hidden');
         }
 
+        let isResumeSyncRunning = false;
         async function triggerRealTimeAppRefresh() {
             closeQuickRefreshMenu();
             closeCartOptionsMenu();
@@ -5256,7 +5272,7 @@
                     isResumeSyncRunning = false;
                     showNotification('Refresh successfully', 'success', 3500);
                 }
-            }, 5000);
+            }, 3000);
         }
 
         document.addEventListener('click', (e) => {
@@ -8357,23 +8373,24 @@
             }, 3000);
         }
 
-        // Guaranteed immediate splash dismiss timer so app NEVER gets stuck on white spinner
-        setTimeout(dismissSplashScreenSafely, 600);
+        // Exact 3-second launch splash timer for both Browser & Home Screen Standalone App
+        let splashDismissScheduled = false;
+        function scheduleExactThreeSecondSplashDismiss() {
+            if (splashDismissScheduled) return;
+            splashDismissScheduled = true;
+            setTimeout(dismissSplashScreenSafely, 3000);
+        }
+        scheduleExactThreeSecondSplashDismiss();
 
-        // Listen for instant cross-tab / cross-window store registrations & updates
+        // Listen for instant cross-tab / cross-window store registrations & updates (without disrupting open inputs)
         window.addEventListener('storage', (e) => {
             if (e && (e.key === 'kspos_rented_stores_v2' || e.key === 'kspos_last_store_sync_ping')) {
                 loadMultiTenantAuthState();
-                const modTitle = document.getElementById('sidebarModuleTitleText')?.textContent;
-                const modScreen = document.getElementById('sidebarModuleScreen');
-                if (modTitle === 'Admin Panel' && modScreen && !modScreen.classList.contains('page-hidden') && !isSyncingStoresNow) {
-                    openSidebarModuleScreen('Admin Panel');
-                }
             }
         });
 
         window.addEventListener('DOMContentLoaded', async () => {
-            setTimeout(dismissSplashScreenSafely, 600);
+            scheduleExactThreeSecondSplashDismiss();
 
             try {
                 const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
@@ -8390,6 +8407,7 @@
             } catch (e) {}
 
             try {
+                loadSubscriptionPlansConfig();
                 loadAdminPaymentConfig();
                 loadMultiTenantAuthState();
                 await restoreStoresFromIndexedDBVault();
@@ -8406,19 +8424,22 @@
                         'plansScreen',
                         'sidebarModuleScreen'
                     ];
+                    let targetScreenToOpen = fallbackScreen;
                     if (savedLastScreen === 'sidebarModuleScreen' && savedLastModule) {
                         if (savedLastModule === 'Admin Panel' && currentSessionUser.role !== 'admin') {
                             navigateTo(fallbackScreen);
                         } else {
                             openSidebarModuleScreen(savedLastModule);
                         }
+                        targetScreenToOpen = 'sidebarModuleScreen';
                     } else if (allowedLoggedInScreens.includes(savedLastScreen)) {
                         navigateTo(savedLastScreen);
+                        targetScreenToOpen = savedLastScreen;
                     } else {
                         navigateTo(fallbackScreen);
                     }
-                    // Show 3-second blur refresh overlay on the exact same page when browser refreshes
-                    if (savedLastScreen && savedLastScreen !== 'welcomeScreen') {
+                    // On browser/app refresh, show 3-second blur spinner on the exact active page
+                    if (targetScreenToOpen && targetScreenToOpen !== 'welcomeScreen') {
                         dismissSplashScreenSafely();
                         triggerSamePageThreeSecondRefreshOverlay();
                     }
@@ -8507,26 +8528,16 @@
                 dismissSplashScreenSafely();
             }
 
-            // Immediate non-blocking Cloud Sync on App Launch / Reopen
+            // One-time silent cloud sync on initial launch (afterwards app refreshes ONLY via 3-dots Refresh or browser reload)
             syncInitialDataFromSupabase(false);
-            setupSupabaseRealtimeStoresListener();
-
-            // Fast 3-second live sync so Admin Panel receives new stores immediately
-            setInterval(() => {
-                if (!document.hidden) {
-                    syncInitialDataFromSupabase(false);
-                }
-            }, 3000);
         });
 
         window.addEventListener('pageshow', () => {
-            restoreStoresFromIndexedDBVault().then(() => {
-                syncInitialDataFromSupabase(false);
-            });
+            restoreStoresFromIndexedDBVault();
         });
 
         window.addEventListener('load', () => {
-            setTimeout(dismissSplashScreenSafely, 800);
+            scheduleExactThreeSecondSplashDismiss();
         });
 
         window.addEventListener('pagehide', () => {
@@ -8535,39 +8546,11 @@
             persistMultiTenantAuthState();
         });
 
-        let appBackgroundTimestamp = null;
-        let isResumeSyncRunning = false;
-
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 persistAppStateToLocal();
                 persistStockTransfersToLocal();
                 persistMultiTenantAuthState();
-                appBackgroundTimestamp = Date.now();
-            } else if (appBackgroundTimestamp !== null && !isResumeSyncRunning) {
-                const idleDurationMs = Date.now() - appBackgroundTimestamp;
-                appBackgroundTimestamp = null;
-
-                if (idleDurationMs >= 15000) {
-                    const resumeOverlay = document.getElementById('appResumeSyncOverlay');
-                    if (resumeOverlay) {
-                        isResumeSyncRunning = true;
-                        resumeOverlay.classList.remove('hidden', 'opacity-0');
-                        resumeOverlay.classList.add('flex');
-
-                        syncInitialDataFromSupabase(false);
-
-                        setTimeout(() => {
-                            resumeOverlay.classList.add('opacity-0');
-                            setTimeout(() => {
-                                resumeOverlay.classList.add('hidden');
-                                resumeOverlay.classList.remove('flex', 'opacity-0');
-                                isResumeSyncRunning = false;
-                                showNotification('Store data synced successfully', 'success');
-                            }, 300);
-                        }, 5000);
-                    }
-                }
             }
         });
     </script>
