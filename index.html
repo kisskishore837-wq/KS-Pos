@@ -412,7 +412,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-500">
                                 <i data-lucide="user" class="w-4 h-4"></i>
                             </div>
-                            <input type="text" id="usernameInput" autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false" required placeholder="Enter your username" class="glass-input w-full pl-10 pr-10 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                            <input type="text" id="usernameInput" name="kspos_login_user_field" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" required placeholder="Enter your username" class="glass-input w-full pl-10 pr-10 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
                             <button type="button" id="clearLoginFieldsBtn" onclick="clearLoginCredentialsFields()" title="Clear saved details to login another store" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-red-500 cursor-pointer">
                                 <i data-lucide="x-circle" class="w-4 h-4"></i>
                             </button>
@@ -425,7 +425,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-sky-500">
                                 <i data-lucide="lock" class="w-4 h-4"></i>
                             </div>
-                            <input type="password" id="passwordInput" required placeholder="Enter your password" class="glass-input w-full pl-10 pr-11 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                            <input type="password" id="passwordInput" name="kspos_login_pass_field" autocomplete="new-password" required placeholder="Enter your password" class="glass-input w-full pl-10 pr-11 py-3.5 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
                             <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-sky-600 cursor-pointer">
                                 <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
                             </button>
@@ -3602,7 +3602,22 @@
                     if (validAdminUsers.includes(cleanUser) && (passwordVal === validAdminPass || passwordVal === 'ks@8804')) {
                         isAdminPinUnlocked = false;
                         isAdminImpersonatingStore = false;
-                        saveDeviceStoreLoginCredentials(matchedStore.username, matchedStore.password);
+                        markDeviceAsTrustedAdmin();
+                        currentSessionUser = {
+                            role: 'admin',
+                            storeId: 'ADMIN',
+                            storeName: 'KS POS Super Admin',
+                            username: adminCredentials.username || 'KS POS',
+                            allowedFeatures: [...DEFAULT_ALL_FEATURES],
+                            trialDaysLeft: 999
+                        };
+                        loadStoreScopedShiftState();
+                        renderShiftsScreen();
+                        renderOrderHistoryScreen();
+                        renderPOSProducts();
+                        renderPOSCart();
+                        updateCustomerCartDisplay();
+                        updateDeleteOrderButtonVisibility();
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         try { persistAppStateToLocal(); } catch (e) {}
@@ -3636,6 +3651,7 @@
                             return;
                         }
                         isAdminImpersonatingStore = false;
+                        saveDeviceStoreLoginCredentials(matchedStore.username, matchedStore.password);
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         currentSessionUser = {
