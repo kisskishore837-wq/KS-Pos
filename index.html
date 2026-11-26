@@ -18,80 +18,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        function isStandaloneHomeScreenApp() {
-            try {
-                return (
-                    window.matchMedia('(display-mode: standalone)').matches ||
-                    window.matchMedia('(display-mode: fullscreen)').matches ||
-                    window.navigator.standalone === true
-                );
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function markDeviceAsTrustedAdmin() {
-            try {
-                // Only mark standalone home-screen main app as auto-filled admin app
-                if (isStandaloneHomeScreenApp()) {
-                    localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
-                    saveToIndexedDBVault('trusted_admin_device', true);
-                }
-                localStorage.removeItem('kspos_saved_store_login_v1');
-            } catch (e) {}
-        }
-
-        function saveDeviceStoreLoginCredentials(username, password) {
-            try {
-                if (isStandaloneHomeScreenApp() && isTrustedAdminDevice()) return;
-                localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
-                    username: username || '',
-                    password: password || ''
-                }));
-            } catch (e) {}
-        }
-
-        function isTrustedAdminDevice() {
-            try {
-                // Browser URL visits always stay empty for privacy; standalone home-screen app gets admin auto-fill
-                if (!isStandaloneHomeScreenApp()) return false;
-                return localStorage.getItem('kspos_trusted_admin_device_v1') === 'true';
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function getSavedDeviceStoreLogin() {
-            try {
-                // Keep browser URL login blank until a user registers a store account
-                if (!isStandaloneHomeScreenApp()) return null;
-                const raw = localStorage.getItem('kspos_saved_store_login_v1');
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                return (parsed && parsed.username && parsed.password) ? parsed : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function applyTrustedAdminAutoFill() {
-            const userInput = document.getElementById('usernameInput');
-            const passInput = document.getElementById('passwordInput');
-            const clearBtn = document.getElementById('clearLoginFieldsBtn');
-            if (!userInput || !passInput) return;
-
-            if (isStandaloneHomeScreenApp() && isTrustedAdminDevice()) {
-                userInput.value = adminCredentials.username || 'KS POS';
-                passInput.value = adminCredentials.password || 'ks@8804';
-                if (clearBtn) clearBtn.classList.remove('hidden');
-                return;
-            }
-
-            userInput.value = '';
-            passInput.value = '';
-            if (clearBtn) clearBtn.classList.add('hidden');
-        }
-
         .luxury-heading {
             font-family: 'Cinzel', 'Cormorant Garamond', serif;
             letter-spacing: 0.05em;
@@ -3389,12 +3315,75 @@
 
         let rentedStoresList = [];
 
+        function isStandaloneHomeScreenApp() {
+            try {
+                return (
+                    window.matchMedia('(display-mode: standalone)').matches ||
+                    window.matchMedia('(display-mode: fullscreen)').matches ||
+                    window.navigator.standalone === true
+                );
+            } catch (e) {
+                return false;
+            }
+        }
+
         function markDeviceAsTrustedAdmin() {
             try {
-                localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+                if (isStandaloneHomeScreenApp()) {
+                    localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+                    saveToIndexedDBVault('trusted_admin_device', true);
+                }
                 localStorage.removeItem('kspos_saved_store_login_v1');
-                saveToIndexedDBVault('trusted_admin_device', true);
             } catch (e) {}
+        }
+
+        function saveDeviceStoreLoginCredentials(username, password) {
+            try {
+                if (!isStandaloneHomeScreenApp() || isTrustedAdminDevice()) return;
+                localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
+                    username: username || '',
+                    password: password || ''
+                }));
+            } catch (e) {}
+        }
+
+        function isTrustedAdminDevice() {
+            try {
+                if (!isStandaloneHomeScreenApp()) return false;
+                return localStorage.getItem('kspos_trusted_admin_device_v1') === 'true';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function getSavedDeviceStoreLogin() {
+            try {
+                if (!isStandaloneHomeScreenApp()) return null;
+                const raw = localStorage.getItem('kspos_saved_store_login_v1');
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                return (parsed && parsed.username && parsed.password) ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function applyTrustedAdminAutoFill() {
+            const userInput = document.getElementById('usernameInput');
+            const passInput = document.getElementById('passwordInput');
+            const clearBtn = document.getElementById('clearLoginFieldsBtn');
+            if (!userInput || !passInput) return;
+
+            if (isStandaloneHomeScreenApp() && isTrustedAdminDevice()) {
+                userInput.value = adminCredentials.username || 'KS POS';
+                passInput.value = adminCredentials.password || 'ks@8804';
+                if (clearBtn) clearBtn.classList.remove('hidden');
+                return;
+            }
+
+            userInput.value = '';
+            passInput.value = '';
+            if (clearBtn) clearBtn.classList.add('hidden');
         }
 
         function saveDeviceStoreLoginCredentials(username, password) {
