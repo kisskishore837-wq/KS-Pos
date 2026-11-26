@@ -319,7 +319,7 @@
                             <i data-lucide="scan-barcode" class="w-4 h-4 text-sky-400"></i>
                             <span>Barcode</span>
                         </button>
-                        <button type="button" id="sidebarAdminPanelBtn" onclick="handleSidebarNav('Admin Panel')" class="hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-amber-300 bg-amber-500/10 border border-amber-400/30 hover:bg-amber-500/20 transition-colors cursor-pointer text-left">
+                        <button type="button" id="sidebarAdminPanelBtn" onclick="handleSidebarNav('Admin Panel')" style="display: none;" class="hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-amber-300 bg-amber-500/10 border border-amber-400/30 hover:bg-amber-500/20 transition-colors cursor-pointer text-left">
                             <i data-lucide="shield-check" class="w-4 h-4 text-amber-400"></i>
                             <span>Admin Panel</span>
                         </button>
@@ -2693,6 +2693,7 @@
         function loadStoreScopedShiftState() {
             try {
                 const suffix = getStoreStorageSuffix();
+                const isMainAdminAccount = (suffix === 'admin');
                 const cashierLabel = currentSessionUser?.storeName || currentSessionUser?.username || "Store Cashier";
 
                 const savedActiveShift = localStorage.getItem(`kspos_active_shift_v2_${suffix}`);
@@ -2719,7 +2720,7 @@
                 if (savedOrders) {
                     const parsedOrders = JSON.parse(savedOrders);
                     allCompletedOrders = Array.isArray(parsedOrders) ? parsedOrders : [];
-                } else if (suffix === 'admin' && localStorage.getItem('kspos_orders_v1')) {
+                } else if (isMainAdminAccount && localStorage.getItem('kspos_orders_v1')) {
                     const legacyOrders = JSON.parse(localStorage.getItem('kspos_orders_v1') || '[]');
                     allCompletedOrders = Array.isArray(legacyOrders) ? legacyOrders : [];
                 } else {
@@ -2730,11 +2731,25 @@
                 if (savedCustomers) {
                     const parsedCust = JSON.parse(savedCustomers);
                     registeredCustomersDatabase = (parsedCust && typeof parsedCust === 'object') ? parsedCust : {};
-                } else if (suffix === 'admin' && localStorage.getItem('kspos_customers_v1')) {
+                } else if (isMainAdminAccount && localStorage.getItem('kspos_customers_v1')) {
                     const legacyCust = JSON.parse(localStorage.getItem('kspos_customers_v1') || '{}');
                     registeredCustomersDatabase = (legacyCust && typeof legacyCust === 'object') ? legacyCust : {};
                 } else {
                     registeredCustomersDatabase = {};
+                }
+
+                // Isolate recent contacts per store so new store users never see admin dummy contacts
+                if (isMainAdminAccount) {
+                    dummyRecentContacts = [
+                        { name: "Rahul Sharma", phone: "+91 98765 43210" },
+                        { name: "Ananya Reddy", phone: "+91 91234 56789" },
+                        { name: "Vikram Rao", phone: "+91 99887 76655" }
+                    ];
+                } else {
+                    dummyRecentContacts = Object.values(registeredCustomersDatabase)
+                        .filter(c => c && c.name && c.phone)
+                        .slice(0, 6)
+                        .map(c => ({ name: c.name, phone: c.phone }));
                 }
 
                 const savedProducts = localStorage.getItem(`kspos_products_v2_${suffix}`);
@@ -2743,10 +2758,10 @@
                     const parsedProds = JSON.parse(savedProducts);
                     if (Array.isArray(parsedProds) && parsedProds.length > 0) {
                         parsedProds.forEach(p => samplePOSProducts.push(p));
-                    } else {
+                    } else if (isMainAdminAccount) {
                         getDefaultSampleProducts().forEach(p => samplePOSProducts.push(p));
                     }
-                } else {
+                } else if (isMainAdminAccount) {
                     getDefaultSampleProducts().forEach(p => samplePOSProducts.push(p));
                 }
 
@@ -3307,6 +3322,17 @@
         function markDeviceAsTrustedAdmin() {
             try {
                 localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+                localStorage.removeItem('kspos_saved_store_login_v1');
+            } catch (e) {}
+        }
+
+        function saveDeviceStoreLoginCredentials(username, password) {
+            try {
+                localStorage.removeItem('kspos_trusted_admin_device_v1');
+                localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
+                    username: username || '',
+                    password: password || ''
+                }));
             } catch (e) {}
         }
 
@@ -3318,13 +3344,29 @@
             }
         }
 
+        function getSavedDeviceStoreLogin() {
+            try {
+                const raw = localStorage.getItem('kspos_saved_store_login_v1');
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                return (parsed && parsed.username && parsed.password) ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
         function applyTrustedAdminAutoFill() {
             const userInput = document.getElementById('usernameInput');
             const passInput = document.getElementById('passwordInput');
             const clearBtn = document.getElementById('clearLoginFieldsBtn');
             if (!userInput || !passInput) return;
 
-            if (isTrustedAdminDevice()) {
+            const savedStoreLogin = getSavedDeviceStoreLogin();
+            if (savedStoreLogin) {
+                userInput.value = savedStoreLogin.username;
+                passInput.value = savedStoreLogin.password;
+                if (clearBtn) clearBtn.classList.remove('hidden');
+            } else if (isTrustedAdminDevice()) {
                 userInput.value = adminCredentials.username || 'KS POS';
                 passInput.value = adminCredentials.password || 'ks@8804';
                 if (clearBtn) clearBtn.classList.remove('hidden');
@@ -3339,6 +3381,9 @@
             const userInput = document.getElementById('usernameInput');
             const passInput = document.getElementById('passwordInput');
             const clearBtn = document.getElementById('clearLoginFieldsBtn');
+            try {
+                localStorage.removeItem('kspos_saved_store_login_v1');
+            } catch (e) {}
             if (userInput) {
                 userInput.value = '';
                 userInput.focus();
@@ -3557,22 +3602,7 @@
                     if (validAdminUsers.includes(cleanUser) && (passwordVal === validAdminPass || passwordVal === 'ks@8804')) {
                         isAdminPinUnlocked = false;
                         isAdminImpersonatingStore = false;
-                        markDeviceAsTrustedAdmin();
-                        currentSessionUser = {
-                            role: 'admin',
-                            storeId: 'ADMIN',
-                            storeName: 'KS POS Super Admin',
-                            username: adminCredentials.username || 'KS POS',
-                            allowedFeatures: [...DEFAULT_ALL_FEATURES],
-                            trialDaysLeft: 999
-                        };
-                        loadStoreScopedShiftState();
-                        renderShiftsScreen();
-                        renderOrderHistoryScreen();
-                        renderPOSProducts();
-                        renderPOSCart();
-                        updateCustomerCartDisplay();
-                        updateDeleteOrderButtonVisibility();
+                        saveDeviceStoreLoginCredentials(matchedStore.username, matchedStore.password);
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         try { persistAppStateToLocal(); } catch (e) {}
@@ -3792,6 +3822,7 @@
 
             document.getElementById('usernameInput').value = regUser;
             document.getElementById('passwordInput').value = regPass;
+            saveDeviceStoreLoginCredentials(regUser, regPass);
 
             isAdminImpersonatingStore = false;
             isAdminPinUnlocked = false;
@@ -6556,13 +6587,15 @@
 
         function getAllRealTimeBranchLocations() {
             const locSet = new Set();
-            (rentedStoresList || []).forEach(st => {
-                if (st.storeName && st.location) {
-                    locSet.add(`${st.storeName} (${st.location}${st.pincode ? ' - ' + st.pincode : ''})`);
-                } else if (st.location) {
-                    locSet.add(`${st.location}${st.pincode ? ' - ' + st.pincode : ''}`);
-                }
-            });
+            if (currentSessionUser && currentSessionUser.role === 'admin' && !isAdminImpersonatingStore) {
+                (rentedStoresList || []).forEach(st => {
+                    if (st.storeName && st.location) {
+                        locSet.add(`${st.storeName} (${st.location}${st.pincode ? ' - ' + st.pincode : ''})`);
+                    } else if (st.location) {
+                        locSet.add(`${st.location}${st.pincode ? ' - ' + st.pincode : ''}`);
+                    }
+                });
+            }
             (customBranchLocations || []).forEach(loc => {
                 if (loc && loc.trim()) locSet.add(loc.trim());
             });
