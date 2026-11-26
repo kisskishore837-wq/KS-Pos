@@ -2031,6 +2031,32 @@
         </div>
     </div>
 
+    <!-- Delete Store Reason Modal -->
+    <div id="deleteStoreModalOverlay" onclick="closeDeleteStoreModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-sm glass-panel bg-white/95 rounded-3xl p-5 sm:p-6 shadow-2xl border border-red-200 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-red-100">
+                <div>
+                    <h3 class="luxury-heading text-base sm:text-lg font-bold text-red-700 tracking-wide">Delete Store</h3>
+                    <p id="deleteStoreTargetSubtitle" class="text-[11px] font-semibold text-slate-600 mt-0.5"></p>
+                </div>
+                <button type="button" onclick="closeDeleteStoreModal()" class="p-1.5 rounded-xl hover:bg-red-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div>
+                <label for="deleteStoreReasonInput" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Reason / Note</label>
+                <textarea id="deleteStoreReasonInput" rows="3" placeholder="Enter reason why you are deleting this store permanently..." class="glass-input w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 resize-none"></textarea>
+            </div>
+            <div class="pt-1 flex justify-end gap-2">
+                <button type="button" onclick="closeDeleteStoreModal()" class="py-2 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">Cancel</button>
+                <button type="button" id="confirmDeleteStoreBtn" onclick="confirmDeleteStoreAction()" class="py-2 px-5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all">
+                    <div id="confirmDeleteStoreSpinner" class="hidden w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
+                    <span id="confirmDeleteStoreBtnText">Delete Store</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Built-in vector fallback matching your exact circular sky-blue KS monogram on #eaedf4 background
         window.DEFAULT_KS_MONOGRAM_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
@@ -2229,9 +2255,10 @@
                         const uname = (row.username || row.email || '').trim();
                         if (!uname) return;
                         const key = uname.toLowerCase();
-                        const parsedFeatures = Array.isArray(row.allowed_features) && row.allowed_features.length > 0
+                        const hasAllNineFromOldDbDefault = Array.isArray(row.allowed_features) && row.allowed_features.length >= DEFAULT_ALL_FEATURES.length && !row.features_customized;
+                        const parsedFeatures = (Array.isArray(row.allowed_features) && row.allowed_features.length > 0 && !hasAllNineFromOldDbDefault)
                             ? row.allowed_features
-                            : (localByUser[key]?.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']);
+                            : (localByUser[key]?.allowedFeatures || ['Dashboard', 'Sell Screen', 'Order History', 'Shifts']);
 
                         cloudStores.push({
                             storeId: row.store_id || localByUser[key]?.storeId || `ST-${String(idx + 1).padStart(3, '0')}`,
@@ -2471,6 +2498,9 @@
                                             s => (s.username || '').toLowerCase() === parsedStore.username.toLowerCase()
                                         );
                                         if (!exists) {
+                                            if (Array.isArray(parsedStore.allowedFeatures) && parsedStore.allowedFeatures.length >= DEFAULT_ALL_FEATURES.length && !parsedStore.featuresCustomized) {
+                                                parsedStore.allowedFeatures = ['Dashboard', 'Sell Screen', 'Order History', 'Shifts'];
+                                            }
                                             rentedStoresList.unshift(parsedStore);
                                             foundBackupStores = true;
                                         }
@@ -2497,6 +2527,8 @@
         async function pushStoreToSupabaseCloud(storePayload, maxRetries = 3) {
             if (!storePayload || !storePayload.username) return false;
             const client = getSupabaseClient();
+            const strictDefaultFour = ['Dashboard', 'Sell Screen', 'Order History', 'Shifts'];
+            const finalFeaturesToPush = Array.isArray(storePayload.allowed_features) ? storePayload.allowed_features : strictDefaultFour;
             const corePayload = {
                 store_id: storePayload.store_id,
                 store_name: storePayload.store_name,
@@ -2510,7 +2542,7 @@
                 status: storePayload.status || 'Active',
                 trial_start_date: storePayload.trial_start_date,
                 trial_days: Number(storePayload.trial_days ?? 30),
-                allowed_features: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+                allowed_features: finalFeaturesToPush
             };
 
             let primarySaved = false;
@@ -2582,7 +2614,8 @@
                 status: storePayload.status || 'Active',
                 trialStartDate: storePayload.trial_start_date,
                 trialDays: Number(storePayload.trial_days ?? 30),
-                allowedFeatures: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+                allowedFeatures: finalFeaturesToPush,
+                featuresCustomized: Boolean(storePayload.features_customized)
             };
 
             if (client) {
@@ -3233,21 +3266,98 @@
             showNotification(`Accepted! ${store.storeName} renewed for ${daysToGrant} days.`, 'success', 4000);
         }
 
+        let pendingDeleteStoreId = '';
+
         function deleteStoreFromAdminPanel(storeId) {
             const store = rentedStoresList.find(s => s.storeId === storeId);
             if (!store) return;
-            rentedStoresList = rentedStoresList.filter(s => s.storeId !== storeId);
+            pendingDeleteStoreId = storeId;
+            const subEl = document.getElementById('deleteStoreTargetSubtitle');
+            if (subEl) subEl.textContent = `${store.storeName} (${store.username})`;
+            const inputEl = document.getElementById('deleteStoreReasonInput');
+            if (inputEl) inputEl.value = '';
+            const overlay = document.getElementById('deleteStoreModalOverlay');
+            if (overlay) overlay.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+            setTimeout(() => inputEl?.focus(), 50);
+        }
+
+        function closeDeleteStoreModal() {
+            pendingDeleteStoreId = '';
+            const overlay = document.getElementById('deleteStoreModalOverlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        async function confirmDeleteStoreAction() {
+            if (!pendingDeleteStoreId) return;
+            const store = rentedStoresList.find(s => s.storeId === pendingDeleteStoreId);
+            if (!store) {
+                closeDeleteStoreModal();
+                return;
+            }
+
+            const reason = document.getElementById('deleteStoreReasonInput')?.value.trim();
+            if (!reason) {
+                showNotification('Please enter a reason/note to delete this store', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('confirmDeleteStoreBtn');
+            const spinner = document.getElementById('confirmDeleteStoreSpinner');
+            const btnText = document.getElementById('confirmDeleteStoreBtnText');
+
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Deleting...';
+
+            const targetUsername = store.username;
+            const targetStoreName = store.storeName;
+            const targetStoreId = store.storeId;
+
+            rentedStoresList = rentedStoresList.filter(s => s.storeId !== targetStoreId && (s.username || '').toLowerCase() !== targetUsername.toLowerCase());
             persistMultiTenantAuthState();
 
             const client = getSupabaseClient();
+            const backupKey = `store_reg_${String(targetUsername).trim().toLowerCase()}`;
+
             if (client) {
                 try {
-                    client.from('stores').delete().eq('username', store.username).then(() => {});
+                    await client.from('stores').delete().eq('username', targetUsername);
+                } catch (e) {}
+                try {
+                    await client.from('app_settings').delete().eq('setting_key', backupKey);
                 } catch (e) {}
             }
 
-            openSidebarModuleScreen('Admin Panel');
-            showNotification(`Store "${store.storeName}" deleted permanently`, 'warning');
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/stores?username=eq.${encodeURIComponent(targetUsername)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+            } catch (e) {}
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/app_settings?setting_key=eq.${encodeURIComponent(backupKey)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+            } catch (e) {}
+
+            setTimeout(() => {
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Delete Store';
+
+                closeDeleteStoreModal();
+                openSidebarModuleScreen('Admin Panel');
+                showNotification(`Store "${targetStoreName}" permanently deleted (${reason})`, 'warning', 4000);
+            }, 3000);
         }
 
         let isSyncingStoresNow = false;
@@ -3827,7 +3937,8 @@
                 status: 'Active',
                 trialStartDate: new Date().toISOString().split('T')[0],
                 trialDays: 30,
-                allowedFeatures: defaultAllowed
+                allowedFeatures: [...defaultAllowed],
+                featuresCustomized: false
             };
 
             rentedStoresList.unshift(newStoreObj);
@@ -3850,7 +3961,8 @@
                 status: 'Active',
                 trial_start_date: newStoreObj.trialStartDate,
                 trial_days: 30,
-                allowed_features: defaultAllowed
+                allowed_features: [...defaultAllowed],
+                features_customized: false
             });
 
             if (btn) btn.disabled = false;
@@ -3936,6 +4048,7 @@
             const store = rentedStoresList.find(s => s.storeId === storeId);
             if (!store) return;
             store.allowedFeatures = Array.isArray(store.allowedFeatures) ? store.allowedFeatures : ['Dashboard', 'Sell Screen', 'Order History', 'Shifts'];
+            store.featuresCustomized = true;
             const idx = store.allowedFeatures.indexOf(featureName);
             if (idx >= 0) {
                 store.allowedFeatures.splice(idx, 1);
@@ -3949,6 +4062,7 @@
         async function saveStoreAllowedFeatures(storeId) {
             const store = rentedStoresList.find(s => s.storeId === storeId);
             if (!store) return;
+            store.featuresCustomized = true;
 
             const btn = document.getElementById(`saveStoreFeaturesBtn-${storeId}`);
             const spinner = document.getElementById(`saveStoreFeaturesSpinner-${storeId}`);
@@ -3998,7 +4112,8 @@
                     status: store.status || 'Active',
                     trialStartDate: store.trialStartDate,
                     trialDays: Number(store.trialDays ?? 30),
-                    allowedFeatures: finalFeatures
+                    allowedFeatures: finalFeatures,
+                    featuresCustomized: true
                 };
                 if (client) {
                     await client.from('app_settings').upsert(
@@ -4006,6 +4121,19 @@
                         { onConflict: 'setting_key' }
                     );
                 }
+                await fetch(`${SUPABASE_URL}/rest/v1/app_settings?on_conflict=setting_key`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'resolution=merge-duplicates,return=minimal'
+                    },
+                    body: JSON.stringify({
+                        setting_key: backupKey,
+                        setting_value: JSON.stringify(backupRecord)
+                    })
+                });
             } catch (e) {}
 
             setTimeout(() => {
@@ -5476,6 +5604,13 @@
                     loadAdminPaymentConfig();
                     loadMultiTenantAuthState();
                     loadStoreScopedShiftState();
+                    if (currentSessionUser.role === 'store' && currentSessionUser.username) {
+                        const latestStore = rentedStoresList.find(s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase());
+                        if (latestStore && Array.isArray(latestStore.allowedFeatures)) {
+                            currentSessionUser.allowedFeatures = [...latestStore.allowedFeatures];
+                            persistAppStateToLocal();
+                        }
+                    }
                     applyRolePermissionsToUI();
                     updateDeleteOrderButtonVisibility();
                     renderPOSProducts();
