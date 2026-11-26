@@ -1,35 +1,95 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KS POS - Smart Retail Management</title>
-    <!-- iOS & Android Home Screen App Icon & Standalone Web App Meta -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="KS POS">
-    <meta name="theme-color" content="#00adef">
-    <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" sizes="180x180" href="./IMG_8948.jpeg">
+    <link id="dynamicAppleTouchIcon" rel="apple-touch-icon" href="./IMG_8948.jpeg">
     <link id="dynamicFavicon" rel="icon" type="image/jpeg" href="./IMG_8948.jpeg">
-    <link id="dynamicWebManifest" rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22KS%20POS%22%2C%22short_name%22%3A%22KS%20POS%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eaedf4%22%2C%22theme_color%22%3A%22%2300adef%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2FIMG_8948.jpeg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpeg%22%7D%5D%7D">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS SDK (Deferred so it never blocks UI rendering) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts: Cinzel, Cormorant Garamond & Inter -->
+    <link id="dynamicWebManifest" rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22KS%20POS%22%2C%22short_name%22%3A%22KS%20POS%22%2C%22display%22%3A%22standalone%22%7D">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background-color: #ffffff;
-            color: #0f172a;
+        }
+
+        function isStandaloneHomeScreenApp() {
+            try {
+                return (
+                    window.matchMedia('(display-mode: standalone)').matches ||
+                    window.matchMedia('(display-mode: fullscreen)').matches ||
+                    window.navigator.standalone === true
+                );
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function markDeviceAsTrustedAdmin() {
+            try {
+                // Only mark standalone home-screen main app as auto-filled admin app
+                if (isStandaloneHomeScreenApp()) {
+                    localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+                    saveToIndexedDBVault('trusted_admin_device', true);
+                }
+                localStorage.removeItem('kspos_saved_store_login_v1');
+            } catch (e) {}
+        }
+
+        function saveDeviceStoreLoginCredentials(username, password) {
+            try {
+                if (isStandaloneHomeScreenApp() && isTrustedAdminDevice()) return;
+                localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
+                    username: username || '',
+                    password: password || ''
+                }));
+            } catch (e) {}
+        }
+
+        function isTrustedAdminDevice() {
+            try {
+                // Browser URL visits always stay empty for privacy; standalone home-screen app gets admin auto-fill
+                if (!isStandaloneHomeScreenApp()) return false;
+                return localStorage.getItem('kspos_trusted_admin_device_v1') === 'true';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function getSavedDeviceStoreLogin() {
+            try {
+                // Keep browser URL login blank until a user registers a store account
+                if (!isStandaloneHomeScreenApp()) return null;
+                const raw = localStorage.getItem('kspos_saved_store_login_v1');
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                return (parsed && parsed.username && parsed.password) ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function applyTrustedAdminAutoFill() {
+            const userInput = document.getElementById('usernameInput');
+            const passInput = document.getElementById('passwordInput');
+            const clearBtn = document.getElementById('clearLoginFieldsBtn');
+            if (!userInput || !passInput) return;
+
+            if (isStandaloneHomeScreenApp() && isTrustedAdminDevice()) {
+                userInput.value = adminCredentials.username || 'KS POS';
+                passInput.value = adminCredentials.password || 'ks@8804';
+                if (clearBtn) clearBtn.classList.remove('hidden');
+                return;
+            }
+
+            userInput.value = '';
+            passInput.value = '';
+            if (clearBtn) clearBtn.classList.add('hidden');
         }
 
         .luxury-heading {
@@ -8557,7 +8617,7 @@
                 loadMultiTenantAuthState();
                 await restoreStoresFromIndexedDBVault();
                 const idbTrustedAdmin = await loadFromIndexedDBVault('trusted_admin_device');
-                if (idbTrustedAdmin === true) {
+                if (idbTrustedAdmin === true && isStandaloneHomeScreenApp()) {
                     try {
                         localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
                     } catch (e) {}
