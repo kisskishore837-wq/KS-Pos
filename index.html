@@ -2700,12 +2700,22 @@
                 if (savedActiveShift) {
                     const parsed = JSON.parse(savedActiveShift);
                     if (parsed && typeof parsed === 'object') {
-                        activeShiftState = { ...createDefaultClosedShiftState(cashierLabel), ...parsed };
+                        activeShiftState = {
+                            ...createDefaultClosedShiftState(cashierLabel),
+                            ...parsed,
+                            // Never auto-open an active shift on app/session load unless explicitly opened by user
+                            isOpen: Boolean(parsed.isOpen) && !isMainAdminAccount
+                        };
                     } else {
                         activeShiftState = createDefaultClosedShiftState(cashierLabel);
                     }
                 } else {
                     activeShiftState = createDefaultClosedShiftState(cashierLabel);
+                }
+
+                // Ensure main admin / fresh sessions always start with Shift Closed until explicitly opened
+                if (isMainAdminAccount) {
+                    activeShiftState.isOpen = false;
                 }
 
                 const savedPastShifts = localStorage.getItem(`kspos_past_shifts_v2_${suffix}`);
@@ -3323,12 +3333,13 @@
             try {
                 localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
                 localStorage.removeItem('kspos_saved_store_login_v1');
+                saveToIndexedDBVault('trusted_admin_device', true);
             } catch (e) {}
         }
 
         function saveDeviceStoreLoginCredentials(username, password) {
             try {
-                localStorage.removeItem('kspos_trusted_admin_device_v1');
+                if (isTrustedAdminDevice()) return;
                 localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
                     username: username || '',
                     password: password || ''
@@ -3361,14 +3372,17 @@
             const clearBtn = document.getElementById('clearLoginFieldsBtn');
             if (!userInput || !passInput) return;
 
+            if (isTrustedAdminDevice()) {
+                userInput.value = adminCredentials.username || 'KS POS';
+                passInput.value = adminCredentials.password || 'ks@8804';
+                if (clearBtn) clearBtn.classList.remove('hidden');
+                return;
+            }
+
             const savedStoreLogin = getSavedDeviceStoreLogin();
             if (savedStoreLogin) {
                 userInput.value = savedStoreLogin.username;
                 passInput.value = savedStoreLogin.password;
-                if (clearBtn) clearBtn.classList.remove('hidden');
-            } else if (isTrustedAdminDevice()) {
-                userInput.value = adminCredentials.username || 'KS POS';
-                passInput.value = adminCredentials.password || 'ks@8804';
                 if (clearBtn) clearBtn.classList.remove('hidden');
             } else {
                 userInput.value = '';
@@ -3600,7 +3614,7 @@
                     const validAdminPass = adminCredentials.password || 'ks@8804';
 
                     if (validAdminUsers.includes(cleanUser) && (passwordVal === validAdminPass || passwordVal === 'ks@8804')) {
-                        isAdminPinUnlocked = false;
+                        isAdminPinUnlocked = true;
                         isAdminImpersonatingStore = false;
                         markDeviceAsTrustedAdmin();
                         currentSessionUser = {
@@ -8542,8 +8556,19 @@
                 loadAdminPaymentConfig();
                 loadMultiTenantAuthState();
                 await restoreStoresFromIndexedDBVault();
+                const idbTrustedAdmin = await loadFromIndexedDBVault('trusted_admin_device');
+                if (idbTrustedAdmin === true) {
+                    try {
+                        localStorage.setItem('kspos_trusted_admin_device_v1', 'true');
+                    } catch (e) {}
+                }
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
+
+                // Always keep shift closed unless explicitly opened by the user
+                if (activeShiftState) {
+                    activeShiftState.isOpen = false;
+                }
 
                 // Always start cleanly on Welcome Screen after the 3-second KS POS white spinner
                 // (Login details remain auto-saved on Login Screen for trusted admin device)
