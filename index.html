@@ -2464,8 +2464,25 @@
             if (!storePayload || !storePayload.username) return false;
             const client = getSupabaseClient();
 
+            // Core schema-safe payload so insert/upsert succeeds even if optional columns aren't added yet
+            const corePayload = {
+                store_id: storePayload.store_id,
+                store_name: storePayload.store_name,
+                owner_name: storePayload.owner_name,
+                username: storePayload.username,
+                password: storePayload.password,
+                phone: storePayload.phone,
+                email: storePayload.email,
+                location: storePayload.location,
+                pincode: storePayload.pincode,
+                status: storePayload.status || 'Active',
+                trial_start_date: storePayload.trial_start_date,
+                trial_days: storePayload.trial_days || 30,
+                allowed_features: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+            };
+
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                // Method A: Supabase JS Client Upsert
+                // Method A1: Full payload via Supabase JS Client Upsert
                 if (client) {
                     try {
                         const { error } = await client
@@ -2473,9 +2490,17 @@
                             .upsert([storePayload], { onConflict: 'username' });
                         if (!error) return true;
                     } catch (e) {}
+
+                    // Method A2: Core payload via Supabase JS Client Upsert
+                    try {
+                        const { error: coreErr } = await client
+                            .from('stores')
+                            .upsert([corePayload], { onConflict: 'username' });
+                        if (!coreErr) return true;
+                    } catch (e) {}
                 }
 
-                // Method B: Direct Supabase REST Upsert (works even if SDK is deferred/offline)
+                // Method B: Direct Supabase REST Upsert (Full then Core)
                 try {
                     const resp = await fetch(`${SUPABASE_URL}/rest/v1/stores?on_conflict=username`, {
                         method: 'POST',
@@ -2488,6 +2513,18 @@
                         body: JSON.stringify(storePayload)
                     });
                     if (resp.ok) return true;
+
+                    const coreResp = await fetch(`${SUPABASE_URL}/rest/v1/stores?on_conflict=username`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Prefer': 'resolution=merge-duplicates,return=minimal'
+                        },
+                        body: JSON.stringify(corePayload)
+                    });
+                    if (coreResp.ok) return true;
                 } catch (e) {}
 
                 // Method C: Plain REST Insert if on_conflict constraint isn't created yet
@@ -2500,13 +2537,13 @@
                             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                             'Prefer': 'return=minimal'
                         },
-                        body: JSON.stringify(storePayload)
+                        body: JSON.stringify(corePayload)
                     });
                     if (insertResp.ok || insertResp.status === 409) return true;
                 } catch (e) {}
 
                 if (attempt < maxRetries) {
-                    await new Promise(r => setTimeout(r, 700 * attempt));
+                    await new Promise(r => setTimeout(r, 600 * attempt));
                 }
             }
             return false;
@@ -2569,6 +2606,40 @@
                 digitalSaleCount: 0,
                 adjustments: []
             };
+        }
+
+        function resetInMemoryStoreDataForNewAccount(storeLabel = "Store Cashier") {
+            activeShiftState = createDefaultClosedShiftState(storeLabel);
+            pastShiftHistory = [];
+            allCompletedOrders = [];
+            registeredCustomersDatabase = {};
+            stockTransfersList = [];
+            customBranchLocations = [];
+            samplePOSProducts.length = 0;
+            getDefaultSampleProducts().forEach(p => samplePOSProducts.push(p));
+
+            posCart = [];
+            heldCart = null;
+            heldCustomerName = "";
+            heldCustomerPhone = "";
+            currentCustomerName = "";
+            currentCustomerPhone = "";
+            currentCustomerData = {
+                isSaved: false,
+                name: "",
+                phone: "",
+                email: "",
+                address: "",
+                note: "",
+                creditGiven: 0,
+                creditUsed: 0,
+                orders: []
+            };
+            discountConfig = { type: 'rupees', value: 0 };
+            isRefundExchangeActive = false;
+            refundCartItems = [];
+            exchangeCartItems = [];
+            activeRefundOrderReference = null;
         }
 
         function persistAppStateToLocal() {
@@ -3745,7 +3816,9 @@
                 trialDaysLeft: 30
             };
 
-            loadStoreScopedShiftState();
+            // Strictly isolate this new store's data with default "No Active Shift"
+            resetInMemoryStoreDataForNewAccount(newStoreObj.ownerName || newStoreObj.storeName);
+            persistAppStateToLocal();
             renderShiftsScreen();
             renderOrderHistoryScreen();
             renderPOSProducts();
@@ -3758,7 +3831,6 @@
                 dashLoc.textContent = `${location}${pincode ? ' - ' + pincode : ''}`;
             }
 
-            persistAppStateToLocal();
             applyRolePermissionsToUI();
             isFirstStartSellingAfterLogin = true;
 
@@ -4213,6 +4285,9 @@
                 showNotification('Access restricted to Super Admin only', 'warning');
                 return;
             }
+            try {
+                localStorage.setItem('kspos_last_module_name_v1', sectionName);
+            } catch (e) {}
             const titleEl = document.getElementById('sidebarModuleTitleText');
             const bodyEl = document.getElementById('sidebarModuleBodyContainer');
             if (titleEl) titleEl.textContent = sectionName;
@@ -4677,6 +4752,8 @@
                 };
                 try {
                     localStorage.removeItem('kspos_session_user_v1');
+                    localStorage.removeItem('kspos_last_active_screen_v1');
+                    localStorage.removeItem('kspos_last_module_name_v1');
                 } catch (e) {}
                 applyRolePermissionsToUI();
 
@@ -8068,6 +8145,10 @@
                 target.classList.add('page-visible');
             }
 
+            try {
+                localStorage.setItem('kspos_last_active_screen_v1', screenId);
+            } catch (e) {}
+
             if (screenId === 'loginScreen') {
                 applyTrustedAdminAutoFill();
             } else if (screenId === 'plansScreen') {
@@ -8254,12 +8335,30 @@
                 splashOverlay.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => {
                     splashOverlay.style.display = 'none';
-                }, 400);
+                }, 350);
             }
         }
 
-        // Guaranteed immediate splash dismiss timers so app NEVER gets stuck on white spinner
-        setTimeout(dismissSplashScreenSafely, 900);
+        function triggerSamePageThreeSecondRefreshOverlay() {
+            const resumeOverlay = document.getElementById('appResumeSyncOverlay');
+            if (!resumeOverlay) return;
+            const labelEl = resumeOverlay.querySelector('p');
+            if (labelEl) labelEl.textContent = 'Refreshing page...';
+            resumeOverlay.classList.remove('hidden', 'opacity-0');
+            resumeOverlay.classList.add('flex');
+
+            setTimeout(() => {
+                resumeOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    resumeOverlay.classList.add('hidden');
+                    resumeOverlay.classList.remove('flex', 'opacity-0');
+                    if (labelEl) labelEl.textContent = 'Syncing store data...';
+                }, 280);
+            }, 3000);
+        }
+
+        // Guaranteed immediate splash dismiss timer so app NEVER gets stuck on white spinner
+        setTimeout(dismissSplashScreenSafely, 600);
 
         // Listen for instant cross-tab / cross-window store registrations & updates
         window.addEventListener('storage', (e) => {
@@ -8274,7 +8373,7 @@
         });
 
         window.addEventListener('DOMContentLoaded', async () => {
-            setTimeout(dismissSplashScreenSafely, 900);
+            setTimeout(dismissSplashScreenSafely, 600);
 
             try {
                 const savedLogo = localStorage.getItem('kspos_official_brand_logo_v1');
@@ -8283,12 +8382,47 @@
                 applyGlobalBrandLogo("", false);
             }
 
+            let savedLastScreen = '';
+            let savedLastModule = '';
+            try {
+                savedLastScreen = localStorage.getItem('kspos_last_active_screen_v1') || '';
+                savedLastModule = localStorage.getItem('kspos_last_module_name_v1') || '';
+            } catch (e) {}
+
             try {
                 loadAdminPaymentConfig();
                 loadMultiTenantAuthState();
                 await restoreStoresFromIndexedDBVault();
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
+
+                const restoreToPreviousPage = (fallbackScreen) => {
+                    const allowedLoggedInScreens = [
+                        'dashboardScreen',
+                        'sellScreen',
+                        'orderHistoryScreen',
+                        'shiftsScreen',
+                        'shiftsDetailsScreen',
+                        'plansScreen',
+                        'sidebarModuleScreen'
+                    ];
+                    if (savedLastScreen === 'sidebarModuleScreen' && savedLastModule) {
+                        if (savedLastModule === 'Admin Panel' && currentSessionUser.role !== 'admin') {
+                            navigateTo(fallbackScreen);
+                        } else {
+                            openSidebarModuleScreen(savedLastModule);
+                        }
+                    } else if (allowedLoggedInScreens.includes(savedLastScreen)) {
+                        navigateTo(savedLastScreen);
+                    } else {
+                        navigateTo(fallbackScreen);
+                    }
+                    // Show 3-second blur refresh overlay on the exact same page when browser refreshes
+                    if (savedLastScreen && savedLastScreen !== 'welcomeScreen') {
+                        dismissSplashScreenSafely();
+                        triggerSamePageThreeSecondRefreshOverlay();
+                    }
+                };
 
                 // Restore active logged-in session across browser refreshes (only Log Out clears it)
                 if (currentSessionUser && currentSessionUser.role === 'admin' && currentSessionUser.username) {
@@ -8301,7 +8435,7 @@
                     renderPOSCart();
                     renderOrderHistoryScreen();
                     renderShiftsScreen();
-                    navigateTo('dashboardScreen');
+                    restoreToPreviousPage('dashboardScreen');
                 } else if (currentSessionUser && currentSessionUser.role === 'store' && currentSessionUser.username) {
                     const matchedStore = (rentedStoresList || []).find(
                         s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase()
@@ -8326,10 +8460,9 @@
                             renderPOSCart();
                             renderOrderHistoryScreen();
                             renderShiftsScreen();
-                            navigateTo('dashboardScreen');
+                            restoreToPreviousPage('dashboardScreen');
                         }
                     } else {
-                        // Store exists in saved session even before cloud finishes syncing
                         applyRolePermissionsToUI();
                         updateDeleteOrderButtonVisibility();
                         renderPlanFeaturesPreview();
@@ -8337,7 +8470,7 @@
                         renderPOSCart();
                         renderOrderHistoryScreen();
                         renderShiftsScreen();
-                        navigateTo('dashboardScreen');
+                        restoreToPreviousPage('dashboardScreen');
                     }
                 } else {
                     isAdminImpersonatingStore = false;
@@ -8358,24 +8491,32 @@
                     renderPOSCart();
                     renderOrderHistoryScreen();
                     renderShiftsScreen();
+
+                    const guestAllowedScreens = ['welcomeScreen', 'loginScreen', 'registerScreen', 'plansScreen'];
+                    if (guestAllowedScreens.includes(savedLastScreen) && savedLastScreen !== 'welcomeScreen') {
+                        navigateTo(savedLastScreen);
+                        dismissSplashScreenSafely();
+                        triggerSamePageThreeSecondRefreshOverlay();
+                    }
                 }
 
                 setInterval(updateShiftsLiveClock, 1000);
                 if (window.lucide) lucide.createIcons();
             } catch (initErr) {
                 console.warn('Init error:', initErr);
+                dismissSplashScreenSafely();
             }
 
             // Immediate non-blocking Cloud Sync on App Launch / Reopen
             syncInitialDataFromSupabase(false);
             setupSupabaseRealtimeStoresListener();
 
-            // Fast 3-second live sync when Admin Panel is open, 12-second sync otherwise
+            // Fast 3-second live sync so Admin Panel receives new stores immediately
             setInterval(() => {
                 if (!document.hidden) {
                     syncInitialDataFromSupabase(false);
                 }
-            }, 3500);
+            }, 3000);
         });
 
         window.addEventListener('pageshow', () => {
@@ -8385,7 +8526,7 @@
         });
 
         window.addEventListener('load', () => {
-            setTimeout(dismissSplashScreenSafely, 1200);
+            setTimeout(dismissSplashScreenSafely, 800);
         });
 
         window.addEventListener('pagehide', () => {
