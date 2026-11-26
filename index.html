@@ -8406,13 +8406,6 @@
                 applyGlobalBrandLogo("", false);
             }
 
-            let savedLastScreen = '';
-            let savedLastModule = '';
-            try {
-                savedLastScreen = localStorage.getItem('kspos_last_active_screen_v1') || '';
-                savedLastModule = localStorage.getItem('kspos_last_module_name_v1') || '';
-            } catch (e) {}
-
             try {
                 loadSubscriptionPlansConfig();
                 loadAdminPaymentConfig();
@@ -8421,121 +8414,40 @@
                 loadAppStateFromLocal();
                 loadStockTransfersFromLocal();
 
-                const restoreToPreviousPage = (fallbackScreen) => {
-                    const allowedLoggedInScreens = [
-                        'dashboardScreen',
-                        'sellScreen',
-                        'orderHistoryScreen',
-                        'shiftsScreen',
-                        'shiftsDetailsScreen',
-                        'plansScreen',
-                        'sidebarModuleScreen'
-                    ];
-                    let targetScreenToOpen = fallbackScreen;
-                    if (savedLastScreen === 'sidebarModuleScreen' && savedLastModule) {
-                        if (savedLastModule === 'Admin Panel' && currentSessionUser.role !== 'admin') {
-                            navigateTo(fallbackScreen);
-                        } else {
-                            openSidebarModuleScreen(savedLastModule);
-                        }
-                        targetScreenToOpen = 'sidebarModuleScreen';
-                    } else if (allowedLoggedInScreens.includes(savedLastScreen)) {
-                        navigateTo(savedLastScreen);
-                        targetScreenToOpen = savedLastScreen;
-                    } else {
-                        navigateTo(fallbackScreen);
-                    }
-                    // On browser/app refresh, show 3-second blur spinner on the exact active page
-                    if (targetScreenToOpen && targetScreenToOpen !== 'welcomeScreen') {
-                        dismissSplashScreenSafely();
-                        triggerSamePageThreeSecondRefreshOverlay();
-                    }
+                // Always start cleanly on Welcome Screen after the 3-second KS POS white spinner
+                // (Login details remain auto-saved on Login Screen for trusted admin device)
+                isAdminImpersonatingStore = false;
+                isAdminPinUnlocked = false;
+                currentSessionUser = {
+                    role: 'guest',
+                    storeId: '',
+                    storeName: '',
+                    username: '',
+                    allowedFeatures: [],
+                    trialDaysLeft: 0
                 };
+                try {
+                    localStorage.removeItem('kspos_session_user_v1');
+                    localStorage.removeItem('kspos_last_active_screen_v1');
+                    localStorage.removeItem('kspos_last_module_name_v1');
+                } catch (e) {}
 
-                // Restore active logged-in session across browser refreshes (only Log Out clears it)
-                if (currentSessionUser && currentSessionUser.role === 'admin' && currentSessionUser.username) {
-                    isAdminImpersonatingStore = false;
-                    isAdminPinUnlocked = false;
-                    applyRolePermissionsToUI();
-                    updateDeleteOrderButtonVisibility();
-                    renderPlanFeaturesPreview();
-                    renderPOSProducts();
-                    renderPOSCart();
-                    renderOrderHistoryScreen();
-                    renderShiftsScreen();
-                    restoreToPreviousPage('dashboardScreen');
-                } else if (currentSessionUser && currentSessionUser.role === 'store' && currentSessionUser.username) {
-                    const matchedStore = (rentedStoresList || []).find(
-                        s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase()
-                    );
-                    if (matchedStore) {
-                        const remDays = getStoreRemainingTrialDays(matchedStore);
-                        if (matchedStore.status === 'Suspended' || matchedStore.status === 'Expired' || remDays <= 0) {
-                            openPlanExpiredScreen(matchedStore, 'warning');
-                        } else if (matchedStore.justRenewedBanner) {
-                            openPlanExpiredScreen(matchedStore, 'renewed');
-                        } else {
-                            currentSessionUser.allowedFeatures = matchedStore.allowedFeatures || currentSessionUser.allowedFeatures;
-                            currentSessionUser.trialDaysLeft = remDays;
-                            const dashLoc = document.getElementById('dashboardLocationText');
-                            if (dashLoc && matchedStore.location) {
-                                dashLoc.textContent = `${matchedStore.location}${matchedStore.pincode ? ' - ' + matchedStore.pincode : ''}`;
-                            }
-                            applyRolePermissionsToUI();
-                            updateDeleteOrderButtonVisibility();
-                            renderPlanFeaturesPreview();
-                            renderPOSProducts();
-                            renderPOSCart();
-                            renderOrderHistoryScreen();
-                            renderShiftsScreen();
-                            restoreToPreviousPage('dashboardScreen');
-                        }
-                    } else {
-                        applyRolePermissionsToUI();
-                        updateDeleteOrderButtonVisibility();
-                        renderPlanFeaturesPreview();
-                        renderPOSProducts();
-                        renderPOSCart();
-                        renderOrderHistoryScreen();
-                        renderShiftsScreen();
-                        restoreToPreviousPage('dashboardScreen');
-                    }
-                } else {
-                    isAdminImpersonatingStore = false;
-                    isAdminPinUnlocked = false;
-                    currentSessionUser = {
-                        role: 'guest',
-                        storeId: '',
-                        storeName: '',
-                        username: '',
-                        allowedFeatures: [],
-                        trialDaysLeft: 0
-                    };
-                    applyTrustedAdminAutoFill();
-                    applyRolePermissionsToUI();
-                    updateDeleteOrderButtonVisibility();
-                    renderPlanFeaturesPreview();
-                    renderPOSProducts();
-                    renderPOSCart();
-                    renderOrderHistoryScreen();
-                    renderShiftsScreen();
-
-                    const guestAllowedScreens = ['welcomeScreen', 'loginScreen', 'registerScreen', 'plansScreen'];
-                    if (guestAllowedScreens.includes(savedLastScreen) && savedLastScreen !== 'welcomeScreen') {
-                        navigateTo(savedLastScreen);
-                        dismissSplashScreenSafely();
-                        triggerSamePageThreeSecondRefreshOverlay();
-                    }
-                }
+                applyTrustedAdminAutoFill();
+                applyRolePermissionsToUI();
+                updateDeleteOrderButtonVisibility();
+                renderPlanFeaturesPreview();
+                renderPOSProducts();
+                renderPOSCart();
+                renderOrderHistoryScreen();
+                renderShiftsScreen();
 
                 setInterval(updateShiftsLiveClock, 1000);
                 if (window.lucide) lucide.createIcons();
             } catch (initErr) {
                 console.warn('Init error:', initErr);
-                dismissSplashScreenSafely();
             }
 
-            // One-time silent cloud sync on initial launch (afterwards app refreshes ONLY via 3-dots Refresh or browser reload)
+            // One-time silent cloud sync on initial launch (afterwards app refreshes ONLY via 3-dots Refresh or resume)
             syncInitialDataFromSupabase(false);
         });
 
