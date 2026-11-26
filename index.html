@@ -2460,8 +2460,9 @@
                     const { data: brandData, error: brandErr } = await client
                         .from('app_settings')
                         .select('setting_key, setting_value')
-                        .in('setting_key', ['official_brand_logo', 'admin_payment_qr', 'admin_payment_upi', 'admin_notify_email']);
+                        .or('setting_key.in.(official_brand_logo,admin_payment_qr,admin_payment_upi,admin_notify_email),setting_key.like.store_reg_%');
                     if (!brandErr && Array.isArray(brandData) && brandData.length > 0) {
+                        let foundBackupStores = false;
                         brandData.forEach(row => {
                             if (row.setting_key === 'official_brand_logo' && row.setting_value) {
                                 applyGlobalBrandLogo(row.setting_value, true);
@@ -2474,8 +2475,26 @@
                             } else if (row.setting_key === 'admin_notify_email' && row.setting_value) {
                                 adminPaymentConfig.adminEmail = row.setting_value;
                                 persistAdminPaymentConfig();
+                            } else if (row.setting_key && row.setting_key.startsWith('store_reg_') && row.setting_value) {
+                                try {
+                                    const parsedStore = typeof row.setting_value === 'string'
+                                        ? JSON.parse(row.setting_value)
+                                        : row.setting_value;
+                                    if (parsedStore && parsedStore.username) {
+                                        const exists = rentedStoresList.some(
+                                            s => (s.username || '').toLowerCase() === parsedStore.username.toLowerCase()
+                                        );
+                                        if (!exists) {
+                                            rentedStoresList.unshift(parsedStore);
+                                            foundBackupStores = true;
+                                        }
+                                    }
+                                } catch (parseErr) {}
                             }
                         });
+                        if (foundBackupStores) {
+                            persistMultiTenantAuthState();
+                        }
                     }
                 }
 
@@ -2508,13 +2527,17 @@
                 allowed_features: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
             };
 
+            let primarySaved = false;
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 if (client) {
                     try {
                         const { error } = await client
                             .from('stores')
                             .upsert([corePayload], { onConflict: 'username' });
-                        if (!error) return true;
+                        if (!error) {
+                            primarySaved = true;
+                            break;
+                        }
                     } catch (e) {}
                 }
 
@@ -2529,7 +2552,10 @@
                         },
                         body: JSON.stringify(corePayload)
                     });
-                    if (resp.ok) return true;
+                    if (resp.ok) {
+                        primarySaved = true;
+                        break;
+                    }
                 } catch (e) {}
 
                 try {
@@ -2543,14 +2569,66 @@
                         },
                         body: JSON.stringify(corePayload)
                     });
-                    if (insertResp.ok || insertResp.status === 409) return true;
+                    if (insertResp.ok || insertResp.status === 409) {
+                        primarySaved = true;
+                        break;
+                    }
                 } catch (e) {}
 
                 if (attempt < maxRetries) {
-                    await new Promise(r => setTimeout(r, 600 * attempt));
+                    await new Promise(r => setTimeout(r, 500 * attempt));
                 }
             }
-            return false;
+
+            // Guaranteed Backup Cloud Registry via app_settings so cross-device stores NEVER fail to appear in Admin Panel
+            let backupSaved = false;
+            const backupKey = `store_reg_${String(storePayload.username).trim().toLowerCase()}`;
+            const backupRecord = {
+                storeId: storePayload.store_id,
+                storeName: storePayload.store_name,
+                ownerName: storePayload.owner_name,
+                username: storePayload.username,
+                password: storePayload.password,
+                phone: storePayload.phone,
+                email: storePayload.email,
+                location: storePayload.location,
+                pincode: storePayload.pincode,
+                status: storePayload.status || 'Active',
+                trialStartDate: storePayload.trial_start_date,
+                trialDays: Number(storePayload.trial_days ?? 30),
+                allowedFeatures: storePayload.allowed_features || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard']
+            };
+
+            if (client) {
+                try {
+                    const { error } = await client.from('app_settings').upsert(
+                        [{ setting_key: backupKey, setting_value: JSON.stringify(backupRecord) }],
+                        { onConflict: 'setting_key' }
+                    );
+                    if (!error) backupSaved = true;
+                } catch (e) {}
+            }
+
+            if (!backupSaved) {
+                try {
+                    const restBackup = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?on_conflict=setting_key`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Prefer': 'resolution=merge-duplicates,return=minimal'
+                        },
+                        body: JSON.stringify({
+                            setting_key: backupKey,
+                            setting_value: JSON.stringify(backupRecord)
+                        })
+                    });
+                    if (restBackup.ok) backupSaved = true;
+                } catch (e) {}
+            }
+
+            return primarySaved || backupSaved;
         }
 
         function getStoreStorageSuffix() {
@@ -3950,6 +4028,9 @@
                 persistAppStateToLocal();
                 renderShiftsScreen();
                 renderPOSCart();
+                if (window.innerWidth < 768) {
+                    switchMobilePOSTab('products');
+                }
                 showNotification('Open shift successful', 'success');
             }, 3000);
         }
@@ -4997,6 +5078,7 @@
         function handleStartSelling() {
             exitStockTransferSellMode();
             navigateTo('sellScreen');
+            renderPOSCart();
             if (!activeShiftState.isOpen && window.innerWidth < 768) {
                 switchMobilePOSTab('cart');
             } else {
