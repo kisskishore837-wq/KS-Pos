@@ -534,32 +534,51 @@
             </div>
         </main>
 
-        <!-- 3B. SUBSCRIPTION EXPIRED / RENEWAL SCREEN -->
+        <!-- 3B. SUBSCRIPTION EXPIRED / RENEWAL FLOW SCREEN -->
         <main id="planExpiredScreen" class="page-view page-hidden flex-col items-center justify-between w-full screen-centered-card min-h-[85vh] glass-panel rounded-3xl p-5 sm:p-9 my-auto overflow-y-auto">
             <div class="w-full flex items-center justify-between pb-3 border-b border-red-100">
-                <button type="button" onclick="navigateTo('loginScreen')" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-5 border border-sky-100 cursor-pointer">
+                <button type="button" onclick="exitExpiredFlowToLogin()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 transition-colors py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-100 cursor-pointer">
                     <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
                     <span>Back to Login</span>
                 </button>
-                <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Plan Expired / Suspended</span>
+                <span id="expiredScreenTopBadge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">License Locked</span>
             </div>
 
-            <div class="w-full my-auto py-5 space-y-5 text-center">
-                <div class="w-16 h-16 mx-auto rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shadow-xs">
-                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            <!-- STEP 1: RED WARNING ALERT ("Your License / Plan is Expired" + "Renewal Plan" Button) -->
+            <div id="expiredStepWarningBox" class="w-full my-auto py-6 space-y-5 text-center">
+                <div class="w-full max-w-md mx-auto rounded-3xl border-2 border-red-300 bg-red-50/90 p-6 sm:p-7 space-y-4 shadow-md">
+                    <div class="w-16 h-16 mx-auto rounded-2xl bg-red-100 border border-red-300 flex items-center justify-center text-red-600 shadow-xs">
+                        <i data-lucide="shield-alert" class="w-9 h-9"></i>
+                    </div>
+                    <div class="space-y-1.5">
+                        <span class="inline-block px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-red-600 text-white">Warning Alert</span>
+                        <h2 class="luxury-heading text-xl sm:text-2xl font-bold text-red-700">Your License / Plan is Expired</h2>
+                        <p id="expiredStoreSubtitleText" class="text-xs font-bold text-slate-800"></p>
+                        <p class="text-xs sm:text-sm font-semibold text-red-800/90 pt-1">
+                            Please renewal plan to continue using your KS POS store account. Access is locked until Admin approves your renewal payment.
+                        </p>
+                    </div>
+                    <div class="pt-2">
+                        <button type="button" onclick="proceedToRenewalPlansSelection()" class="w-full py-3.5 px-6 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all active:scale-[0.99]">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Renewal Plan</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="space-y-1.5">
-                    <h2 id="expiredStoreTitleText" class="luxury-heading text-xl sm:text-2xl font-bold text-slate-900">Your Plan is Expired</h2>
-                    <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
-                        Your 30-day free trial or subscription period has ended. Please scan the Admin QR below to renew your plan and submit your payment UTR / Transaction ID.
-                    </p>
+            </div>
+
+            <!-- STEP 2: ADMIN QR PAYMENT & ALERT SUBMISSION (SHOWN AFTER USER SELECTS PLAN) -->
+            <div id="expiredStepQrPaymentBox" class="hidden w-full my-auto py-4 space-y-4 text-center">
+                <div class="space-y-1">
+                    <span id="selectedRenewalPlanBadge" class="inline-block px-3 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200">KS POS Standard • ₹999 (30 Days)</span>
+                    <h2 class="luxury-heading text-lg sm:text-xl font-bold text-slate-900">Scan Admin QR &amp; Complete Payment</h2>
+                    <p class="text-xs text-slate-600">Pay the selected plan amount below and submit your UTR / Transaction ID</p>
                 </div>
 
-                <!-- Admin QR Payment Card -->
                 <div class="w-full max-w-sm mx-auto rounded-3xl border border-sky-200 bg-sky-50/60 p-5 space-y-3.5 shadow-xs">
                     <div class="flex items-center justify-between text-xs font-bold text-slate-700">
-                        <span>Scan &amp; Pay (UPI / QR)</span>
-                        <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800">₹999 / Month</span>
+                        <span>Payable Amount</span>
+                        <span id="renewalPayableAmountText" class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm font-extrabold">₹999</span>
                     </div>
 
                     <div id="renewalQrImageContainer" class="w-48 h-48 mx-auto rounded-2xl bg-white border border-sky-200 p-2 flex items-center justify-center overflow-hidden shadow-2xs">
@@ -570,31 +589,85 @@
                         </div>
                     </div>
 
-                    <div class="text-left space-y-2 pt-1">
+                    <div class="text-left space-y-1.5 pt-1">
                         <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">Enter UPI Transaction ID / UTR Number</label>
                         <input type="text" id="renewalPaymentUtrInput" placeholder="e.g. 432910582910" class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-900 placeholder-slate-400">
                     </div>
 
                     <button type="button" id="submitRenewalPaymentBtn" onclick="submitStoreRenewalPayment()" class="w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
                         <div id="submitRenewalSpinner" class="hidden w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div>
-                        <span id="submitRenewalBtnText">Payment Completed (Notify Admin)</span>
+                        <span id="submitRenewalBtnText">Submit Payment &amp; Alert Admin</span>
                     </button>
 
                     <div class="pt-1 flex items-center justify-center gap-2">
                         <button type="button" onclick="sendRenewalAlertViaGmail()" class="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-sky-600 text-sky-800 hover:text-white border border-sky-200 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
                             <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-                            <span>Email Admin</span>
+                            <span>Gmail Alert</span>
                         </button>
                         <button type="button" onclick="sendRenewalAlertViaWhatsApp()" class="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
                             <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
                             <span>SMS / WhatsApp</span>
                         </button>
                     </div>
+
+                    <button type="button" onclick="proceedToRenewalPlansSelection()" class="w-full pt-1 text-[11px] font-bold text-sky-700 hover:underline cursor-pointer">
+                        ← Change Selected Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: WAITING FOR ADMIN ACCEPTANCE (LOCKED UNTIL ADMIN CLICKS ACCEPT) -->
+            <div id="expiredStepWaitingApprovalBox" class="hidden w-full my-auto py-5 space-y-4 text-center">
+                <div class="w-full max-w-md mx-auto rounded-3xl border border-amber-300 bg-amber-50/90 p-6 space-y-4 shadow-sm">
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700">
+                        <i data-lucide="clock" class="w-7 h-7 animate-pulse"></i>
+                    </div>
+                    <div class="space-y-1.5">
+                        <h3 class="luxury-heading text-lg sm:text-xl font-bold text-slate-900">Payment Alert Sent to Admin</h3>
+                        <p class="text-xs sm:text-sm text-slate-700">
+                            UTR Submitted: <b id="waitingApprovalUtrText" class="text-sky-800">-</b>
+                        </p>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Your account remains locked until Admin verifies and clicks <b>Accept</b>. Once accepted, this screen will automatically turn green!
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                        <button type="button" onclick="checkRenewalApprovalNow()" class="py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            <span>Check Approval Status</span>
+                        </button>
+                        <button type="button" onclick="sendRenewalAlertViaWhatsApp()" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                            <span>Remind on WhatsApp</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: GREEN RENEWED CARD ("Your Plan is Renewed" -> Click to Activate App) -->
+            <div id="expiredStepRenewedSuccessBox" class="hidden w-full my-auto py-6 space-y-5 text-center">
+                <div onclick="activateRenewedStoreAndEnterApp()" class="w-full max-w-md mx-auto rounded-3xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 via-emerald-100/90 to-teal-50 p-7 sm:p-8 space-y-4 shadow-xl cursor-pointer hover:scale-[1.01] transition-all">
+                    <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                        <i data-lucide="check-circle-2" class="w-9 h-9"></i>
+                    </div>
+                    <div class="space-y-1.5">
+                        <span class="inline-block px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-emerald-600 text-white">Approved by Admin</span>
+                        <h2 class="luxury-heading text-xl sm:text-2xl font-bold text-emerald-900">Your Plan is Renewed</h2>
+                        <p class="text-xs sm:text-sm font-semibold text-emerald-800">
+                            Tap here to activate your account and open KS POS!
+                        </p>
+                    </div>
+                    <div class="pt-2">
+                        <button type="button" class="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-md cursor-pointer">
+                            <span>Click to Activate Plan</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="w-full pt-3 border-t border-sky-100 text-center text-[11px] text-slate-500">
-                Once Admin verifies your UTR payment, your store account will be activated immediately.
+                KS POS Subscription Protection • App unlocks immediately after Admin acceptance.
             </div>
         </main>
 
@@ -696,9 +769,9 @@
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
-                            <button type="button" onclick="navigateTo('registerScreen')" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
+                            <button type="button" id="stdPlanActionBtn" onclick="handlePlanCardAction('Standard')" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
                                 <i data-lucide="sparkles" class="w-4 h-4"></i>
-                                <span>Start Free Trial (30 Days)</span>
+                                <span id="stdPlanActionBtnText">Start Free Trial (30 Days)</span>
                             </button>
                         </div>
                     </div>
@@ -723,9 +796,9 @@
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 <span>Edit</span>
                             </button>
-                            <button type="button" onclick="navigateTo('registerScreen')" class="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
+                            <button type="button" id="proPlanActionBtn" onclick="handlePlanCardAction('Pro')" class="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs">
                                 <i data-lucide="sparkles" class="w-4 h-4"></i>
-                                <span>Start Free Trial (30 Days)</span>
+                                <span id="proPlanActionBtnText">Start Free Trial (30 Days)</span>
                             </button>
                         </div>
                     </div>
@@ -2169,6 +2242,10 @@
                             allowedFeatures: parsedFeatures,
                             pendingUtr: row.pending_utr || localByUser[key]?.pendingUtr || '',
                             paymentSubmittedAt: row.payment_submitted_at || localByUser[key]?.paymentSubmittedAt || '',
+                            pendingPlanName: row.pending_plan_name || localByUser[key]?.pendingPlanName || '',
+                            pendingPlanAmount: Number(row.pending_plan_amount ?? localByUser[key]?.pendingPlanAmount ?? 0),
+                            pendingPlanDays: Number(row.pending_plan_days ?? localByUser[key]?.pendingPlanDays ?? 30),
+                            justRenewedBanner: Boolean(row.just_renewed_banner || localByUser[key]?.justRenewedBanner),
                             expiryAlertSent: Boolean(row.expiry_alert_sent || localByUser[key]?.expiryAlertSent)
                         });
                     });
@@ -2201,8 +2278,25 @@
                     if (currentSessionUser.role === 'store') {
                         const activeStore = rentedStoresList.find(s => s.username.toLowerCase() === currentSessionUser.username.toLowerCase());
                         if (activeStore) {
+                            const remDays = getStoreRemainingTrialDays(activeStore);
+                            if (!isAdminImpersonatingStore && (activeStore.status === 'Suspended' || activeStore.status === 'Expired' || remDays <= 0)) {
+                                openPlanExpiredScreen(activeStore);
+                                return;
+                            }
                             currentSessionUser.allowedFeatures = activeStore.allowedFeatures;
+                            currentSessionUser.trialDaysLeft = remDays;
                             applyRolePermissionsToUI();
+                        }
+                    }
+
+                    if (currentExpiredStoreObj) {
+                        const refreshedExpStore = rentedStoresList.find(s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase());
+                        if (refreshedExpStore) {
+                            currentExpiredStoreObj = refreshedExpStore;
+                            const remNow = getStoreRemainingTrialDays(refreshedExpStore);
+                            if (refreshedExpStore.status === 'Active' && remNow > 0) {
+                                showExpiredScreenStep('renewed');
+                            }
                         }
                     }
 
@@ -2624,6 +2718,13 @@
         };
         let pendingAdminQrDataUrl = "";
         let currentExpiredStoreObj = null;
+        let isRenewalPlanSelectionMode = false;
+        let selectedRenewalPlanDetails = {
+            planName: "KS POS Standard (Monthly)",
+            amount: 999,
+            days: 30
+        };
+        let renewalApprovalPollInterval = null;
 
         function loadAdminPaymentConfig() {
             try {
@@ -2699,11 +2800,192 @@
             return Math.max(0, totalDays - elapsedDays);
         }
 
-        function openPlanExpiredScreen(store) {
+        function showExpiredScreenStep(stepName) {
+            const steps = {
+                warning: document.getElementById('expiredStepWarningBox'),
+                qr: document.getElementById('expiredStepQrPaymentBox'),
+                waiting: document.getElementById('expiredStepWaitingApprovalBox'),
+                renewed: document.getElementById('expiredStepRenewedSuccessBox')
+            };
+            Object.keys(steps).forEach(k => {
+                if (steps[k]) {
+                    if (k === stepName) steps[k].classList.remove('hidden');
+                    else steps[k].classList.add('hidden');
+                }
+            });
+
+            const badge = document.getElementById('expiredScreenTopBadge');
+            if (badge) {
+                if (stepName === 'renewed') {
+                    badge.textContent = 'Plan Renewed';
+                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+                } else if (stepName === 'waiting') {
+                    badge.textContent = 'Pending Admin Approval';
+                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300';
+                } else if (stepName === 'qr') {
+                    badge.textContent = 'Scan & Pay QR';
+                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-300';
+                } else {
+                    badge.textContent = 'Plan Expired';
+                    badge.className = 'px-3 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200';
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function startRenewalApprovalPolling() {
+            stopRenewalApprovalPolling();
+            renewalApprovalPollInterval = setInterval(async () => {
+                if (!currentExpiredStoreObj) {
+                    stopRenewalApprovalPolling();
+                    return;
+                }
+                await syncInitialDataFromSupabase(false);
+                const latestStore = (rentedStoresList || []).find(
+                    s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase()
+                );
+                if (latestStore) {
+                    currentExpiredStoreObj = latestStore;
+                    const rem = getStoreRemainingTrialDays(latestStore);
+                    if (latestStore.status === 'Active' && rem > 0) {
+                        stopRenewalApprovalPolling();
+                        showExpiredScreenStep('renewed');
+                        showNotification('Your Plan is Renewed! Tap to activate.', 'success', 4500);
+                    }
+                }
+            }, 4000);
+        }
+
+        function stopRenewalApprovalPolling() {
+            if (renewalApprovalPollInterval) {
+                clearInterval(renewalApprovalPollInterval);
+                renewalApprovalPollInterval = null;
+            }
+        }
+
+        function exitExpiredFlowToLogin() {
+            stopRenewalApprovalPolling();
+            isRenewalPlanSelectionMode = false;
+            currentExpiredStoreObj = null;
+            navigateTo('loginScreen');
+        }
+
+        function proceedToRenewalPlansSelection() {
+            isRenewalPlanSelectionMode = true;
+            navigateTo('plansScreen');
+        }
+
+        function handlePlanCardAction(tierName) {
+            if (!isRenewalPlanSelectionMode || !currentExpiredStoreObj) {
+                navigateTo('registerScreen');
+                return;
+            }
+
+            const baseMonthly = tierName === 'Pro' ? 1999 : 999;
+            let monthsCount = 1;
+            let billingLabel = 'Monthly (30 Days)';
+
+            if (isCustomMonthsOn) {
+                const enteredMos = parseInt(document.getElementById('customMonthsInput')?.value || '1', 10);
+                monthsCount = (!isNaN(enteredMos) && enteredMos > 0) ? enteredMos : 1;
+                billingLabel = `${monthsCount} Month${monthsCount > 1 ? 's' : ''}`;
+            } else if (isPerYearOn) {
+                monthsCount = 12;
+                billingLabel = 'Yearly (365 Days)';
+            }
+
+            const totalPayable = isPerYearOn && !isCustomMonthsOn
+                ? (tierName === 'Pro' ? 19190 : 9590)
+                : (baseMonthly * monthsCount);
+            const totalDays = isPerYearOn && !isCustomMonthsOn ? 365 : (monthsCount * 30);
+
+            selectedRenewalPlanDetails = {
+                planName: `KS POS ${tierName} - ${billingLabel}`,
+                amount: totalPayable,
+                days: totalDays
+            };
+
+            const planBadge = document.getElementById('selectedRenewalPlanBadge');
+            const amtText = document.getElementById('renewalPayableAmountText');
+            if (planBadge) planBadge.textContent = `${selectedRenewalPlanDetails.planName} (${totalDays} Days)`;
+            if (amtText) amtText.textContent = `₹${totalPayable.toLocaleString()}`;
+
+            navigateTo('planExpiredScreen');
+            showExpiredScreenStep('qr');
+        }
+
+        async function checkRenewalApprovalNow() {
+            if (!currentExpiredStoreObj) return;
+            await syncInitialDataFromSupabase(false);
+            const latestStore = (rentedStoresList || []).find(
+                s => s.username.toLowerCase() === currentExpiredStoreObj.username.toLowerCase()
+            );
+            if (latestStore) {
+                currentExpiredStoreObj = latestStore;
+                const rem = getStoreRemainingTrialDays(latestStore);
+                if (latestStore.status === 'Active' && rem > 0) {
+                    stopRenewalApprovalPolling();
+                    showExpiredScreenStep('renewed');
+                    showNotification('Your Plan is Renewed!', 'success');
+                    return;
+                }
+            }
+            showNotification('Still waiting for Admin acceptance...', 'warning');
+        }
+
+        function activateRenewedStoreAndEnterApp() {
+            if (!currentExpiredStoreObj) return;
+            const store = currentExpiredStoreObj;
+            const remainingDays = getStoreRemainingTrialDays(store);
+
+            if (store.status !== 'Active' || remainingDays <= 0) {
+                showNotification('Waiting for Admin approval before activation', 'warning');
+                return;
+            }
+
+            store.justRenewedBanner = false;
+            persistMultiTenantAuthState();
+
+            stopRenewalApprovalPolling();
+            isRenewalPlanSelectionMode = false;
+            isAdminImpersonatingStore = false;
+
+            currentSessionUser = {
+                role: 'store',
+                storeId: store.storeId,
+                storeName: store.storeName,
+                username: store.username,
+                allowedFeatures: store.allowedFeatures || ['Sell Screen', 'Order History', 'Shifts', 'Dashboard'],
+                trialDaysLeft: remainingDays
+            };
+
+            loadStoreScopedShiftState();
+            renderShiftsScreen();
+            renderOrderHistoryScreen();
+            renderPOSProducts();
+            renderPOSCart();
+            updateCustomerCartDisplay();
+            updateDeleteOrderButtonVisibility();
+
+            const dashLoc = document.getElementById('dashboardLocationText');
+            if (dashLoc && store.location) {
+                dashLoc.textContent = `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`;
+            }
+
+            persistAppStateToLocal();
+            applyRolePermissionsToUI();
+            isFirstStartSellingAfterLogin = true;
+            currentExpiredStoreObj = null;
+
+            navigateTo('dashboardScreen');
+            showNotification('Plan Activated! Welcome back to KS POS.', 'success', 4500);
+        }
+
+        function openPlanExpiredScreen(store, initialStep = null) {
             currentExpiredStoreObj = store;
-            const titleEl = document.getElementById('expiredStoreTitleText');
-            if (titleEl) {
-                titleEl.textContent = `${store.storeName}: Your Plan is Expired`;
+            const subEl = document.getElementById('expiredStoreSubtitleText');
+            if (subEl) {
+                subEl.textContent = `${store.storeName} (${store.username})`;
             }
             const qrImg = document.getElementById('renewalAdminQrImg');
             const qrPlaceholder = document.getElementById('renewalNoQrPlaceholder');
@@ -2722,7 +3004,25 @@
             const utrInput = document.getElementById('renewalPaymentUtrInput');
             if (utrInput) utrInput.value = store.pendingUtr || '';
 
+            const remDays = getStoreRemainingTrialDays(store);
+            let targetStep = initialStep;
+            if (!targetStep) {
+                if (store.status === 'Active' && remDays > 0 && store.justRenewedBanner) {
+                    targetStep = 'renewed';
+                } else if (store.pendingUtr) {
+                    targetStep = 'waiting';
+                    const waitUtr = document.getElementById('waitingApprovalUtrText');
+                    if (waitUtr) waitUtr.textContent = store.pendingUtr;
+                } else {
+                    targetStep = 'warning';
+                }
+            }
+
             navigateTo('planExpiredScreen');
+            showExpiredScreenStep(targetStep);
+            if (targetStep === 'waiting') {
+                startRenewalApprovalPolling();
+            }
         }
 
         function submitStoreRenewalPayment() {
@@ -2739,12 +3039,15 @@
 
             if (btn) btn.disabled = true;
             if (spinner) spinner.classList.remove('hidden');
-            if (btnText) btnText.textContent = 'Submitting Payment...';
+            if (btnText) btnText.textContent = 'Sending Alert to Admin...';
 
             setTimeout(() => {
                 const nowStr = new Date().toLocaleString();
                 currentExpiredStoreObj.pendingUtr = utrVal;
                 currentExpiredStoreObj.paymentSubmittedAt = nowStr;
+                currentExpiredStoreObj.pendingPlanName = selectedRenewalPlanDetails.planName;
+                currentExpiredStoreObj.pendingPlanAmount = selectedRenewalPlanDetails.amount;
+                currentExpiredStoreObj.pendingPlanDays = selectedRenewalPlanDetails.days;
                 persistMultiTenantAuthState();
 
                 const client = getSupabaseClient();
@@ -2752,22 +3055,32 @@
                     try {
                         client.from('stores').update({
                             pending_utr: utrVal,
-                            payment_submitted_at: nowStr
+                            payment_submitted_at: nowStr,
+                            pending_plan_name: selectedRenewalPlanDetails.planName,
+                            pending_plan_amount: selectedRenewalPlanDetails.amount,
+                            pending_plan_days: selectedRenewalPlanDetails.days
                         }).eq('username', currentExpiredStoreObj.username).then(() => {});
                     } catch (e) {}
                 }
 
                 if (btn) btn.disabled = false;
                 if (spinner) spinner.classList.add('hidden');
-                if (btnText) btnText.textContent = 'Payment Completed (Notify Admin)';
+                if (btnText) btnText.textContent = 'Submit Payment & Alert Admin';
 
-                showNotification('Payment UTR submitted! Admin notified for activation.', 'success', 4500);
-            }, 1500);
+                const waitUtr = document.getElementById('waitingApprovalUtrText');
+                if (waitUtr) waitUtr.textContent = utrVal;
+
+                showExpiredScreenStep('waiting');
+                startRenewalApprovalPolling();
+                showNotification('Payment submitted! Waiting for Admin acceptance.', 'success', 4500);
+            }, 1200);
         }
 
         function sendRenewalAlertViaGmail() {
             if (!currentExpiredStoreObj) return;
-            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || 'Pending';
+            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || currentExpiredStoreObj.pendingUtr || 'Pending';
+            const planLabel = selectedRenewalPlanDetails?.planName || currentExpiredStoreObj.pendingPlanName || 'KS POS Plan';
+            const amountLabel = selectedRenewalPlanDetails?.amount || currentExpiredStoreObj.pendingPlanAmount || 999;
             const subject = encodeURIComponent(`KS POS Plan Renewal Payment Completed - ${currentExpiredStoreObj.storeName}`);
             const body = encodeURIComponent(
                 `Hello KS POS Admin,\n\n` +
@@ -2775,18 +3088,65 @@
                 `Owner: ${currentExpiredStoreObj.ownerName}\n` +
                 `Username: ${currentExpiredStoreObj.username}\n` +
                 `Phone: ${currentExpiredStoreObj.phone}\n` +
+                `Selected Plan: ${planLabel} (₹${amountLabel})\n` +
                 `Payment UTR / Transaction ID: ${utrVal}\n\n` +
-                `Please verify the payment and activate our KS POS plan.`
+                `Please verify the payment and click Accept in Admin Panel to activate our KS POS plan.`
             );
             window.open(`mailto:${adminPaymentConfig.adminEmail}?subject=${subject}&body=${body}`, '_blank');
         }
 
         function sendRenewalAlertViaWhatsApp() {
             if (!currentExpiredStoreObj) return;
-            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || 'Pending';
+            const utrVal = document.getElementById('renewalPaymentUtrInput')?.value.trim() || currentExpiredStoreObj.pendingUtr || 'Pending';
+            const planLabel = selectedRenewalPlanDetails?.planName || currentExpiredStoreObj.pendingPlanName || 'KS POS Plan';
+            const amountLabel = selectedRenewalPlanDetails?.amount || currentExpiredStoreObj.pendingPlanAmount || 999;
             const cleanPhone = String(adminPaymentConfig.adminPhone || '').replace(/[^0-9]/g, '');
             const msg = encodeURIComponent(
-                `Hello KS POS Admin, Payment Completed for *${currentExpiredStoreObj.storeName}* (User: ${currentExpiredStoreObj.username}). UTR ID: *${utrVal}*. Please activate our plan.`
+                `Hello KS POS Admin, Renewal Payment Completed for *${currentExpiredStoreObj.storeName}* (User: ${currentExpiredStoreObj.username}). Plan: *${planLabel}* (₹${amountLabel}). UTR ID: *${utrVal}*. Please click Accept to activate.`
+            );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+        }
+        function approveAndActivateStorePlan(storeId, defaultDays = 30) {
+            const store = rentedStoresList.find(s => s.storeId === storeId);
+            if (!store) return;
+            const daysToAdd = Number(store.pendingPlanDays) > 0 ? Number(store.pendingPlanDays) : defaultDays;
+            store.status = 'Active';
+            store.trialStartDate = new Date().toISOString().split('T')[0];
+            store.trialDays = daysToAdd;
+            store.pendingUtr = '';
+            store.paymentSubmittedAt = '';
+            store.pendingPlanName = '';
+            store.pendingPlanAmount = 0;
+            store.pendingPlanDays = 0;
+            store.justRenewedBanner = true;
+            persistMultiTenantAuthState();
+
+            const client = getSupabaseClient();
+            if (client) {
+                try {
+                    client.from('stores').update({
+                        status: 'Active',
+                        trial_start_date: store.trialStartDate,
+                        trial_days: daysToAdd,
+                        pending_utr: '',
+                        payment_submitted_at: '',
+                        pending_plan_name: '',
+                        pending_plan_amount: 0,
+                        pending_plan_days: 0,
+                        just_renewed_banner: true
+                    }).eq('username', store.username).then(() => {});
+                } catch (e) {}
+            }
+
+            openSidebarModuleScreen('Admin Panel');
+            showNotification(`Accepted! ${store.storeName} renewed for ${daysToAdd} days.`, 'success');
+        }
+
+        function sendStoreExpiryAlertSMS(store) {
+            if (!store) return;
+            const cleanPhone = String(store.phone || '').replace(/[^0-9]/g, '');
+            const msg = encodeURIComponent(
+                `Hello ${store.ownerName}, your KS POS plan for ${store.storeName} is expired. Please renew the plan to continue using KS POS.`
             );
             window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
         }
@@ -2801,42 +3161,6 @@
                 `Thank you,\nKS POS Team`
             );
             window.open(`mailto:${store.email}?cc=${adminPaymentConfig.adminEmail}&subject=${subject}&body=${body}`, '_blank');
-        }
-
-        function sendStoreExpiryAlertSMS(store) {
-            if (!store) return;
-            const cleanPhone = String(store.phone || '').replace(/[^0-9]/g, '');
-            const msg = encodeURIComponent(
-                `Hello ${store.ownerName}, your KS POS plan for ${store.storeName} is expired. Please renew the plan to continue using KS POS.`
-            );
-            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
-        }
-
-        function approveAndActivateStorePlan(storeId, daysToAdd = 30) {
-            const store = rentedStoresList.find(s => s.storeId === storeId);
-            if (!store) return;
-            store.status = 'Active';
-            store.trialStartDate = new Date().toISOString().split('T')[0];
-            store.trialDays = daysToAdd;
-            store.pendingUtr = '';
-            store.paymentSubmittedAt = '';
-            persistMultiTenantAuthState();
-
-            const client = getSupabaseClient();
-            if (client) {
-                try {
-                    client.from('stores').update({
-                        status: 'Active',
-                        trial_start_date: store.trialStartDate,
-                        trial_days: daysToAdd,
-                        pending_utr: '',
-                        payment_submitted_at: ''
-                    }).eq('username', store.username).then(() => {});
-                } catch (e) {}
-            }
-
-            openSidebarModuleScreen('Admin Panel');
-            showNotification(`${store.storeName} activated for +${daysToAdd} days!`, 'success');
         }
 
         function deleteStoreFromAdminPanel(storeId) {
@@ -2963,69 +3287,6 @@
             if (passInput) passInput.value = '';
             if (clearBtn) clearBtn.classList.add('hidden');
             showNotification('Cleared fields — enter any registered store account', 'success', 2500);
-        }
-
-        function openStoreAppAsAdmin(storeId) {
-            const store = (rentedStoresList || []).find(s => s.storeId === storeId);
-            if (!store) return;
-
-            const remainingDays = getStoreRemainingTrialDays(store);
-            isAdminImpersonatingStore = true;
-            currentSessionUser = {
-                role: 'store',
-                storeId: store.storeId,
-                storeName: store.storeName,
-                username: store.username,
-                allowedFeatures: [...DEFAULT_ALL_FEATURES],
-                trialDaysLeft: remainingDays
-            };
-
-            loadStoreScopedShiftState();
-            renderShiftsScreen();
-            renderPOSCart();
-
-            const dashLoc = document.getElementById('dashboardLocationText');
-            if (dashLoc) {
-                dashLoc.textContent = store.location
-                    ? `${store.location}${store.pincode ? ' - ' + store.pincode : ''}`
-                    : 'Hyderabad, Telangana, India';
-            }
-
-            applyRolePermissionsToUI();
-            const banner = document.getElementById('adminStoreImpersonationBanner');
-            const previewTitle = document.getElementById('adminPreviewStoreNameText');
-            if (previewTitle) previewTitle.textContent = `${store.storeName} (Full Control)`;
-            if (banner) banner.classList.remove('hidden');
-
-            navigateTo('dashboardScreen');
-            showNotification(`Full Control Opened: ${store.storeName}`, 'success', 2500);
-        }
-
-        function exitStoreImpersonationToAdmin() {
-            isAdminImpersonatingStore = false;
-            isAdminPinUnlocked = true;
-            currentSessionUser = {
-                role: 'admin',
-                storeId: 'ADMIN',
-                storeName: 'KS POS Super Admin',
-                username: adminCredentials.username || 'KS POS',
-                allowedFeatures: [...DEFAULT_ALL_FEATURES],
-                trialDaysLeft: 999
-            };
-
-            loadStoreScopedShiftState();
-            renderShiftsScreen();
-            renderPOSCart();
-
-            const dashLoc = document.getElementById('dashboardLocationText');
-            if (dashLoc) dashLoc.textContent = 'Hyderabad, Telangana, India';
-
-            const banner = document.getElementById('adminStoreImpersonationBanner');
-            if (banner) banner.classList.add('hidden');
-
-            applyRolePermissionsToUI();
-            openSidebarModuleScreen('Admin Panel');
-            showNotification('Returned to Super Admin Panel', 'success', 2500);
         }
 
         function loadMultiTenantAuthState() {
@@ -3277,11 +3538,17 @@
                                 try { persistMultiTenantAuthState(); } catch (e) {}
                             }
                             resetLoginButtonUI();
-                            showNotification('Your plan is expired. Please renew the plan.', 'warning', 4500);
-                            openPlanExpiredScreen(matchedStore);
+                            showNotification('Your License / Plan is Expired. Please renewal plan.', 'warning', 4500);
+                            openPlanExpiredScreen(matchedStore, 'warning');
+                            return;
+                        }
+                        if (matchedStore.justRenewedBanner) {
+                            resetLoginButtonUI();
+                            openPlanExpiredScreen(matchedStore, 'renewed');
                             return;
                         }
                         isAdminImpersonatingStore = false;
+                        isRenewalPlanSelectionMode = false;
                         const banner = document.getElementById('adminStoreImpersonationBanner');
                         if (banner) banner.classList.add('hidden');
                         currentSessionUser = {
@@ -4151,8 +4418,8 @@
                                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                                     <span>See Store</span>
                                                 </button>
-                                                <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs" title="Approve Payment & Renew 30 Days">
-                                                    ${st.pendingUtr ? 'Verify UTR & Activate (+30d)' : 'Renew +30d'}
+                                                <button type="button" onclick="approveAndActivateStorePlan('${st.storeId}', 30)" class="px-3 py-1.5 rounded-xl text-xs font-bold ${st.pendingUtr ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-300 animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'} text-white transition-colors cursor-pointer shadow-2xs" title="Accept Payment & Renew Plan">
+                                                    ${st.pendingUtr ? `Accept Payment (+${st.pendingPlanDays || 30}d)` : 'Renew +30d'}
                                                 </button>
                                                 <button type="button" onclick="toggleStoreAccountStatus('${st.storeId}')" class="px-3 py-1.5 rounded-xl text-xs font-bold ${isActive ? 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-600 hover:text-white' : 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-600 hover:text-white'} transition-colors cursor-pointer">
                                                     ${isActive ? 'Suspend' : 'Activate'}
@@ -4389,6 +4656,11 @@
         }
 
         function handlePlansScreenBack() {
+            if (isRenewalPlanSelectionMode && currentExpiredStoreObj) {
+                navigateTo('planExpiredScreen');
+                showExpiredScreenStep('warning');
+                return;
+            }
             if (currentSessionUser.role === 'admin' || currentSessionUser.role === 'store') {
                 navigateTo('dashboardScreen');
             } else {
@@ -4416,6 +4688,15 @@
 
         function renderPlanFeaturesPreview() {
             applyRolePermissionsToUI();
+            const stdBtnText = document.getElementById('stdPlanActionBtnText');
+            const proBtnText = document.getElementById('proPlanActionBtnText');
+            if (isRenewalPlanSelectionMode) {
+                if (stdBtnText) stdBtnText.textContent = 'Select Plan';
+                if (proBtnText) proBtnText.textContent = 'Select Plan';
+            } else {
+                if (stdBtnText) stdBtnText.textContent = 'Start Free Trial (30 Days)';
+                if (proBtnText) proBtnText.textContent = 'Start Free Trial (30 Days)';
+            }
             const listEl = document.getElementById('planFeaturesPreviewList');
             if (!listEl) return;
             listEl.innerHTML = planFeatures.map(feat => `
@@ -4957,7 +5238,7 @@
             const removeBtn = document.getElementById('removeCartCustomerBtn');
 
             if (label) {
-                label.textContent = currentCustomerData.name || currentCustomerName;
+                label.textContent = currentCustomerData.name || currentCustomerName || "Add Customer";
             }
             if (subCreditEl) {
                 const creditAvailable = Math.max(0, (currentCustomerData.creditGiven || 0) - (currentCustomerData.creditUsed || 0));
