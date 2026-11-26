@@ -3381,55 +3381,8 @@
                 return;
             }
 
-            userInput.value = '';
-            passInput.value = '';
-            if (clearBtn) clearBtn.classList.add('hidden');
-        }
-
-        function saveDeviceStoreLoginCredentials(username, password) {
-            try {
-                if (isTrustedAdminDevice()) return;
-                localStorage.setItem('kspos_saved_store_login_v1', JSON.stringify({
-                    username: username || '',
-                    password: password || ''
-                }));
-            } catch (e) {}
-        }
-
-        function isTrustedAdminDevice() {
-            try {
-                return localStorage.getItem('kspos_trusted_admin_device_v1') === 'true';
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function getSavedDeviceStoreLogin() {
-            try {
-                const raw = localStorage.getItem('kspos_saved_store_login_v1');
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                return (parsed && parsed.username && parsed.password) ? parsed : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function applyTrustedAdminAutoFill() {
-            const userInput = document.getElementById('usernameInput');
-            const passInput = document.getElementById('passwordInput');
-            const clearBtn = document.getElementById('clearLoginFieldsBtn');
-            if (!userInput || !passInput) return;
-
-            if (isTrustedAdminDevice()) {
-                userInput.value = adminCredentials.username || 'KS POS';
-                passInput.value = adminCredentials.password || 'ks@8804';
-                if (clearBtn) clearBtn.classList.remove('hidden');
-                return;
-            }
-
             const savedStoreLogin = getSavedDeviceStoreLogin();
-            if (savedStoreLogin) {
+            if (isStandaloneHomeScreenApp() && savedStoreLogin) {
                 userInput.value = savedStoreLogin.username;
                 passInput.value = savedStoreLogin.password;
                 if (clearBtn) clearBtn.classList.remove('hidden');
