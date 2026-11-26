@@ -6830,6 +6830,7 @@
 
             const newOrder = {
                 orderId: newOrderId,
+                shiftId: activeShiftState.shiftId || "",
                 dateStr: formatted.dateStr,
                 timeStr: formatted.timeStr,
                 isoDate: formatted.isoDate,
@@ -7802,11 +7803,13 @@
         function renderSalesCashListTable() {
             const tbody = document.getElementById('salesCashListTableBody');
             if (!tbody) return;
-            const salesOrders = allCompletedOrders.filter(o =>
+            const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+            const salesOrders = !targetShift ? [] : allCompletedOrders.filter(o =>
+                (!o.shiftId || o.shiftId === targetShift.shiftId) &&
                 ['Cash', 'UPI', 'Card', 'Cash Refund'].includes(o.paymentMode)
             );
             if (salesOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or cash bills recorded yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or cash bills recorded in this shift yet.</td></tr>`;
                 return;
             }
             tbody.innerHTML = salesOrders.map(o => {
@@ -7851,8 +7854,10 @@
         function renderStoreCreditDetailTable() {
             const tbody = document.getElementById('storeCreditDetailTableBody');
             if (!tbody) return;
+            const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+            const shiftOrders = !targetShift ? [] : allCompletedOrders.filter(o => !o.shiftId || o.shiftId === targetShift.shiftId);
             const creditEntries = [];
-            allCompletedOrders.forEach(o => {
+            shiftOrders.forEach(o => {
                 const userStr = o.staff || activeShiftState.cashier || 'Kishore Kumar';
                 if ((o.storeCreditGiven || 0) > 0 || o.paymentMode === 'Store Credit') {
                     const amt = (o.storeCreditGiven || 0) > 0 ? o.storeCreditGiven : Math.abs(o.totalRefundValue || o.total || 0);
@@ -7915,11 +7920,13 @@
         function renderTotalSalesListTable() {
             const tbody = document.getElementById('totalSalesListTableBody');
             if (!tbody) return;
-            if (allCompletedOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or store credit orders recorded yet.</td></tr>`;
+            const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+            const shiftOrders = !targetShift ? [] : allCompletedOrders.filter(o => !o.shiftId || o.shiftId === targetShift.shiftId);
+            if (shiftOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or store credit orders recorded in this shift yet.</td></tr>`;
                 return;
             }
-            tbody.innerHTML = allCompletedOrders.map(o => {
+            tbody.innerHTML = shiftOrders.map(o => {
                 const pm = o.paymentMode;
                 const isStoreCreditOrder = pm === 'Store Credit' || (o.storeCreditUsed || 0) > 0 || (o.storeCreditGiven || 0) > 0;
                 const categoryLabel = pm === 'Store Credit'
@@ -8546,11 +8553,40 @@
             persistMultiTenantAuthState();
         });
 
+        let appBackgroundTimestamp = null;
+
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 persistAppStateToLocal();
                 persistStockTransfersToLocal();
                 persistMultiTenantAuthState();
+                appBackgroundTimestamp = Date.now();
+            } else if (appBackgroundTimestamp !== null && !isResumeSyncRunning) {
+                const idleDurationMs = Date.now() - appBackgroundTimestamp;
+                appBackgroundTimestamp = null;
+
+                if (idleDurationMs >= 5000) {
+                    const resumeOverlay = document.getElementById('appResumeSyncOverlay');
+                    if (resumeOverlay) {
+                        isResumeSyncRunning = true;
+                        const labelEl = resumeOverlay.querySelector('p');
+                        if (labelEl) labelEl.textContent = 'Syncing store data...';
+                        resumeOverlay.classList.remove('hidden', 'opacity-0');
+                        resumeOverlay.classList.add('flex');
+
+                        syncInitialDataFromSupabase(false);
+
+                        setTimeout(() => {
+                            resumeOverlay.classList.add('opacity-0');
+                            setTimeout(() => {
+                                resumeOverlay.classList.add('hidden');
+                                resumeOverlay.classList.remove('flex', 'opacity-0');
+                                isResumeSyncRunning = false;
+                                showNotification('Store data synced successfully', 'success');
+                            }, 300);
+                        }, 3000);
+                    }
+                }
             }
         });
     </script>
