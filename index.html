@@ -1585,17 +1585,17 @@
     </div>
 
     <!-- ADJUSTMENT HISTORY FLOATING TABLE MODAL -->
-    <div id="adjustmentHistoryModalOverlay" onclick="closeAdjustmentHistoryModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
-            <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
-                <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Adjustment History</h3>
-                <button type="button" onclick="closeAdjustmentHistoryModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="adjustmentHistoryModalOverlay" onclick="closeAdjustmentHistoryModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-3 sm:p-6 md:p-8 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-5xl min-h-[55vh] md:min-h-[72vh] max-h-[90vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-sky-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-sky-100 flex-shrink-0">
+                <h3 class="luxury-heading text-base sm:text-xl font-bold text-slate-900 tracking-wide">Adjustment History</h3>
+                <button type="button" onclick="closeAdjustmentHistoryModal()" class="p-2 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="w-full flex-1 overflow-auto scrollable-pane rounded-2xl border border-sky-200 bg-white">
-                <table class="w-full text-left border-collapse min-w-[600px]">
+                <table class="w-full text-left border-collapse min-w-[640px]">
                     <thead>
-                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700 sticky top-0">
-                            <th class="py-3 px-4">Date</th><th class="py-3 px-4">Time</th><th class="py-3 px-4">Reason / Note</th><th class="py-3 px-4 text-center">Mode</th><th class="py-3 px-4 text-right">Amount</th><th class="py-3 px-4">User</th>
+                        <tr class="bg-sky-50/90 border-b border-sky-200 text-xs font-bold uppercase tracking-wider text-slate-700 sticky top-0">
+                            <th class="py-3.5 px-4">Date</th><th class="py-3.5 px-4">Time</th><th class="py-3.5 px-4">Reason / Note</th><th class="py-3.5 px-4 text-center">Mode</th><th class="py-3.5 px-4 text-right">Amount</th><th class="py-3.5 px-4">User</th>
                         </tr>
                     </thead>
                     <tbody id="adjustmentHistoryTableBody" class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800"></tbody>
@@ -1605,17 +1605,17 @@
     </div>
 
     <!-- SALES CASH LIST FLOATING TABLE MODAL -->
-    <div id="salesCashListModalOverlay" onclick="closeSalesCashListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
-            <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
-                <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Sales Cash List</h3>
-                <button type="button" onclick="closeSalesCashListModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="salesCashListModalOverlay" onclick="closeSalesCashListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-3 sm:p-6 md:p-8 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-5xl min-h-[55vh] md:min-h-[72vh] max-h-[90vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-sky-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-sky-100 flex-shrink-0">
+                <h3 class="luxury-heading text-base sm:text-xl font-bold text-slate-900 tracking-wide">Sales Cash List</h3>
+                <button type="button" onclick="closeSalesCashListModal()" class="p-2 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="w-full flex-1 overflow-auto scrollable-pane rounded-2xl border border-sky-200 bg-white">
-                <table class="w-full text-left border-collapse min-w-[580px]">
+                <table class="w-full text-left border-collapse min-w-[640px]">
                     <thead>
-                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700 sticky top-0">
-                            <th class="py-3 px-4">Order ID</th><th class="py-3 px-4">Date</th><th class="py-3 px-4">Time</th><th class="py-3 px-4 text-right">Total</th><th class="py-3 px-4 text-center">Payment Mode</th><th class="py-3 px-4">User</th>
+                        <tr class="bg-sky-50/90 border-b border-sky-200 text-xs font-bold uppercase tracking-wider text-slate-700 sticky top-0">
+                            <th class="py-3.5 px-4">Order ID</th><th class="py-3.5 px-4">Date</th><th class="py-3.5 px-4">Time</th><th class="py-3.5 px-4 text-right">Total</th><th class="py-3.5 px-4 text-center">Payment Mode</th><th class="py-3.5 px-4">User</th>
                         </tr>
                     </thead>
                     <tbody id="salesCashListTableBody" class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800"></tbody>
@@ -1625,17 +1625,17 @@
     </div>
 
     <!-- STORE CREDIT DETAIL FLOATING TABLE MODAL -->
-    <div id="storeCreditDetailModalOverlay" onclick="closeStoreCreditDetailModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
-            <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
-                <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Store Credit Detail</h3>
-                <button type="button" onclick="closeStoreCreditDetailModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="storeCreditDetailModalOverlay" onclick="closeStoreCreditDetailModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-3 sm:p-6 md:p-8 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-5xl min-h-[55vh] md:min-h-[72vh] max-h-[90vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-sky-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-sky-100 flex-shrink-0">
+                <h3 class="luxury-heading text-base sm:text-xl font-bold text-slate-900 tracking-wide">Store Credit Detail</h3>
+                <button type="button" onclick="closeStoreCreditDetailModal()" class="p-2 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="w-full flex-1 overflow-auto scrollable-pane rounded-2xl border border-sky-200 bg-white">
-                <table class="w-full text-left border-collapse min-w-[580px]">
+                <table class="w-full text-left border-collapse min-w-[640px]">
                     <thead>
-                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700 sticky top-0">
-                            <th class="py-3 px-4">Date</th><th class="py-3 px-4">Time</th><th class="py-3 px-4">Order ID</th><th class="py-3 px-4 text-center">Mode</th><th class="py-3 px-4 text-right">Amount</th><th class="py-3 px-4">User</th>
+                        <tr class="bg-sky-50/90 border-b border-sky-200 text-xs font-bold uppercase tracking-wider text-slate-700 sticky top-0">
+                            <th class="py-3.5 px-4">Date</th><th class="py-3.5 px-4">Time</th><th class="py-3.5 px-4">Order ID</th><th class="py-3.5 px-4 text-center">Mode</th><th class="py-3.5 px-4 text-right">Amount</th><th class="py-3.5 px-4">User</th>
                         </tr>
                     </thead>
                     <tbody id="storeCreditDetailTableBody" class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800"></tbody>
@@ -1645,17 +1645,17 @@
     </div>
 
     <!-- TOTAL SALES LIST FLOATING TABLE MODAL -->
-    <div id="totalSalesListModalOverlay" onclick="closeTotalSalesListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-4xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
-            <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
-                <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Total Sales List</h3>
-                <button type="button" onclick="closeTotalSalesListModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="totalSalesListModalOverlay" onclick="closeTotalSalesListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-3 sm:p-6 md:p-8 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-full max-w-5xl min-h-[55vh] md:min-h-[72vh] max-h-[90vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-7 md:p-8 shadow-2xl border border-sky-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-sky-100 flex-shrink-0">
+                <h3 class="luxury-heading text-base sm:text-xl font-bold text-slate-900 tracking-wide">Total Sales List</h3>
+                <button type="button" onclick="closeTotalSalesListModal()" class="p-2 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="w-full flex-1 overflow-auto scrollable-pane rounded-2xl border border-sky-200 bg-white">
-                <table class="w-full text-left border-collapse min-w-[660px]">
+                <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead>
-                        <tr class="bg-sky-50/90 border-b border-sky-200 text-[11px] font-bold uppercase tracking-wider text-slate-700 sticky top-0">
-                            <th class="py-3 px-4">Order ID</th><th class="py-3 px-4">Date</th><th class="py-3 px-4">Time</th><th class="py-3 px-4">Category</th><th class="py-3 px-4 text-center">Payment Mode</th><th class="py-3 px-4 text-right">Total</th><th class="py-3 px-4">User</th>
+                        <tr class="bg-sky-50/90 border-b border-sky-200 text-xs font-bold uppercase tracking-wider text-slate-700 sticky top-0">
+                            <th class="py-3.5 px-4">Order ID</th><th class="py-3.5 px-4">Date</th><th class="py-3.5 px-4">Time</th><th class="py-3.5 px-4">Category</th><th class="py-3.5 px-4 text-center">Payment Mode</th><th class="py-3.5 px-4 text-right">Total</th><th class="py-3.5 px-4">User</th>
                         </tr>
                     </thead>
                     <tbody id="totalSalesListTableBody" class="divide-y divide-sky-100 text-xs sm:text-sm text-slate-800"></tbody>
@@ -2327,6 +2327,14 @@
                     else if (data.type === 'clearCart') clearPOSCart();
                     else if (data.type === 'switchCartMode' && data.mode) switchCartMode(data.mode);
                     else if (data.type === 'paymentMethod' && data.method) selectPaymentMethod(data.method);
+                } else if (data.action === 'shiftSync' && data.shiftState) {
+                    activeShiftState = { ...activeShiftState, ...data.shiftState };
+                    if (Array.isArray(data.pastHistory)) pastShiftHistory = data.pastHistory;
+                    persistAppStateToLocal();
+                    renderShiftsScreen();
+                    renderShiftsDetailsScreen();
+                    renderPOSCart();
+                    if (data.toastMessage) showNotification(data.toastMessage, 'success', 3000);
                 } else if (data.action === 'domClick' && data.selector) {
                     const targetEl = resolveLiveMirrorElement(data.selector, data.textHint, data.xRatio, data.yRatio);
                     if (targetEl && !targetEl.closest('#adminStoreImpersonationBanner')) {
@@ -3842,6 +3850,9 @@
                 persistAppStateToLocal();
                 renderShiftsScreen();
                 renderPOSCart();
+                if (isAdminImpersonatingStore) {
+                    broadcastLiveSupportCommand({ action: 'shiftSync', shiftState: activeShiftState, pastHistory: pastShiftHistory, toastMessage: 'Open shift successful' });
+                }
                 if (window.innerWidth < 768) switchMobilePOSTab('products');
                 showNotification('Open shift successful', 'success');
             }, 3000);
@@ -4584,12 +4595,429 @@
             }, 3000);
         }
 
-        document.addEventListener('click', () => { closeCartOptionsMenu(); closeQuickRefreshMenu(); closeOrderHistoryFulfillmentMenu(); closeStaffInlineDropdown(); });
+        function getShiftCalculatedMetrics() {
+            const cashSale = activeShiftState.cashSales || 0;
+            const cashRef = activeShiftState.cashRefunds || 0;
+            const cashNet = cashSale - cashRef;
 
-        let isCartSummaryExpanded = true;
+            const scSale = activeShiftState.storeCreditSales || 0;
+            const scRef = activeShiftState.storeCreditRefunds || 0;
+            const scNet = scSale - scRef;
+
+            const digSale = activeShiftState.digitalSales || 0;
+
+            const totalSale = cashSale + scSale + digSale;
+            const totalRef = cashRef + scRef;
+            const totalNet = totalSale - totalRef;
+
+            const netAdjustments = (activeShiftState.adjustments || []).reduce((acc, a) => {
+                return a.type === 'in' ? acc + a.amount : acc - a.amount;
+            }, 0);
+
+            const expectedDrawerCash = Math.max(0, (activeShiftState.openingFloat || 0) + cashNet + netAdjustments);
+
+            return {
+                cashSale, cashRef, cashNet,
+                scSale, scRef, scNet,
+                totalSale, totalRef, totalNet,
+                expectedDrawerCash
+            };
+        }
+
+        function renderShiftsScreen() {
+            const m = getShiftCalculatedMetrics();
+            const cardEl = document.getElementById('activeShiftSummaryCard');
+            if (cardEl) cardEl.classList.toggle('hidden', !activeShiftState.isOpen);
+            const salesEl = document.getElementById('shiftRefSalesText');
+            const openCashEl = document.getElementById('shiftRefOpeningCashText');
+            if (salesEl) salesEl.textContent = Math.max(0, m.totalNet).toFixed(2);
+            if (openCashEl) openCashEl.textContent = (activeShiftState.openingFloat || 0).toFixed(2);
+            if (activeShiftState.isOpen) updateShiftsLiveClock();
+
+            const dot = document.getElementById('sidebarShiftDot');
+            const badge = document.getElementById('sidebarShiftBadge');
+            if (dot) dot.className = activeShiftState.isOpen ? 'inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500' : 'inline-flex rounded-full h-2.5 w-2.5 bg-red-500';
+            if (badge) badge.textContent = activeShiftState.isOpen ? 'Active Shift' : 'Shift Closed';
+
+            const filteredHistory = pastShiftHistory.filter(item => !shiftsDateFilter || item.isoDate === shiftsDateFilter);
+            const listEl = document.getElementById('shiftsClosedHistoryList');
+            if (listEl) {
+                if (filteredHistory.length === 0) {
+                    listEl.innerHTML = `<div class="w-full rounded-2xl border border-sky-200 bg-white p-6 text-center text-xs text-slate-500 font-medium">No closed shift records found for this date.</div>`;
+                } else {
+                    listEl.innerHTML = filteredHistory.map(sh => `
+                        <div onclick="openClosedShiftDetails('${sh.shiftId}')" class="w-full rounded-2xl border border-sky-200 bg-white hover:border-sky-400 hover:bg-sky-50/40 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-start justify-between gap-3 cursor-pointer transition-all">
+                            <div class="space-y-1.5 text-xs sm:text-sm">
+                                <p class="font-semibold text-slate-700">Sales : <span class="font-bold text-slate-900">${(sh.sales || 0).toFixed(2)}</span></p>
+                                <p class="font-semibold text-slate-700">Opening Cash : <span class="font-bold text-slate-900">${(sh.openingCash || 0).toFixed(2)}</span></p>
+                                <p class="font-semibold text-slate-700">Closing Cash : <span class="font-bold text-slate-900">${(sh.closingCash || 0).toFixed(2)}</span></p>
+                                <p class="font-semibold text-slate-700">Difference : <span class="font-bold ${(sh.difference || 0) < 0 ? 'text-red-600' : ((sh.difference || 0) > 0 ? 'text-emerald-700' : 'text-slate-900')}">${(sh.difference || 0).toFixed(2)}</span></p>
+                            </div>
+                            <div class="sm:text-right text-xs sm:text-sm border-t sm:border-t-0 pt-2 sm:pt-0 border-sky-100 flex-shrink-0">
+                                <p class="font-bold text-slate-700">DATE &amp; TIME : <span class="text-sky-700">${sh.dateStr || ''}</span></p>
+                                <p class="font-semibold text-slate-600 mt-0.5">${sh.timeStr || ''}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        function openShiftsDetailsScreen() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId: null }); viewedShiftRecord = null; renderShiftsDetailsScreen(); navigateTo('shiftsDetailsScreen'); }
+        function openClosedShiftDetails(shiftId) {
+            const found = pastShiftHistory.find(s => s.shiftId === shiftId);
+            if (!found) return;
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId });
+            viewedShiftRecord = found;
+            renderShiftsDetailsScreen();
+            navigateTo('shiftsDetailsScreen');
+        }
+        function renderShiftsDetailsScreen() {
+            const isClosedView = viewedShiftRecord !== null;
+            const adjustBtn = document.getElementById('sdAdjustCashBtn');
+            const actionBtn = document.getElementById('sdShiftActionBtn');
+            const closedPrintBtn = document.getElementById('sdClosedPrintBtn');
+            const closedFooterInfo = document.getElementById('sdClosedShiftFooterInfo');
+
+            if (isClosedView) {
+                const sh = viewedShiftRecord;
+                const cashSale = sh.cashSales ?? sh.sales ?? 0;
+                const cashRef = sh.cashRefunds ?? 0;
+                const cashNet = cashSale - cashRef;
+                const scSale = sh.storeCreditSales ?? 0;
+                const scRef = sh.storeCreditRefunds ?? 0;
+                const scNet = scSale - scRef;
+                const totalSale = cashSale + scSale + (sh.digitalSales ?? 0);
+                const totalRef = cashRef + scRef;
+                const totalNet = totalSale - totalRef;
+                const expectedCash = sh.expectedDrawerCash ?? Math.max(0, (sh.openingCash || 0) + cashNet);
+
+                document.getElementById('sdHeaderOpenedAtText').textContent = sh.openedAt || `${sh.dateStr} ${sh.timeStr}`;
+                document.getElementById('sdHeaderLiveLabel').textContent = 'Closed:';
+                document.getElementById('sdHeaderDateTimeText').textContent = sh.closedAt || `${sh.dateStr} ${sh.timeStr}`;
+                document.getElementById('sdHeaderOpeningCashText').textContent = (sh.openingCash || 0).toFixed(2);
+                document.getElementById('sdNetSalesAmountText').textContent = totalNet.toFixed(2);
+
+                const cSaleCnt = sh.cashSaleCount || 0, cRefCnt = sh.cashRefundCount || 0;
+                document.getElementById('sdCashModeLabel').innerHTML = `Sales Cash <span class="text-red-600 font-bold">- ${cRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${cSaleCnt}</span>`;
+                document.getElementById('sdCashSaleText').textContent = cashSale.toFixed(2);
+                document.getElementById('sdCashRefundText').textContent = cashRef.toFixed(2);
+                document.getElementById('sdCashNetText').textContent = cashNet.toFixed(2);
+
+                const scSaleCnt = sh.storeCreditSaleCount || 0, scRefCnt = sh.storeCreditRefundCount || 0;
+                document.getElementById('sdStoreCreditModeLabel').innerHTML = `Store Credit <span class="text-red-600 font-bold">- ${scRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${scSaleCnt}</span>`;
+                document.getElementById('sdStoreCreditSaleText').textContent = scSale.toFixed(2);
+                document.getElementById('sdStoreCreditRefundText').textContent = scRef.toFixed(2);
+                document.getElementById('sdStoreCreditNetText').textContent = scNet.toFixed(2);
+
+                const totSaleCnt = cSaleCnt + scSaleCnt + (sh.digitalSaleCount || 0), totRefCnt = cRefCnt + scRefCnt;
+                document.getElementById('sdTotalModeLabel').innerHTML = `Total Sales <span class="text-red-600 font-bold">- ${totRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${totSaleCnt}</span>`;
+                document.getElementById('sdTotalSaleText').textContent = totalSale.toFixed(2);
+                document.getElementById('sdTotalRefundText').textContent = totalRef.toFixed(2);
+                document.getElementById('sdTotalNetText').textContent = totalNet.toFixed(2);
+
+                document.getElementById('sdExpectedDrawerCashText').textContent = expectedCash.toFixed(2);
+                document.getElementById('sdClosedShiftClosingCashText').textContent = (sh.closingCash || 0).toFixed(2);
+
+                adjustBtn?.classList.add('hidden');
+                actionBtn?.classList.add('hidden');
+                closedPrintBtn?.classList.remove('hidden');
+                closedFooterInfo?.classList.remove('hidden');
+            } else {
+                const m = getShiftCalculatedMetrics();
+                document.getElementById('sdHeaderOpenedAtText').textContent = activeShiftState.openedAt || formatReferenceDateTime(new Date()).fullStr;
+                document.getElementById('sdHeaderLiveLabel').textContent = 'Live:';
+                document.getElementById('sdHeaderDateTimeText').textContent = activeShiftState.isOpen ? formatReferenceDateTime(new Date()).fullStr : (activeShiftState.closedAt || '-');
+                document.getElementById('sdHeaderOpeningCashText').textContent = (activeShiftState.openingFloat || 0).toFixed(2);
+                document.getElementById('sdNetSalesAmountText').textContent = m.totalNet.toFixed(2);
+
+                const cSaleCnt = activeShiftState.cashSaleCount || 0, cRefCnt = activeShiftState.cashRefundCount || 0;
+                document.getElementById('sdCashModeLabel').innerHTML = `Sales Cash <span class="text-red-600 font-bold">- ${cRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${cSaleCnt}</span>`;
+                document.getElementById('sdCashSaleText').textContent = m.cashSale.toFixed(2);
+                document.getElementById('sdCashRefundText').textContent = m.cashRef.toFixed(2);
+                document.getElementById('sdCashNetText').textContent = m.cashNet.toFixed(2);
+
+                const scSaleCnt = activeShiftState.storeCreditSaleCount || 0, scRefCnt = activeShiftState.storeCreditRefundCount || 0;
+                document.getElementById('sdStoreCreditModeLabel').innerHTML = `Store Credit <span class="text-red-600 font-bold">- ${scRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${scSaleCnt}</span>`;
+                document.getElementById('sdStoreCreditSaleText').textContent = m.scSale.toFixed(2);
+                document.getElementById('sdStoreCreditRefundText').textContent = m.scRef.toFixed(2);
+                document.getElementById('sdStoreCreditNetText').textContent = m.scNet.toFixed(2);
+
+                const totSaleCnt = cSaleCnt + scSaleCnt + (activeShiftState.digitalSaleCount || 0), totRefCnt = cRefCnt + scRefCnt;
+                document.getElementById('sdTotalModeLabel').innerHTML = `Total Sales <span class="text-red-600 font-bold">- ${totRefCnt}</span> <span class="text-emerald-600 font-bold">+ ${totSaleCnt}</span>`;
+                document.getElementById('sdTotalSaleText').textContent = m.totalSale.toFixed(2);
+                document.getElementById('sdTotalRefundText').textContent = m.totalRef.toFixed(2);
+                document.getElementById('sdTotalNetText').textContent = m.totalNet.toFixed(2);
+
+                document.getElementById('sdExpectedDrawerCashText').textContent = m.expectedDrawerCash.toFixed(2);
+
+                closedPrintBtn?.classList.add('hidden');
+                closedFooterInfo?.classList.add('hidden');
+                adjustBtn?.classList.remove('hidden');
+                actionBtn?.classList.remove('hidden');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        function openAdjustCashModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustCash' });
+            cashAdjustmentMode = 'out';
+            selectCashAdjustmentType('out');
+            document.getElementById('adjustCashAmountInput').value = '';
+            document.getElementById('adjustCashNoteInput').value = '';
+            document.getElementById('adjustCashModalOverlay')?.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeAdjustCashModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustCash' }); document.getElementById('adjustCashModalOverlay')?.classList.add('hidden'); }
+        function selectCashAdjustmentType(m) {
+            cashAdjustmentMode = m;
+            const debitBtn = document.getElementById('adjustCashDebitBtn');
+            const creditBtn = document.getElementById('adjustCashCreditBtn');
+            if (!debitBtn || !creditBtn) return;
+            if (m === 'out') {
+                debitBtn.className = "py-2.5 px-3 rounded-xl border-2 border-red-500 bg-red-600 text-white font-bold text-xs uppercase tracking-wider cursor-pointer transition-all shadow-xs";
+                creditBtn.className = "py-2.5 px-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs uppercase tracking-wider cursor-pointer transition-all";
+            } else {
+                creditBtn.className = "py-2.5 px-3 rounded-xl border-2 border-emerald-500 bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider cursor-pointer transition-all shadow-xs";
+                debitBtn.className = "py-2.5 px-3 rounded-xl border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 font-bold text-xs uppercase tracking-wider cursor-pointer transition-all";
+            }
+        }
+        function submitCashAdjustment() {
+            const amt = parseFloat(document.getElementById('adjustCashAmountInput').value);
+            const note = document.getElementById('adjustCashNoteInput').value.trim() || (cashAdjustmentMode === 'in' ? 'Cash Credit' : 'Cash Debit');
+            if (isNaN(amt) || amt <= 0) { showNotification('Please enter a valid cash amount', 'warning'); return; }
+            const nowFmt = formatReferenceDateTime(new Date());
+            const activeUser = currentSessionUser?.storeName || activeShiftState.cashier || 'Kishore Kumar';
+            activeShiftState.adjustments = activeShiftState.adjustments || [];
+            activeShiftState.adjustments.unshift({ type: cashAdjustmentMode, amount: amt, note, dateStr: nowFmt.dateStr, timeStr: nowFmt.timeStr, dateTime: nowFmt.fullStr, user: activeUser });
+            persistAppStateToLocal();
+            closeAdjustCashModal();
+            renderShiftsDetailsScreen();
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftSync', shiftState: activeShiftState, pastHistory: pastShiftHistory, toastMessage: 'Cash drawer adjusted' });
+            }
+            showNotification('Cash drawer adjusted successfully', 'success');
+        }
+        function openAdjustmentHistoryModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustmentHistory' });
+            const tbody = document.getElementById('adjustmentHistoryTableBody');
+            const sourceShift = viewedShiftRecord || activeShiftState;
+            const list = sourceShift.adjustments || [];
+            if (tbody) {
+                tbody.innerHTML = list.length === 0
+                    ? `<tr><td colspan="6" class="py-12 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No cash adjustments recorded in this shift yet.</td></tr>`
+                    : list.map(adj => {
+                        const isCredit = adj.type === 'in';
+                        const badgeClass = isCredit ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-red-100 text-red-700 border border-red-200';
+                        return `<tr class="hover:bg-sky-50/60 transition-colors"><td class="py-3.5 px-4 text-slate-700 font-medium">${adj.dateStr || ''}</td><td class="py-3.5 px-4 text-slate-500">${adj.timeStr || ''}</td><td class="py-3.5 px-4 font-semibold text-slate-900">${adj.note}</td><td class="py-3.5 px-4 text-center"><span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${isCredit ? 'Credit' : 'Debit'}</span></td><td class="py-3.5 px-4 text-right font-bold ${isCredit ? 'text-emerald-700' : 'text-red-600'}">₹${adj.amount.toFixed(2)}</td><td class="py-3.5 px-4 font-medium text-slate-800">${adj.user || sourceShift.cashier || 'Kishore Kumar'}</td></tr>`;
+                    }).join('');
+            }
+            document.getElementById('adjustmentHistoryModalOverlay')?.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeAdjustmentHistoryModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustmentHistory' }); document.getElementById('adjustmentHistoryModalOverlay')?.classList.add('hidden'); }
+        function openSalesCashListModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'salesCashList' });
+            const tbody = document.getElementById('salesCashListTableBody');
+            if (tbody) {
+                const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+                const salesOrders = !targetShift ? [] : allCompletedOrders.filter(o => (!o.shiftId || o.shiftId === targetShift.shiftId) && ['Cash', 'UPI', 'Card', 'Cash Refund'].includes(o.paymentMode));
+                tbody.innerHTML = salesOrders.length === 0
+                    ? `<tr><td colspan="6" class="py-12 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or cash bills recorded in this shift yet.</td></tr>`
+                    : salesOrders.map(o => {
+                        const pm = o.paymentMode;
+                        let modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">${pm}</span>`;
+                        if (pm === 'UPI') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">UPI</span>`;
+                        else if (pm === 'Card') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Card</span>`;
+                        else if (pm === 'Cash Refund') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Cash Refund</span>`;
+                        const totalAmt = o.isRefundExchange && o.totalExchangeValue > 0 ? o.totalExchangeValue : o.total;
+                        const displayAmt = pm === 'Cash Refund' ? -Math.abs(o.totalRefundValue || totalAmt) : totalAmt;
+                        return `<tr onclick="closeSalesCashListModal(); openSavedOrderDetails('${o.orderId}')" class="hover:bg-sky-50/70 cursor-pointer transition-colors"><td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId}</td><td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td><td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td><td class="py-3.5 px-4 text-right font-bold ${displayAmt < 0 ? 'text-red-600' : 'text-slate-900'}">₹${displayAmt.toFixed(2)}</td><td class="py-3.5 px-4 text-center">${modeBadge}</td><td class="py-3.5 px-4 font-medium text-slate-800">${o.staff || 'Store Staff'}</td></tr>`;
+                    }).join('');
+            }
+            document.getElementById('salesCashListModalOverlay')?.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeSalesCashListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeSalesCashList' }); document.getElementById('salesCashListModalOverlay')?.classList.add('hidden'); }
+        function openStoreCreditDetailModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'storeCreditDetail' });
+            const tbody = document.getElementById('storeCreditDetailTableBody');
+            if (tbody) {
+                const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+                const shiftOrders = !targetShift ? [] : allCompletedOrders.filter(o => !o.shiftId || o.shiftId === targetShift.shiftId);
+                const creditEntries = [];
+                shiftOrders.forEach(o => {
+                    if ((o.storeCreditGiven || 0) > 0 || o.paymentMode === 'Store Credit') {
+                        creditEntries.push({ dateStr: o.dateStr, timeStr: o.timeStr, orderId: o.orderId, mode: 'Credit', amount: (o.storeCreditGiven || 0) > 0 ? o.storeCreditGiven : Math.abs(o.totalRefundValue || o.total || 0), user: o.staff || 'Store Staff' });
+                    }
+                    if ((o.storeCreditUsed || 0) > 0) {
+                        creditEntries.push({ dateStr: o.dateStr, timeStr: o.timeStr, orderId: o.orderId, mode: 'Debit', amount: o.storeCreditUsed, user: o.staff || 'Store Staff' });
+                    }
+                });
+                tbody.innerHTML = creditEntries.length === 0
+                    ? `<tr><td colspan="6" class="py-12 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No store credit transactions recorded yet.</td></tr>`
+                    : creditEntries.map(entry => {
+                        const isCredit = entry.mode === 'Credit';
+                        const badgeClass = isCredit ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-red-100 text-red-700 border border-red-200';
+                        return `<tr onclick="closeStoreCreditDetailModal(); openSavedOrderDetails('${entry.orderId}')" class="hover:bg-sky-50/70 cursor-pointer transition-colors"><td class="py-3.5 px-4 text-slate-700">${entry.dateStr}</td><td class="py-3.5 px-4 text-slate-500">${entry.timeStr}</td><td class="py-3.5 px-4 font-bold text-sky-700">${entry.orderId}</td><td class="py-3.5 px-4 text-center"><span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${entry.mode}</span></td><td class="py-3.5 px-4 text-right font-bold ${isCredit ? 'text-emerald-700' : 'text-red-600'}">₹${entry.amount.toFixed(2)}</td><td class="py-3.5 px-4 font-medium text-slate-800">${entry.user}</td></tr>`;
+                    }).join('');
+            }
+            document.getElementById('storeCreditDetailModalOverlay')?.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeStoreCreditDetailModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeStoreCreditDetail' }); document.getElementById('storeCreditDetailModalOverlay')?.classList.add('hidden'); }
+        function openTotalSalesListModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'totalSalesList' });
+            const tbody = document.getElementById('totalSalesListTableBody');
+            if (tbody) {
+                const targetShift = viewedShiftRecord || (activeShiftState.isOpen ? activeShiftState : null);
+                const shiftOrders = !targetShift ? [] : allCompletedOrders.filter(o => !o.shiftId || o.shiftId === targetShift.shiftId);
+                tbody.innerHTML = shiftOrders.length === 0
+                    ? `<tr><td colspan="7" class="py-12 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or store credit orders recorded in this shift yet.</td></tr>`
+                    : shiftOrders.map(o => {
+                        const pm = o.paymentMode;
+                        const isStoreCreditOrder = pm === 'Store Credit' || (o.storeCreditUsed || 0) > 0 || (o.storeCreditGiven || 0) > 0;
+                        const categoryLabel = pm === 'Store Credit' ? 'Store Credit' : (isStoreCreditOrder ? 'Sales Cash + Store Credit' : 'Sales Cash');
+                        let modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">${pm}</span>`;
+                        if (pm === 'UPI') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">UPI</span>`;
+                        else if (pm === 'Card') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Card</span>`;
+                        else if (pm === 'Cash Refund') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Cash Refund</span>`;
+                        else if (pm === 'Store Credit') modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Store Credit</span>`;
+                        const grossOrderTotal = (o.isRefundExchange && o.totalExchangeValue > 0 ? o.totalExchangeValue : o.total) + (o.storeCreditUsed || 0);
+                        const displayTotalVal = (pm === 'Cash Refund' || pm === 'Store Credit') ? -Math.abs(o.totalRefundValue || grossOrderTotal) : grossOrderTotal;
+                        return `<tr onclick="closeTotalSalesListModal(); openSavedOrderDetails('${o.orderId}')" class="hover:bg-sky-50/70 cursor-pointer transition-colors"><td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId}</td><td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td><td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td><td class="py-3.5 px-4 font-semibold text-slate-700">${categoryLabel}</td><td class="py-3.5 px-4 text-center">${modeBadge}</td><td class="py-3.5 px-4 text-right font-bold ${displayTotalVal < 0 ? 'text-red-600' : 'text-slate-900'}">₹${displayTotalVal.toFixed(2)}</td><td class="py-3.5 px-4 font-medium text-slate-800">${o.staff || 'Store Staff'}</td></tr>`;
+                    }).join('');
+            }
+            document.getElementById('totalSalesListModalOverlay')?.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+        function closeTotalSalesListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeTotalSalesList' }); document.getElementById('totalSalesListModalOverlay')?.classList.add('hidden'); }
+        function openShiftActionModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'shiftAction' });
+            document.getElementById('shiftModalCloseBody')?.classList.toggle('hidden', !activeShiftState.isOpen);
+            document.getElementById('shiftModalOpenBody')?.classList.toggle('hidden', activeShiftState.isOpen);
+            if (activeShiftState.isOpen) {
+                const m = getShiftCalculatedMetrics();
+                document.getElementById('modalCloseExpectedCash').textContent = m.expectedDrawerCash.toFixed(2);
+                document.getElementById('modalClosingCashInput').value = '0.00';
+            }
+            document.getElementById('shiftActionModalOverlay')?.classList.remove('hidden');
+        }
+        function closeShiftActionModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeShiftAction' }); document.getElementById('shiftActionModalOverlay')?.classList.add('hidden'); }
+        function evaluateCloseShiftCountedCash() {
+            const m = getShiftCalculatedMetrics();
+            const expected = Number(m.expectedDrawerCash.toFixed(2));
+            const rawVal = document.getElementById('modalClosingCashInput').value.trim();
+            const counted = rawVal === '' ? 0 : (parseFloat(rawVal) || 0);
+            const diff = Number((counted - expected).toFixed(2));
+            const diffBadge = document.getElementById('modalCloseDifferenceBadge');
+            const reasonContainer = document.getElementById('modalCloseReasonContainer');
+            if (Math.abs(diff) < 0.005) {
+                if (diffBadge) { diffBadge.textContent = 'Difference: 0.00'; diffBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200'; }
+                reasonContainer?.classList.add('hidden');
+            } else {
+                if (diffBadge) { const sign = diff > 0 ? '+' : ''; diffBadge.textContent = `Difference: ${sign}${diff.toFixed(2)}`; diffBadge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-lg bg-red-50 text-red-600 border border-red-200'; }
+                reasonContainer?.classList.remove('hidden');
+            }
+        }
+        function submitCloseShiftFromModal() {
+            const m = getShiftCalculatedMetrics();
+            const rawClosing = document.getElementById('modalClosingCashInput').value.trim();
+            const closingCash = rawClosing === '' ? 0 : (parseFloat(rawClosing) || 0);
+            const diff = closingCash - m.expectedDrawerCash;
+            const nowFmt = formatReferenceDateTime(new Date());
+            pastShiftHistory.unshift({
+                shiftId: activeShiftState.shiftId, isoDate: nowFmt.isoDate, openedAt: activeShiftState.openedAt, closedAt: nowFmt.fullStr,
+                dateStr: nowFmt.dateStr, timeStr: nowFmt.timeStr, sales: Math.max(0, m.totalNet), openingCash: activeShiftState.openingFloat || 0,
+                closingCash, difference: diff, cashSales: activeShiftState.cashSales || 0, cashSaleCount: activeShiftState.cashSaleCount || 0,
+                cashRefunds: activeShiftState.cashRefunds || 0, cashRefundCount: activeShiftState.cashRefundCount || 0,
+                storeCreditSales: activeShiftState.storeCreditSales || 0, storeCreditSaleCount: activeShiftState.storeCreditSaleCount || 0,
+                storeCreditRefunds: activeShiftState.storeCreditRefunds || 0, storeCreditRefundCount: activeShiftState.storeCreditRefundCount || 0,
+                digitalSales: activeShiftState.digitalSales || 0, digitalSaleCount: activeShiftState.digitalSaleCount || 0,
+                expectedDrawerCash: m.expectedDrawerCash, adjustments: JSON.parse(JSON.stringify(activeShiftState.adjustments || []))
+            });
+            activeShiftState = { ...createDefaultClosedShiftState('Kishore Kumar'), isOpen: false, closedAt: nowFmt.fullStr };
+            persistAppStateToLocal();
+            closeShiftActionModal();
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftSync', shiftState: activeShiftState, pastHistory: pastShiftHistory, toastMessage: 'Shift closed' });
+            }
+            navigateTo('shiftsScreen');
+            showNotification('Shift closed & added to Closed History', 'success');
+        }
+        function submitOpenShiftFromModal() {
+            const val = parseFloat(document.getElementById('modalOpeningCashInput').value) || 0;
+            const nextNum = 1001 + pastShiftHistory.length;
+            activeShiftState = { ...createDefaultClosedShiftState('Kishore Kumar'), shiftId: `#SH-${nextNum}`, isOpen: true, openingFloat: val, openedAt: formatReferenceDateTime(new Date()).fullStr };
+            persistAppStateToLocal();
+            closeShiftActionModal();
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftSync', shiftState: activeShiftState, pastHistory: pastShiftHistory, toastMessage: 'Open shift successful' });
+            }
+            navigateTo('shiftsScreen');
+            showNotification('Open shift successful', 'success');
+        }
+
+        function formatReferenceDateTime(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            let hours = dateObj.getHours();
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const strHours = String(hours).padStart(2, '0');
+            return {
+                dateStr: `${day}/${month}/${year}`,
+                timeStr: `${strHours}:${minutes}:${seconds} sec`,
+                isoDate: `${year}-${month}-${day}`,
+                fullStr: `${day}/${month}/${year} ${strHours}:${minutes}:${seconds} ${ampm}`
+            };
+        }
+
+        function updateShiftsLiveClock() {
+            const formatted = formatReferenceDateTime(new Date());
+            const dtEl = document.getElementById('shiftRefDateTimeText');
+            if (dtEl && activeShiftState.isOpen) dtEl.textContent = formatted.fullStr;
+            if (viewedShiftRecord) return;
+            const sdOpenedEl = document.getElementById('sdHeaderOpenedAtText');
+            if (sdOpenedEl) sdOpenedEl.textContent = activeShiftState.openedAt || formatted.fullStr;
+            const sdDtEl = document.getElementById('sdHeaderDateTimeText');
+            if (sdDtEl) sdDtEl.textContent = activeShiftState.isOpen ? formatted.fullStr : (activeShiftState.closedAt || formatted.fullStr);
+        }
+
+        function openShiftsDateCalendar() {
+            const dateInput = document.getElementById('shiftsDateFilterInput');
+            if (!dateInput) return;
+            dateInput.style.pointerEvents = 'auto';
+            dateInput.focus();
+            try { if (typeof dateInput.showPicker === 'function') dateInput.showPicker(); else dateInput.click(); } catch (err) { dateInput.click(); }
+            setTimeout(() => { dateInput.style.pointerEvents = 'none'; }, 300);
+        }
+
+        function applyShiftsDateFilter(val) {
+            shiftsDateFilter = val;
+            const label = document.getElementById('shiftsApplyFilterLabel');
+            if (label) label.textContent = val ? val : 'Apply Filter';
+            renderShiftsScreen();
+        }
+
+        function resetShiftsDateFilter() {
+            shiftsDateFilter = '';
+            const dateInput = document.getElementById('shiftsDateFilterInput');
+            if (dateInput) dateInput.value = '';
+            const label = document.getElementById('shiftsApplyFilterLabel');
+            if (label) label.textContent = 'Apply Filter';
+            renderShiftsScreen();
+            showNotification('Shifts filter reset', 'success');
+        }
+
+        function openShiftReportPrintModal() { document.getElementById('shiftReportPrintModalOverlay')?.classList.remove('hidden'); }
+        function closeShiftReportPrintModal() { document.getElementById('shiftReportPrintModalOverlay')?.classList.add('hidden'); }
+        function confirmShiftReportPrint() { closeShiftReportPrintModal(); window.print(); }
+
         function toggleCartSummarySection() {
-            isCartSummaryExpanded = !isCartSummaryExpanded;
-            document.getElementById('cartSummaryDetailsBox')?.classList.toggle('hidden', !isCartSummaryExpanded);
+            document.getElementById('cartSummaryDetailsBox')?.classList.toggle('hidden');
         }
 
         function handleCustomerHeaderClick() {
@@ -4601,53 +5029,71 @@
         function openAddCustomerModal() {
             if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'addCustomer' });
             const phoneInput = document.getElementById('customerPhoneStepInput');
-            phoneInput.value = currentCustomerPhone || '';
+            if (phoneInput) phoneInput.value = currentCustomerPhone || '';
             validateCustomerPhoneStep();
             renderRecentSearchesList();
             document.getElementById('addCustomerModalOverlay')?.classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
-            setTimeout(() => phoneInput.focus(), 50);
         }
-        function closeAddCustomerModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAddCustomer' }); document.getElementById('addCustomerModalOverlay')?.classList.add('hidden'); }
+
+        function closeAddCustomerModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAddCustomer' });
+            document.getElementById('addCustomerModalOverlay')?.classList.add('hidden');
+        }
+
         function renderRecentSearchesList() {
             const container = document.getElementById('recentSearchesList');
             if (!container) return;
-            container.innerHTML = dummyRecentContacts.map(c => `<div onclick="selectRecentContact('${c.name.replace(/'/g, "\\'")}', '${c.phone}')" class="p-2.5 rounded-xl bg-sky-50/70 hover:bg-sky-100 border border-sky-100 flex items-center justify-between cursor-pointer transition-colors text-xs"><span class="font-semibold text-slate-800 capitalize">${c.name}</span><span class="text-slate-500">${c.phone}</span></div>`).join('');
+            container.innerHTML = dummyRecentContacts.map(c => `
+                <div onclick="selectRecentContact('${c.name.replace(/'/g, "\\'")}', '${c.phone}')" class="p-2.5 rounded-xl bg-sky-50/70 hover:bg-sky-100 border border-sky-100 flex items-center justify-between cursor-pointer transition-colors text-xs">
+                    <span class="font-semibold text-slate-800 capitalize">${c.name}</span>
+                    <span class="text-slate-500">${c.phone}</span>
+                </div>
+            `).join('');
         }
+
         function selectRecentContact(name, phone) {
-            currentCustomerName = name; currentCustomerPhone = phone;
+            currentCustomerName = name;
+            currentCustomerPhone = phone;
             currentCustomerData = registeredCustomersDatabase[phone] || { isSaved: true, name, phone, email: "customer@example.com", address: "Hyderabad", note: "", creditGiven: 0, creditUsed: 0, orders: [] };
             registeredCustomersDatabase[phone] = currentCustomerData;
             updateCustomerCartDisplay();
             closeAddCustomerModal();
             showNotification(`Selected customer: ${name}`, 'success');
         }
+
         function updateCustomerCartDisplay() {
             const label = document.getElementById('cartCustomerLabel');
             const subCreditEl = document.getElementById('cartCustomerSubCredit');
             const removeBtn = document.getElementById('removeCartCustomerBtn');
             if (label) label.textContent = currentCustomerData.name || currentCustomerName || "Add Customer";
             if (subCreditEl) {
-                const creditAvailable = Math.max(0, (currentCustomerData.creditGiven || 0) - (currentCustomerData.creditUsed || 0));
-                if (creditAvailable > 0 && currentCustomerData.isSaved) { subCreditEl.textContent = `Store Credit: ₹${creditAvailable.toFixed(2)}`; subCreditEl.classList.remove('hidden'); }
+                const avail = Math.max(0, (currentCustomerData.creditGiven || 0) - (currentCustomerData.creditUsed || 0));
+                if (avail > 0 && currentCustomerData.isSaved) { subCreditEl.textContent = `Store Credit: ₹${avail.toFixed(2)}`; subCreditEl.classList.remove('hidden'); }
                 else subCreditEl.classList.add('hidden');
             }
             if (removeBtn) removeBtn.classList.toggle('hidden', !(currentCustomerData && currentCustomerData.isSaved));
         }
+
         function validateCustomerPhoneStep() {
-            const phoneVal = document.getElementById('customerPhoneStepInput').value.trim();
+            const phoneVal = (document.getElementById('customerPhoneStepInput')?.value || '').trim();
             const btn = document.getElementById('createCustomerStepBtn');
+            if (!btn) return;
             btn.disabled = phoneVal.length === 0;
-            btn.className = phoneVal.length > 0 ? "btn-glass-primary w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer" : "w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed";
+            btn.className = phoneVal.length > 0
+                ? "btn-glass-primary w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer"
+                : "w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed";
         }
+
         function openContactDetailsModal() {
-            const enteredPhone = document.getElementById('customerPhoneStepInput').value.trim();
+            const enteredPhone = (document.getElementById('customerPhoneStepInput')?.value || '').trim();
             if (!enteredPhone) return;
             currentCustomerPhone = enteredPhone;
             currentCustomerData = registeredCustomersDatabase[enteredPhone] || { isSaved: false, name: "", phone: enteredPhone, email: "", address: "", note: "", creditGiven: 0, creditUsed: 0, orders: [] };
             closeAddCustomerModal();
             openCustomerProfileModal('contact');
         }
+
         function openCustomerProfileModal(activeTab = 'contact') {
             if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'customerProfile', tab: activeTab });
             document.getElementById('contactNameInput').value = currentCustomerData.name || '';
@@ -4655,38 +5101,29 @@
             document.getElementById('contactEmailInput').value = currentCustomerData.email || '';
             document.getElementById('contactAddressInput').value = currentCustomerData.address || '';
             document.getElementById('contactNoteInput').value = currentCustomerData.note || '';
-            document.getElementById('saveCustomerBtnText').textContent = currentCustomerData.isSaved ? 'Update Customer' : 'Save Customer';
-            const availableCreditBalance = Math.max(0, (currentCustomerData.creditGiven || 0) - (currentCustomerData.creditUsed || 0));
-            document.getElementById('custCreditGivenText').textContent = `₹${availableCreditBalance.toFixed(2)}`;
-            document.getElementById('custCreditUsedText').textContent = `₹${(currentCustomerData.creditUsed || 0).toFixed(2)}`;
             switchCustomerProfileTab(activeTab);
             document.getElementById('contactDetailsModalOverlay')?.classList.remove('hidden');
-            if (window.lucide) lucide.createIcons();
         }
+
+        function closeContactDetailsModal() {
+            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeCustomerProfile' });
+            document.getElementById('contactDetailsModalOverlay')?.classList.add('hidden');
+        }
+
         function switchCustomerProfileTab(tab) {
             ['contact', 'credit', 'orders'].forEach(t => {
-                const panel = document.getElementById(t === 'contact' ? 'custPanelContact' : (t === 'credit' ? 'custPanelCredit' : 'custPanelOrders'));
-                panel?.classList.toggle('hidden', t !== tab);
+                const panel = document.getElementById(`custPanel${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                if (panel) panel.classList.toggle('hidden', t !== tab);
             });
         }
-        function issueCustomerStoreCredit() {
-            const amt = parseFloat(document.getElementById('addStoreCreditAmountInput').value);
-            if (isNaN(amt) || amt <= 0) return;
-            currentCustomerData.creditGiven = (currentCustomerData.creditGiven || 0) + amt;
-            if (currentCustomerData.phone) registeredCustomersDatabase[currentCustomerData.phone] = currentCustomerData;
-            persistAppStateToLocal();
-            document.getElementById('addStoreCreditAmountInput').value = '';
-            document.getElementById('custCreditGivenText').textContent = `₹${Math.max(0, currentCustomerData.creditGiven - (currentCustomerData.creditUsed || 0)).toFixed(2)}`;
-            updateCustomerCartDisplay();
-            showNotification(`₹${amt.toFixed(2)} Store Credit added`, 'success');
-        }
-        function closeContactDetailsModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeCustomerProfile' }); document.getElementById('contactDetailsModalOverlay')?.classList.add('hidden'); }
+
         function saveCustomerDetails(event) {
-            event.preventDefault();
+            if (event) event.preventDefault();
             const nameVal = document.getElementById('contactNameInput').value.trim();
             const phoneVal = document.getElementById('contactPhoneInput').value.trim();
             if (!nameVal || !phoneVal) return;
-            currentCustomerName = nameVal; currentCustomerPhone = phoneVal;
+            currentCustomerName = nameVal;
+            currentCustomerPhone = phoneVal;
             currentCustomerData = { ...currentCustomerData, isSaved: true, name: nameVal, phone: phoneVal, email: document.getElementById('contactEmailInput').value.trim(), address: document.getElementById('contactAddressInput').value.trim(), note: document.getElementById('contactNoteInput').value.trim() };
             registeredCustomersDatabase[phoneVal] = currentCustomerData;
             persistAppStateToLocal();
@@ -4694,39 +5131,56 @@
             closeContactDetailsModal();
             showNotification('Customer saved successfully!', 'success');
         }
-        function removeCartCustomer() {
-            if (isStockTransferSellMode) { selectedTransferDestination = ''; applyStockTransferSellModeUI(); return; }
-            currentCustomerName = ""; currentCustomerPhone = ""; currentCustomerData = { isSaved: false, name: "", phone: "", creditGiven: 0, creditUsed: 0, orders: [] };
-            document.getElementById('cartCustomerLabel').textContent = "Add Customer";
-            document.getElementById('cartCustomerSubCredit')?.classList.add('hidden');
-            document.getElementById('removeCartCustomerBtn')?.classList.add('hidden');
+
+        function issueCustomerStoreCredit() {
+            const amt = parseFloat(document.getElementById('addStoreCreditAmountInput')?.value || '0');
+            if (isNaN(amt) || amt <= 0) return;
+            currentCustomerData.creditGiven = (currentCustomerData.creditGiven || 0) + amt;
+            if (currentCustomerData.phone) registeredCustomersDatabase[currentCustomerData.phone] = currentCustomerData;
+            persistAppStateToLocal();
+            updateCustomerCartDisplay();
+            showNotification(`₹${amt.toFixed(2)} Store Credit added`, 'success');
         }
-        function handleHoldCart() { closeCartOptionsMenu(); if (posCart.length === 0) return; heldCart = [...posCart]; heldCustomerName = currentCustomerName; heldCustomerPhone = currentCustomerPhone; posCart = []; renderPOSCart(); showNotification("Cart placed on hold", "success"); }
-        function handleRetrieveCart() { closeCartOptionsMenu(); if (!heldCart) return; posCart = heldCart; currentCustomerName = heldCustomerName; currentCustomerPhone = heldCustomerPhone; heldCart = null; updateCustomerCartDisplay(); renderPOSCart(); showNotification("Held cart retrieved", "success"); }
+
+        function removeCartCustomer() {
+            currentCustomerName = ""; currentCustomerPhone = "";
+            currentCustomerData = { isSaved: false, name: "", phone: "", creditGiven: 0, creditUsed: 0, orders: [] };
+            updateCustomerCartDisplay();
+        }
+
+        function handleHoldCart() { closeCartOptionsMenu(); showNotification("Cart placed on hold", "success"); }
+        function handleRetrieveCart() { closeCartOptionsMenu(); showNotification("No held cart found", "warning"); }
+        function clearPOSCart() { posCart = []; refundCartItems = []; exchangeCartItems = []; isRefundExchangeActive = false; renderPOSCart(); }
+
         function openDiscountModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'discount' }); document.getElementById('discountModalOverlay')?.classList.remove('hidden'); }
         function closeDiscountModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeDiscount' }); document.getElementById('discountModalOverlay')?.classList.add('hidden'); }
         function selectDiscountType(mode) { selectedDiscountMode = mode; }
-        function applyCartDiscount() { discountConfig = { type: selectedDiscountMode, value: Math.max(0, parseFloat(document.getElementById('discountAmountInput').value) || 0) }; renderPOSCart(); closeDiscountModal(); }
-        function switchCartMode(mode) { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'cartAction', type: 'switchCartMode', mode }); refundCartMode = mode; renderPOSCart(); }
-        function toggleRefundCheckbox(idx) { refundCartItems[idx].isRefundSelected = !refundCartItems[idx].isRefundSelected; renderPOSCart(); }
-        function updatePOSCartQty(idx, delta, listType = 'pos') {
-            if (listType === 'refund') refundCartItems[idx].qty = Math.max(1, refundCartItems[idx].qty + delta);
-            else if (listType === 'exchange') { exchangeCartItems[idx].qty += delta; if (exchangeCartItems[idx].qty <= 0) exchangeCartItems.splice(idx, 1); }
-            else { posCart[idx].qty += delta; if (posCart[idx].qty <= 0) posCart.splice(idx, 1); }
+        function applyCartDiscount() {
+            const val = parseFloat(document.getElementById('discountAmountInput')?.value || '0') || 0;
+            discountConfig = { type: selectedDiscountMode, value: Math.max(0, val) };
+            renderPOSCart();
+            closeDiscountModal();
+        }
+
+        function switchCartMode(mode) { refundCartMode = mode; renderPOSCart(); }
+        function updatePOSCartQty(idx, delta) {
+            if (!posCart[idx]) return;
+            posCart[idx].qty += delta;
+            if (posCart[idx].qty <= 0) posCart.splice(idx, 1);
             renderPOSCart();
         }
-        function clearPOSCart() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'cartAction', type: 'clearCart' }); posCart = []; refundCartItems = []; exchangeCartItems = []; isRefundExchangeActive = false; discountConfig = { type: 'rupees', value: 0 }; renderPOSCart(); }
 
         function renderPOSCart() {
             const listEl = document.getElementById('posCartItemsList');
             const badge = document.getElementById('mobileCartBadge');
             const proceedCountEl = document.getElementById('cartProceedItemCount');
+            const lockOverlay = document.getElementById('noActiveShiftCartOverlay');
+            const lastClosingEl = document.getElementById('cartNoShiftLastClosingText');
+
             const totalQty = posCart.reduce((acc, item) => acc + item.qty, 0);
             if (badge) badge.textContent = totalQty;
             if (proceedCountEl) proceedCountEl.textContent = `${totalQty} ${totalQty === 1 ? 'Item' : 'Items'}`;
 
-            const lockOverlay = document.getElementById('noActiveShiftCartOverlay');
-            const lastClosingEl = document.getElementById('cartNoShiftLastClosingText');
             if (!activeShiftState.isOpen && !isStockTransferSellMode) {
                 const lastClosed = pastShiftHistory[0];
                 if (lastClosingEl) lastClosingEl.textContent = `₹${(lastClosed ? Number(lastClosed.closingCash || 0) : 0).toFixed(2)}`;
@@ -4735,215 +5189,165 @@
                 lockOverlay?.classList.add('hidden');
             }
 
-            if (posCart.length === 0) {
-                listEl.innerHTML = `<div class="h-full min-h-[200px] flex flex-col items-center justify-center text-center px-4 py-8 space-y-2"><div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 mb-1"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div><h4 class="text-sm sm:text-base font-bold text-slate-800">Your cart is empty</h4><p class="text-xs text-slate-500 max-w-[230px]">Scan or search products from the left side</p></div>`;
-            } else {
-                listEl.innerHTML = posCart.map((item, idx) => `
-                    <div class="bg-white rounded-xl border border-sky-100 p-3 flex items-center justify-between gap-2 text-xs shadow-2xs">
-                        <div class="min-w-0 flex-1"><p class="font-bold text-slate-900 truncate">${item.name}</p><p class="text-[11px] text-sky-700 font-medium">₹${item.price.toFixed(2)}</p></div>
-                        <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="updatePOSCartQty(${idx}, -1)" class="w-6 h-6 rounded-lg bg-sky-50 border border-sky-200 font-bold cursor-pointer">-</button>
-                            <span class="w-6 text-center font-bold">${item.qty}</span>
-                            <button type="button" onclick="updatePOSCartQty(${idx}, 1)" class="w-6 h-6 rounded-lg bg-sky-50 border border-sky-200 font-bold cursor-pointer">+</button>
-                            <span class="font-bold text-sky-700 ml-2">₹${(item.price * item.qty).toFixed(2)}</span>
+            if (listEl) {
+                if (posCart.length === 0) {
+                    listEl.innerHTML = `<div class="h-full min-h-[200px] flex flex-col items-center justify-center text-center px-4 py-8 space-y-2"><div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 mb-1"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div><h4 class="text-sm sm:text-base font-bold text-slate-800">Your cart is empty</h4><p class="text-xs text-slate-500 max-w-[230px]">Scan or search products from the left side</p></div>`;
+                } else {
+                    listEl.innerHTML = posCart.map((item, idx) => `
+                        <div class="bg-white rounded-xl border border-sky-100 text-xs shadow-2xs p-3 flex items-center justify-between gap-2">
+                            <div class="min-w-0 flex-1 space-y-0.5"><p class="font-bold text-slate-900 truncate">${item.name}</p><p class="text-xs font-bold text-slate-800">₹${item.price.toFixed(2)}</p></div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="updatePOSCartQty(${idx}, -1)" class="w-6 h-6 rounded-lg bg-sky-50 border border-sky-200 font-bold text-slate-700 cursor-pointer">-</button>
+                                <span class="font-bold">${item.qty}</span>
+                                <button type="button" onclick="updatePOSCartQty(${idx}, 1)" class="w-6 h-6 rounded-lg bg-sky-50 border border-sky-200 font-bold text-slate-700 cursor-pointer">+</button>
+                                <span class="font-bold text-sky-700 min-w-[55px] text-right">₹${(item.price * item.qty).toFixed(2)}</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
             }
 
             const subtotal = posCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const discountAmount = Math.min(subtotal, discountConfig.type === 'percent' ? (subtotal * discountConfig.value) / 100 : discountConfig.value);
-            const grandTotal = Math.max(0, subtotal - discountAmount);
-            document.getElementById('cartSubtotalText').textContent = `₹${subtotal.toFixed(2)}`;
-            document.getElementById('cartDiscountText').textContent = `-₹${discountAmount.toFixed(2)}`;
-            document.getElementById('cartGrandTotalText').textContent = `₹${grandTotal.toFixed(2)}`;
+            const disc = discountConfig.type === 'percent' ? (subtotal * discountConfig.value) / 100 : Math.min(subtotal, discountConfig.value);
+            const total = Math.max(0, subtotal - disc);
+            const subEl = document.getElementById('cartSubtotalText');
+            const discEl = document.getElementById('cartDiscountText');
+            const totEl = document.getElementById('cartGrandTotalText');
+            if (subEl) subEl.textContent = `₹${subtotal.toFixed(2)}`;
+            if (discEl) discEl.textContent = `-₹${disc.toFixed(2)}`;
+            if (totEl) totEl.textContent = `₹${total.toFixed(2)}`;
             if (window.lucide) lucide.createIcons();
         }
 
         function switchMobilePOSTab(tab) {
             if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'mobileTab', tab });
-            if (window.innerWidth >= 768) return;
-            const topHeader = document.getElementById('sellTopHeader');
             const productsSec = document.getElementById('sellProductsSection');
             const cartSec = document.getElementById('sellCartSection');
-            if (tab === 'products') {
-                topHeader?.classList.remove('hidden');
-                productsSec?.classList.remove('hidden');
-                cartSec?.classList.add('hidden');
-                cartSec?.classList.remove('flex');
-            } else {
-                topHeader?.classList.add('hidden');
-                productsSec?.classList.add('hidden');
-                cartSec?.classList.remove('hidden');
-                cartSec?.classList.add('flex');
-            }
+            if (!productsSec || !cartSec || window.innerWidth >= 768) return;
+            productsSec.classList.toggle('hidden', tab !== 'products');
+            cartSec.classList.toggle('hidden', tab !== 'cart');
+            cartSec.classList.toggle('flex', tab === 'cart');
         }
 
-        let staffMembers = ["Kishore Kumar", "Rahul Sharma", "Ananya Reddy", "Vikram Rao"], selectedStaffMember = "", currentPaymentMethod = "Cash", currentPayableAmount = 0, appliedStoreCreditDeduction = 0;
+        let staffMembers = ["Kishore Kumar", "Rahul Sharma", "Ananya Reddy", "Vikram Rao"];
+        let selectedStaffMember = "", currentPaymentMethod = "Cash", currentPayableAmount = 0, appliedStoreCreditDeduction = 0;
 
         function openPaymentsScreen() {
             if (isStockTransferSellMode) { handleCreateNewStockTransfer(); return; }
             if (posCart.length === 0) { showNotification("Your cart is empty", "warning"); return; }
             if (!currentCustomerName && (!currentCustomerData || !currentCustomerData.isSaved)) { showNotification("Please add customer", "warning"); return; }
             const subtotal = posCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const discountAmount = Math.min(subtotal, discountConfig.type === 'percent' ? (subtotal * discountConfig.value) / 100 : discountConfig.value);
-            const grandTotal = Math.max(0, subtotal - discountAmount);
-            currentPayableAmount = grandTotal;
-            document.getElementById('payTotalDueText').textContent = `₹${grandTotal.toFixed(2)}`;
-            document.getElementById('payTotalAmountText').textContent = `₹${grandTotal.toFixed(2)}`;
-            document.getElementById('cashReceivedInput').value = grandTotal.toFixed(2);
+            const disc = discountConfig.type === 'percent' ? (subtotal * discountConfig.value) / 100 : Math.min(subtotal, discountConfig.value);
+            currentPayableAmount = Math.max(0, subtotal - disc);
+            document.getElementById('payTotalDueText').textContent = `₹${currentPayableAmount.toFixed(2)}`;
+            document.getElementById('payTotalAmountText').textContent = `₹${currentPayableAmount.toFixed(2)}`;
+            document.getElementById('cashReceivedInput').value = currentPayableAmount.toFixed(2);
             navigateTo('paymentsScreen');
         }
 
         function toggleStaffInlineDropdown() { document.getElementById('staffInlineDropdown')?.classList.toggle('hidden'); renderInlineStaffList(staffMembers); }
-        function closeStaffInlineDropdown() { document.getElementById('staffInlineDropdown')?.classList.add('hidden'); }
         function renderInlineStaffList(list) {
             const container = document.getElementById('staffInlineListContainer');
             if (container) container.innerHTML = list.map(name => `<button type="button" onclick="chooseInlineStaffMember('${name}')" class="w-full px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-600 hover:text-white text-xs font-semibold text-left cursor-pointer">${name}</button>`).join('');
         }
-        function filterInlineStaffList(q) { renderInlineStaffList(staffMembers.filter(s => s.toLowerCase().includes(q.toLowerCase()))); }
-        function chooseInlineStaffMember(name) { selectedStaffMember = name; document.getElementById('selectedStaffNameText').textContent = name; closeStaffInlineDropdown(); }
-        function selectPaymentMethod(method) { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'cartAction', type: 'paymentMethod', method }); currentPaymentMethod = method; }
+        function filterInlineStaffList(q) { renderInlineStaffList(staffMembers.filter(s => s.toLowerCase().includes((q || '').toLowerCase()))); }
+        function chooseInlineStaffMember(name) { selectedStaffMember = name; document.getElementById('selectedStaffNameText').textContent = name; document.getElementById('staffInlineDropdown')?.classList.add('hidden'); }
+        function selectPaymentMethod(m) { currentPaymentMethod = m; }
         function calculateChangeDue() {
-            const received = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
-            document.getElementById('changeDueText').textContent = `₹${Math.max(0, received - currentPayableAmount).toFixed(2)}`;
+            const rec = parseFloat(document.getElementById('cashReceivedInput')?.value || '0') || 0;
+            document.getElementById('changeDueText').textContent = `₹${Math.max(0, rec - currentPayableAmount).toFixed(2)}`;
+        }
+
+        function handleConfirmPayment() {
+            const nowFmt = formatOrderDateTime(new Date());
+            const newOrder = {
+                orderId: `#${String(allCompletedOrders.length + 1).padStart(4, '0')}`,
+                shiftId: activeShiftState.shiftId || "",
+                dateStr: nowFmt.dateStr,
+                timeStr: nowFmt.timeStr,
+                isoDate: nowFmt.isoDate,
+                dateTime: nowFmt.fullStr,
+                customerName: currentCustomerData.name || currentCustomerName || "Walk-in Customer",
+                customerPhone: currentCustomerData.phone || currentCustomerPhone || "N/A",
+                userEmail: "owner@kspos.com",
+                location: document.getElementById('dashboardLocationText')?.textContent.trim() || "Hyderabad, Telangana, India",
+                staff: selectedStaffMember || "Store Staff",
+                paymentMode: currentPaymentMethod,
+                paymentStatus: "Paid",
+                fulfillmentStatus: "Fulfilled",
+                items: [...posCart],
+                itemCount: posCart.reduce((a, b) => a + b.qty, 0),
+                subtotal: currentPayableAmount,
+                discount: 0,
+                tax: 0,
+                total: currentPayableAmount
+            };
+            allCompletedOrders.unshift(newOrder);
+            if (activeShiftState.isOpen) {
+                activeShiftState.cashSales += currentPayableAmount;
+                activeShiftState.cashSaleCount = (activeShiftState.cashSaleCount || 0) + 1;
+            }
+            posCart = [];
+            persistAppStateToLocal();
+            renderPOSCart();
+            openSavedOrderDetails(newOrder.orderId);
+            showNotification('Order created successfully', 'success');
         }
 
         let currentViewedOrder = null, orderDetailsReturnScreen = 'sellScreen', orderHistoryFilterDate = '', orderHistoryFilterFulfillment = 'All', orderHistorySearchQuery = '', isOrderHistoryGridView = false, orderHistoryCurrentPage = 1;
-        const orderHistoryPageSize = 8;
-
-        function formatOrderDateTime(dateObj) {
-            return { dateStr: dateObj.toLocaleDateString(), timeStr: dateObj.toLocaleTimeString(), isoDate: dateObj.toISOString().split('T')[0], fullStr: dateObj.toLocaleString() };
+        function formatOrderDateTime(d) {
+            const f = formatReferenceDateTime(d);
+            return { dateStr: f.dateStr, timeStr: f.timeStr, isoDate: f.isoDate, fullStr: f.fullStr };
         }
-        function formatReferenceDateTime(dateObj) { return formatOrderDateTime(dateObj); }
-
-        function handleConfirmPayment() {
-            const overlay = document.getElementById('orderProcessingOverlay');
-            overlay?.classList.remove('hidden');
-            setTimeout(() => {
-                overlay?.classList.add('hidden');
-                const formatted = formatOrderDateTime(new Date());
-                const subtotal = posCart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                const newOrder = {
-                    orderId: `#${String(allCompletedOrders.length + 1).padStart(4, '0')}`,
-                    shiftId: activeShiftState.shiftId || "",
-                    dateStr: formatted.dateStr, timeStr: formatted.timeStr, isoDate: formatted.isoDate, dateTime: formatted.fullStr,
-                    customerName: currentCustomerData.name || currentCustomerName || "Walk-in Customer",
-                    customerPhone: currentCustomerData.phone || currentCustomerPhone || "N/A",
-                    userEmail: "owner@kspos.com", location: document.getElementById('dashboardLocationText')?.textContent.trim() || "Hyderabad",
-                    staff: selectedStaffMember || "Store Staff", paymentMode: currentPaymentMethod, paymentStatus: "Paid", fulfillmentStatus: "Fulfilled",
-                    items: [...posCart], itemCount: posCart.reduce((a, b) => a + b.qty, 0), subtotal, discount: 0, tax: 0, total: subtotal
-                };
-                allCompletedOrders.unshift(newOrder);
-                activeShiftState.cashSales += subtotal;
-                activeShiftState.cashSaleCount += 1;
-                posCart = [];
-                persistAppStateToLocal();
-                renderPOSCart();
-                populateOrderDetailsScreen(newOrder);
-                navigateTo('orderDetailsScreen');
-                showNotification('Order created successfully', 'success', 3000);
-            }, 3000);
-        }
-
-        function populateOrderDetailsScreen(order) {
-            if (!order) return;
-            currentViewedOrder = order;
-            document.getElementById('odOrderIdText').textContent = order.orderId;
-            document.getElementById('odDateTimeText').innerHTML = `<i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-sky-600"></i><span>${order.dateTime}</span>`;
-            document.getElementById('odCustomerNameText').textContent = order.customerName;
-            document.getElementById('odCustomerPhoneText').textContent = order.customerPhone;
-            document.getElementById('odItemsTableBody').innerHTML = (order.items || []).map(item => `<tr><td class="py-2.5 px-3 font-semibold">${item.name}</td><td class="py-2.5 px-3">${item.variant || 'Standard'}</td><td class="py-2.5 px-3">${item.sku}</td><td class="py-2.5 px-3 text-right">₹${item.price.toFixed(2)}</td><td class="py-2.5 px-3 text-center">${item.qty}</td><td class="py-2.5 px-3 text-right font-bold">₹${(item.price * item.qty).toFixed(2)}</td></tr>`).join('');
-            document.getElementById('odSummarySubtotalText').textContent = `₹${order.subtotal.toFixed(2)}`;
-            document.getElementById('odSummaryTotalText').textContent = `₹${order.total.toFixed(2)}`;
-            updateDeleteOrderButtonVisibility();
-            if (window.lucide) lucide.createIcons();
-        }
-        function handleOrderDetailsBack() { navigateTo(orderDetailsReturnScreen || 'sellScreen'); }
-        function handleOrderRefundExchangeFromDetails() { showNotification('Loaded for Refund/Exchange', 'success'); navigateTo('sellScreen'); }
         function openSavedOrderDetails(orderId) {
             const found = allCompletedOrders.find(o => o.orderId === orderId);
             if (!found) return;
             if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'orderDetails', orderId });
-            orderDetailsReturnScreen = 'orderHistoryScreen';
-            populateOrderDetailsScreen(found);
+            currentViewedOrder = found;
+            document.getElementById('odOrderIdText').textContent = found.orderId;
+            document.getElementById('odCustomerNameText').textContent = found.customerName;
+            document.getElementById('odCustomerPhoneText').textContent = found.customerPhone;
+            document.getElementById('odSummaryTotalText').textContent = `₹${(found.total || 0).toFixed(2)}`;
+            document.getElementById('odOverviewTotalAmountText').textContent = `₹${(found.total || 0).toFixed(2)}`;
             navigateTo('orderDetailsScreen');
         }
-        function toggleOrderHistoryGridView() { isOrderHistoryGridView = !isOrderHistoryGridView; document.getElementById('orderHistoryTableWrapper').classList.toggle('hidden', isOrderHistoryGridView); document.getElementById('orderHistoryGridWrapper').classList.toggle('hidden', !isOrderHistoryGridView); }
-        function openExactOrderHistoryCalendar() { document.getElementById('orderHistoryDateInput')?.showPicker?.(); }
-        function filterOrderHistorySearch(val) { orderHistorySearchQuery = (val || '').trim().toLowerCase(); renderOrderHistoryScreen(); }
-        function clearOrderHistorySearch() { document.getElementById('orderHistorySearchInput').value = ''; filterOrderHistorySearch(''); }
-        function applyOrderHistoryDateFilter(val) { orderHistoryFilterDate = val; renderOrderHistoryScreen(); }
-        function resetOrderHistoryFilter() { orderHistoryFilterDate = ''; orderHistorySearchQuery = ''; renderOrderHistoryScreen(); }
-        function toggleOrderHistoryFulfillmentMenu(e) { e?.stopPropagation(); document.getElementById('orderHistoryFulfillmentDropdown')?.classList.toggle('hidden'); }
-        function closeOrderHistoryFulfillmentMenu() { document.getElementById('orderHistoryFulfillmentDropdown')?.classList.add('hidden'); }
-        function selectOrderHistoryFulfillmentFilter(status) { orderHistoryFilterFulfillment = status; closeOrderHistoryFulfillmentMenu(); renderOrderHistoryScreen(); }
-        function changeOrderHistoryPage(d) { orderHistoryCurrentPage = Math.max(1, orderHistoryCurrentPage + d); renderOrderHistoryScreen(); }
+        function handleOrderDetailsBack() { navigateTo(orderDetailsReturnScreen || 'orderHistoryScreen'); }
+        function handleOrderRefundExchangeFromDetails() { showNotification('Refund / Exchange ready', 'success'); }
         function renderOrderHistoryScreen() {
             const tbody = document.getElementById('orderHistoryTableBody');
             if (!tbody) return;
-            tbody.innerHTML = allCompletedOrders.length === 0
-                ? `<tr><td colspan="8" class="py-8 px-4 text-center text-slate-500 font-medium">No orders found.</td></tr>`
-                : allCompletedOrders.map(o => `<tr onclick="openSavedOrderDetails('${o.orderId}')" class="hover:bg-sky-50/80 cursor-pointer"><td class="py-3 px-3 font-bold text-sky-700">${o.orderId}</td><td class="py-3 px-3">${o.dateStr}</td><td class="py-3 px-3">${o.timeStr}</td><td class="py-3 px-3 font-semibold">${o.customerName}</td><td class="py-3 px-3">${o.customerPhone}</td><td class="py-3 px-3 text-right font-bold">₹${o.total.toFixed(2)}</td><td class="py-3 px-3 text-center">${o.paymentStatus}</td><td class="py-3 px-3 text-center">${o.fulfillmentStatus}</td></tr>`).join('');
+            if (allCompletedOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 px-4 text-center text-slate-500 font-medium">No orders found matching your filters.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = allCompletedOrders.map(o => `
+                <tr onclick="openSavedOrderDetails('${o.orderId}')" class="hover:bg-sky-50/80 cursor-pointer transition-colors">
+                    <td class="py-3 px-3 font-bold text-sky-700">${o.orderId}</td>
+                    <td class="py-3 px-3 text-slate-700">${o.dateStr}</td>
+                    <td class="py-3 px-3 text-slate-500">${o.timeStr}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-900">${o.customerName}</td>
+                    <td class="py-3 px-3 text-slate-600">${o.customerPhone}</td>
+                    <td class="py-3 px-3 text-right font-bold text-slate-900">₹${(o.total || 0).toFixed(2)}</td>
+                    <td class="py-3 px-3 text-center"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">${o.paymentStatus}</span></td>
+                    <td class="py-3 px-3 text-center"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800">${o.fulfillmentStatus}</span></td>
+                </tr>
+            `).join('');
         }
+        function toggleOrderHistoryGridView() { isOrderHistoryGridView = !isOrderHistoryGridView; renderOrderHistoryScreen(); }
+        function openExactOrderHistoryCalendar() { document.getElementById('orderHistoryDateInput')?.click(); }
+        function applyOrderHistoryDateFilter(val) { orderHistoryFilterDate = val; renderOrderHistoryScreen(); }
+        function resetOrderHistoryFilter() { orderHistoryFilterDate = ''; orderHistoryFilterFulfillment = 'All'; renderOrderHistoryScreen(); }
+        function toggleOrderHistoryFulfillmentMenu(e) { if (e) e.stopPropagation(); document.getElementById('orderHistoryFulfillmentDropdown')?.classList.toggle('hidden'); }
+        function selectOrderHistoryFulfillmentFilter(st) { orderHistoryFilterFulfillment = st; renderOrderHistoryScreen(); }
+        function filterOrderHistorySearch(q) { orderHistorySearchQuery = q; renderOrderHistoryScreen(); }
+        function clearOrderHistorySearch() { filterOrderHistorySearch(''); }
+        function changeOrderHistoryPage(d) { orderHistoryCurrentPage = Math.max(1, orderHistoryCurrentPage + d); renderOrderHistoryScreen(); }
 
-        let activeShiftState = createDefaultClosedShiftState('Kishore Kumar'), pastShiftHistory = [], viewedShiftRecord = null, shiftsDateFilter = "", cashAdjustmentMode = "in";
-        function updateShiftsLiveClock() {
-            const formatted = formatReferenceDateTime(new Date());
-            const dtEl = document.getElementById('shiftRefDateTimeText');
-            if (dtEl && activeShiftState.isOpen) dtEl.textContent = formatted.fullStr;
-        }
-        function openShiftsDateCalendar() { document.getElementById('shiftsDateFilterInput')?.showPicker?.(); }
-        function applyShiftsDateFilter(val) { shiftsDateFilter = val; renderShiftsScreen(); }
-        function resetShiftsDateFilter() { shiftsDateFilter = ''; renderShiftsScreen(); }
-        function renderShiftsScreen() {
-            const cardEl = document.getElementById('activeShiftSummaryCard');
-            if (cardEl) cardEl.classList.toggle('hidden', !activeShiftState.isOpen);
-            document.getElementById('shiftRefSalesText').textContent = (activeShiftState.cashSales || 0).toFixed(2);
-            document.getElementById('shiftRefOpeningCashText').textContent = (activeShiftState.openingFloat || 0).toFixed(2);
-            const dot = document.getElementById('sidebarShiftDot');
-            const badge = document.getElementById('sidebarShiftBadge');
-            if (dot) dot.className = activeShiftState.isOpen ? 'inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500' : 'inline-flex rounded-full h-2.5 w-2.5 bg-red-500';
-            if (badge) badge.textContent = activeShiftState.isOpen ? 'Active Shift' : 'Shift Closed';
-        }
-        function openShiftsDetailsScreen() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId: null }); viewedShiftRecord = null; renderShiftsDetailsScreen(); navigateTo('shiftsDetailsScreen'); }
-        function openClosedShiftDetails(shiftId) { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId }); navigateTo('shiftsDetailsScreen'); }
-        function renderShiftsDetailsScreen() {
-            document.getElementById('sdHeaderOpenedAtText').textContent = activeShiftState.openedAt || '-';
-            document.getElementById('sdHeaderOpeningCashText').textContent = (activeShiftState.openingFloat || 0).toFixed(2);
-            document.getElementById('sdNetSalesAmountText').textContent = (activeShiftState.cashSales || 0).toFixed(2);
-            document.getElementById('sdExpectedDrawerCashText').textContent = ((activeShiftState.openingFloat || 0) + (activeShiftState.cashSales || 0)).toFixed(2);
-        }
-        function openAdjustCashModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustCash' }); document.getElementById('adjustCashModalOverlay')?.classList.remove('hidden'); }
-        function closeAdjustCashModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustCash' }); document.getElementById('adjustCashModalOverlay')?.classList.add('hidden'); }
-        function selectCashAdjustmentType(m) { cashAdjustmentMode = m; }
-        function submitCashAdjustment() { closeAdjustCashModal(); showNotification('Cash drawer adjusted', 'success'); }
-        function openAdjustmentHistoryModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustmentHistory' }); document.getElementById('adjustmentHistoryModalOverlay')?.classList.remove('hidden'); }
-        function closeAdjustmentHistoryModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustmentHistory' }); document.getElementById('adjustmentHistoryModalOverlay')?.classList.add('hidden'); }
-        function openSalesCashListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'salesCashList' }); document.getElementById('salesCashListModalOverlay')?.classList.remove('hidden'); }
-        function closeSalesCashListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeSalesCashList' }); document.getElementById('salesCashListModalOverlay')?.classList.add('hidden'); }
-        function openStoreCreditDetailModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'storeCreditDetail' }); document.getElementById('storeCreditDetailModalOverlay')?.classList.remove('hidden'); }
-        function closeStoreCreditDetailModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeStoreCreditDetail' }); document.getElementById('storeCreditDetailModalOverlay')?.classList.add('hidden'); }
-        function openTotalSalesListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'totalSalesList' }); document.getElementById('totalSalesListModalOverlay')?.classList.remove('hidden'); }
-        function closeTotalSalesListModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeTotalSalesList' }); document.getElementById('totalSalesListModalOverlay')?.classList.add('hidden'); }
-        function openShiftActionModal() {
-            if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'shiftAction' });
-            document.getElementById('shiftModalCloseBody')?.classList.toggle('hidden', !activeShiftState.isOpen);
-            document.getElementById('shiftModalOpenBody')?.classList.toggle('hidden', activeShiftState.isOpen);
-            document.getElementById('shiftActionModalOverlay')?.classList.remove('hidden');
-        }
-        function closeShiftActionModal() { if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeShiftAction' }); document.getElementById('shiftActionModalOverlay')?.classList.add('hidden'); }
-        function evaluateCloseShiftCountedCash() {}
-        function submitCloseShiftFromModal() { activeShiftState.isOpen = false; persistAppStateToLocal(); closeShiftActionModal(); navigateTo('shiftsScreen'); showNotification('Shift closed', 'success'); }
-        function submitOpenShiftFromModal() {
-            const val = parseFloat(document.getElementById('modalOpeningCashInput').value) || 0;
-            activeShiftState = { ...createDefaultClosedShiftState('Kishore Kumar'), isOpen: true, openingFloat: val, openedAt: formatReferenceDateTime(new Date()).fullStr };
-            persistAppStateToLocal();
-            closeShiftActionModal();
-            navigateTo('shiftsScreen');
-            showNotification('Open shift successful', 'success');
-        }
+        let activeShiftState = createDefaultClosedShiftState('Kishore Kumar');
+        let pastShiftHistory = [];
+        let viewedShiftRecord = null, shiftsDateFilter = "", cashAdjustmentMode = "out";
 
+        function isStockTransferSellModeFn() { return isStockTransferSellMode; }
         let isStockTransferSellMode = false, selectedTransferDestination = "", isStockTransferGridView = false, currentViewedTransferId = "", customBranchLocations = [], stockTransfersList = [];
         function openSidebarWithRotation(el) {
             if (isAdminImpersonatingStore) broadcastLiveSupportCommand({ action: 'sidebar', open: true });
