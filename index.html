@@ -194,6 +194,30 @@
             width: 100% !important;
             max-width: min(720px, calc(100vw - 12px)) !important;
         }
+
+        @keyframes adminLiveRipple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.35);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.4);
+                opacity: 0;
+            }
+        }
+
+        .admin-live-pointer-ripple {
+            position: fixed;
+            width: 34px;
+            height: 34px;
+            border-radius: 9999px;
+            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.55);
+            pointer-events: none;
+            z-index: 9999;
+            animation: adminLiveRipple 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
     </style>
 </head>
 <body class="bg-white text-slate-900 min-h-screen w-full relative selection:bg-sky-200 selection:text-sky-900">
@@ -2303,11 +2327,175 @@
                     else if (data.type === 'clearCart') clearPOSCart();
                     else if (data.type === 'switchCartMode' && data.mode) switchCartMode(data.mode);
                     else if (data.type === 'paymentMethod' && data.method) selectPaymentMethod(data.method);
+                } else if (data.action === 'domClick' && data.selector) {
+                    const targetEl = resolveLiveMirrorElement(data.selector, data.textHint, data.xRatio, data.yRatio);
+                    if (targetEl && !targetEl.closest('#adminStoreImpersonationBanner')) {
+                        showRemoteAdminPointerRipple(targetEl, data.xRatio, data.yRatio);
+                        targetEl.click();
+                    } else if (typeof data.xRatio === 'number' && typeof data.yRatio === 'number') {
+                        showRemoteAdminPointerRipple(null, data.xRatio, data.yRatio);
+                    }
+                } else if (data.action === 'domInput' && data.selector) {
+                    const inputEl = resolveLiveMirrorElement(data.selector, '', null, null);
+                    if (inputEl && ('value' in inputEl)) {
+                        showRemoteAdminPointerRipple(inputEl, null, null);
+                        if (inputEl.type === 'checkbox' || inputEl.type === 'radio') {
+                            inputEl.checked = Boolean(data.checked);
+                        } else {
+                            inputEl.value = data.value ?? '';
+                        }
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } else if (data.action === 'domScroll') {
+                    if (data.selector && data.selector !== 'window') {
+                        const scrollEl = resolveLiveMirrorElement(data.selector, '', null, null);
+                        if (scrollEl) {
+                            scrollEl.scrollTop = Number(data.scrollTop || 0);
+                            scrollEl.scrollLeft = Number(data.scrollLeft || 0);
+                        }
+                    } else {
+                        window.scrollTo({ top: Number(data.scrollTop || 0), behavior: 'auto' });
+                    }
                 }
             } finally {
                 setTimeout(() => { isApplyingRemoteLiveCommand = false; }, 180);
             }
         }
+
+        function buildUniqueElementSelector(el) {
+            if (!el || el === document.body || el === document.documentElement) return 'window';
+            if (el.id) return `#${CSS.escape(el.id)}`;
+            const path = [];
+            let curr = el;
+            while (curr && curr.nodeType === 1 && curr !== document.body) {
+                if (curr.id) {
+                    path.unshift(`#${CSS.escape(curr.id)}`);
+                    break;
+                }
+                let idx = 1;
+                let sib = curr.previousElementSibling;
+                while (sib) {
+                    if (sib.tagName === curr.tagName) idx++;
+                    sib = sib.previousElementSibling;
+                }
+                path.unshift(`${curr.tagName.toLowerCase()}:nth-of-type(${idx})`);
+                curr = curr.parentElement;
+            }
+            return path.join(' > ');
+        }
+
+        function resolveLiveMirrorElement(selector, textHint, xRatio, yRatio) {
+            if (selector && selector !== 'window') {
+                try {
+                    const found = document.querySelector(selector);
+                    if (found) return found;
+                } catch (e) {}
+            }
+            if (textHint) {
+                const cleanHint = String(textHint).trim().toLowerCase();
+                if (cleanHint) {
+                    const candidates = Array.from(document.querySelectorAll('button, a, [onclick], input, select, textarea, tr'));
+                    const matched = candidates.find(el => {
+                        if (el.offsetParent === null) return false;
+                        const txt = (el.innerText || el.value || el.placeholder || '').trim().toLowerCase();
+                        return txt === cleanHint || (cleanHint.length > 3 && txt.includes(cleanHint));
+                    });
+                    if (matched) return matched;
+                }
+            }
+            if (typeof xRatio === 'number' && typeof yRatio === 'number') {
+                const px = Math.round(xRatio * window.innerWidth);
+                const py = Math.round(yRatio * window.innerHeight);
+                const atPoint = document.elementFromPoint(px, py);
+                if (atPoint) return atPoint.closest('button, a, [onclick], input, select, textarea, tr') || atPoint;
+            }
+            return null;
+        }
+
+        function showRemoteAdminPointerRipple(targetEl, xRatio, yRatio) {
+            try {
+                let cx = typeof xRatio === 'number' ? Math.round(xRatio * window.innerWidth) : window.innerWidth / 2;
+                let cy = typeof yRatio === 'number' ? Math.round(yRatio * window.innerHeight) : window.innerHeight / 2;
+                if (targetEl && typeof targetEl.getBoundingClientRect === 'function') {
+                    const rect = targetEl.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        cx = Math.round(rect.left + rect.width / 2);
+                        cy = Math.round(rect.top + rect.height / 2);
+                    }
+                }
+                const ripple = document.createElement('div');
+                ripple.className = 'admin-live-pointer-ripple';
+                ripple.style.left = `${cx}px`;
+                ripple.style.top = `${cy}px`;
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 800);
+            } catch (e) {}
+        }
+
+        let liveInputDebounceTimer = null;
+        let liveScrollDebounceTimer = null;
+
+        document.addEventListener('click', (e) => {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand) return;
+            const rawTarget = e.target;
+            if (!rawTarget || rawTarget.closest('#adminStoreImpersonationBanner')) return;
+            const interactiveEl = rawTarget.closest('button, a, [onclick], input, select, textarea, label, tr, [role="button"]') || rawTarget;
+            if (interactiveEl.closest('#adminStoreImpersonationBanner')) return;
+
+            const selector = buildUniqueElementSelector(interactiveEl);
+            const textHint = (interactiveEl.innerText || interactiveEl.value || interactiveEl.getAttribute('title') || '').trim().slice(0, 60);
+            const xRatio = Number((e.clientX / Math.max(1, window.innerWidth)).toFixed(4));
+            const yRatio = Number((e.clientY / Math.max(1, window.innerHeight)).toFixed(4));
+
+            broadcastLiveSupportCommand({
+                action: 'domClick',
+                selector,
+                textHint,
+                xRatio,
+                yRatio
+            });
+        }, true);
+
+        document.addEventListener('input', (e) => {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand) return;
+            const target = e.target;
+            if (!target || target.closest('#adminStoreImpersonationBanner')) return;
+            if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+
+            const selector = buildUniqueElementSelector(target);
+            const val = target.value;
+            const checked = Boolean(target.checked);
+
+            if (liveInputDebounceTimer) clearTimeout(liveInputDebounceTimer);
+            liveInputDebounceTimer = setTimeout(() => {
+                broadcastLiveSupportCommand({
+                    action: 'domInput',
+                    selector,
+                    value: val,
+                    checked
+                });
+            }, 140);
+        }, true);
+
+        document.addEventListener('scroll', (e) => {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand) return;
+            const target = e.target;
+            const isDocScroll = (target === document || target === document.documentElement || target === document.body);
+            const selector = isDocScroll ? 'window' : buildUniqueElementSelector(target);
+            const scrollTop = isDocScroll ? window.scrollY : (target.scrollTop || 0);
+            const scrollLeft = isDocScroll ? window.scrollX : (target.scrollLeft || 0);
+
+            if (liveScrollDebounceTimer) clearTimeout(liveScrollDebounceTimer);
+            liveScrollDebounceTimer = setTimeout(() => {
+                broadcastLiveSupportCommand({
+                    action: 'domScroll',
+                    selector,
+                    scrollTop,
+                    scrollLeft
+                });
+            }, 160);
+        }, true);
 
         async function pushLiveCommandToCloudFallback(roomKey, cmdObj) {
             if (!roomKey || !cmdObj) return;
@@ -4909,6 +5097,65 @@
                 if (window.lucide) lucide.createIcons();
             } catch (initErr) {}
             syncInitialDataFromSupabase(false);
+        });
+
+        window.addEventListener('pageshow', () => {
+            restoreStoresFromIndexedDBVault();
+        });
+
+        window.addEventListener('load', () => {
+            scheduleExactThreeSecondSplashDismiss();
+        });
+
+        window.addEventListener('pagehide', () => {
+            persistAppStateToLocal();
+            persistStockTransfersToLocal();
+            persistMultiTenantAuthState();
+        });
+
+        let appBackgroundTimestamp = null;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                persistAppStateToLocal();
+                persistStockTransfersToLocal();
+                persistMultiTenantAuthState();
+                appBackgroundTimestamp = Date.now();
+            } else if (appBackgroundTimestamp !== null && !isResumeSyncRunning) {
+                const idleDurationMs = Date.now() - appBackgroundTimestamp;
+                appBackgroundTimestamp = null;
+
+                if (idleDurationMs >= 15000) {
+                    const resumeOverlay = document.getElementById('appResumeSyncOverlay');
+                    if (resumeOverlay) {
+                        isResumeSyncRunning = true;
+                        const labelEl = resumeOverlay.querySelector('p');
+                        if (labelEl) labelEl.textContent = 'Syncing store data...';
+                        resumeOverlay.classList.remove('hidden', 'opacity-0');
+                        resumeOverlay.classList.add('flex');
+
+                        syncInitialDataFromSupabase(false);
+
+                        setTimeout(() => {
+                            if (currentSessionUser.role === 'store' && currentSessionUser.username) {
+                                const latestStore = rentedStoresList.find(s => (s.username || '').toLowerCase() === currentSessionUser.username.toLowerCase());
+                                if (latestStore && Array.isArray(latestStore.allowedFeatures)) {
+                                    currentSessionUser.allowedFeatures = [...latestStore.allowedFeatures];
+                                    persistAppStateToLocal();
+                                }
+                            }
+                            resumeOverlay.classList.add('opacity-0');
+                            setTimeout(() => {
+                                resumeOverlay.classList.add('hidden');
+                                resumeOverlay.classList.remove('flex', 'opacity-0');
+                                isResumeSyncRunning = false;
+                                applyRolePermissionsToUI();
+                                showNotification('Store data synced successfully', 'success');
+                            }, 300);
+                        }, 5000);
+                    }
+                }
+            }
         });
     </script>
 </body>
