@@ -201,11 +201,26 @@
     <!-- ADMIN STORE IMPERSONATION TOP BANNER (VISIBLE WHEN ADMIN OPENS A STORE APP) -->
     <div id="adminStoreImpersonationBanner" class="hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-[85] w-[94vw] max-w-md rounded-2xl bg-neutral-950/95 backdrop-blur-md border border-amber-400/70 text-white px-3.5 py-2.5 shadow-2xl flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
             <div class="min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">Admin Preview Mode</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300">Admin Preview Mode</span>
+                    <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 border border-emerald-400/50 text-[9px] font-bold text-emerald-300 uppercase">Live Control ON</span>
+                </div>
                 <span id="adminPreviewStoreNameText" class="text-xs font-bold text-white truncate block">Viewing Store App</span>
             </div>
+        </div>
+        <button type="button" onclick="exitStoreImpersonationToAdmin()" class="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs whitespace-nowrap flex items-center gap-1 cursor-pointer transition-colors flex-shrink-0">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Back to Admin</span>
+        </button>
+    </div>
+
+    <!-- CUSTOMER LIVE SUPPORT INDICATOR BANNER (VISIBLE WHEN ADMIN IS CONTROLLING LIVE) -->
+    <div id="customerLiveSupportBanner" class="hidden fixed top-2.5 right-3 z-[84] rounded-full bg-emerald-600/95 backdrop-blur-md border border-emerald-300 text-white px-3 py-1 shadow-lg flex items-center gap-1.5 text-[11px] font-bold">
+        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+        <span>Admin Live Support Active</span>
+    </div>
         </div>
         <button type="button" onclick="exitStoreImpersonationToAdmin()" class="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs whitespace-nowrap flex items-center gap-1 cursor-pointer transition-colors flex-shrink-0">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -3808,6 +3823,7 @@
                         }
                         try { persistAppStateToLocal(); } catch (e) {}
                         try { applyRolePermissionsToUI(); } catch (e) {}
+                        connectLiveSupportChannel(matchedStore.username, false);
                         isFirstStartSellingAfterLogin = true;
                         resetLoginButtonUI();
                         showNotification(`Logged in: ${matchedStore.storeName} (${remainingDays}d Left)`, 'success');
@@ -3823,6 +3839,97 @@
                     showNotification('Invalid username or password', 'warning');
                 }
             }, 400);
+        }
+
+        // --- REAL-TIME ANYDESK-STYLE LIVE CO-BROWSING / REMOTE SUPPORT ---
+        let liveSupportChannel = null;
+        let isApplyingRemoteLiveCommand = false;
+        let customerLiveBannerTimeout = null;
+
+        function disconnectLiveSupportChannel() {
+            if (liveSupportChannel) {
+                try {
+                    const client = getSupabaseClient();
+                    if (client && typeof client.removeChannel === 'function') {
+                        client.removeChannel(liveSupportChannel);
+                    } else if (typeof liveSupportChannel.unsubscribe === 'function') {
+                        liveSupportChannel.unsubscribe();
+                    }
+                } catch (e) {}
+                liveSupportChannel = null;
+            }
+            const custBanner = document.getElementById('customerLiveSupportBanner');
+            if (custBanner) custBanner.classList.add('hidden');
+        }
+
+        function showCustomerLiveSupportIndicator() {
+            const custBanner = document.getElementById('customerLiveSupportBanner');
+            if (!custBanner) return;
+            custBanner.classList.remove('hidden');
+            if (customerLiveBannerTimeout) clearTimeout(customerLiveBannerTimeout);
+            customerLiveBannerTimeout = setTimeout(() => {
+                custBanner.classList.add('hidden');
+            }, 6000);
+        }
+
+        function broadcastLiveSupportCommand(payload) {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand || !liveSupportChannel) return;
+            try {
+                liveSupportChannel.send({
+                    type: 'broadcast',
+                    event: 'admin_live_action',
+                    payload: {
+                        ...payload,
+                        ts: Date.now()
+                    }
+                });
+            } catch (e) {}
+        }
+
+        function connectLiveSupportChannel(storeUsername, isController = false) {
+            disconnectLiveSupportChannel();
+            const cleanRoom = String(storeUsername || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+            if (!cleanRoom) return;
+            const client = getSupabaseClient();
+            if (!client || typeof client.channel !== 'function') return;
+
+            try {
+                const channel = client.channel(`kspos_live_support_${cleanRoom}`, {
+                    config: { broadcast: { self: false } }
+                });
+
+                if (!isController) {
+                    channel.on('broadcast', { event: 'admin_live_action' }, (msg) => {
+                        if (isAdminImpersonatingStore || currentSessionUser.role !== 'store') return;
+                        const data = msg?.payload || {};
+                        isApplyingRemoteLiveCommand = true;
+                        try {
+                            showCustomerLiveSupportIndicator();
+                            if (data.action === 'navigate' && data.screenId) {
+                                navigateTo(data.screenId);
+                            } else if (data.action === 'module' && data.moduleName) {
+                                openSidebarModuleScreen(data.moduleName);
+                            } else if (data.action === 'mobileTab' && data.tab) {
+                                switchMobilePOSTab(data.tab);
+                            }
+                        } finally {
+                            setTimeout(() => {
+                                isApplyingRemoteLiveCommand = false;
+                            }, 150);
+                        }
+                    });
+                }
+
+                channel.subscribe((status) => {
+                    if (status === 'SUBSCRIBED' && isController) {
+                        broadcastLiveSupportCommand({ action: 'navigate', screenId: 'dashboardScreen' });
+                    }
+                });
+
+                liveSupportChannel = channel;
+            } catch (e) {
+                console.warn('Live support channel note:', e);
+            }
         }
 
         function openStoreAppAsAdmin(storeId) {
@@ -3861,14 +3968,16 @@
             applyRolePermissionsToUI();
             const banner = document.getElementById('adminStoreImpersonationBanner');
             const previewTitle = document.getElementById('adminPreviewStoreNameText');
-            if (previewTitle) previewTitle.textContent = `${store.storeName} (Saved Features View)`;
+            if (previewTitle) previewTitle.textContent = `${store.storeName} (Live Control)`;
             if (banner) banner.classList.remove('hidden');
 
+            connectLiveSupportChannel(store.username, true);
             navigateTo('dashboardScreen');
-            showNotification(`See Store: ${store.storeName} (${storeSavedFeatures.length} Enabled Features)`, 'success', 2500);
+            showNotification(`See Store: ${store.storeName} (Live Control Connected)`, 'success', 2500);
         }
 
         function exitStoreImpersonationToAdmin() {
+            disconnectLiveSupportChannel();
             isAdminImpersonatingStore = false;
             isAdminPinUnlocked = true;
             currentSessionUser = {
@@ -4537,6 +4646,9 @@
                 showNotification('Access restricted to Super Admin only', 'warning');
                 return;
             }
+            if (isAdminImpersonatingStore && sectionName !== 'Admin Panel') {
+                broadcastLiveSupportCommand({ action: 'module', moduleName: sectionName });
+            }
             try {
                 localStorage.setItem('kspos_last_module_name_v1', sectionName);
             } catch (e) {}
@@ -4996,6 +5108,7 @@
 
                 isAdminImpersonatingStore = false;
                 isAdminPinUnlocked = false;
+                disconnectLiveSupportChannel();
                 currentSessionUser = {
                     role: 'guest',
                     storeId: '',
@@ -6514,6 +6627,9 @@
         }
 
         function switchMobilePOSTab(tab) {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'mobileTab', tab: tab });
+            }
             const topHeader = document.getElementById('sellTopHeader');
             const productsSec = document.getElementById('sellProductsSection');
             const cartSec = document.getElementById('sellCartSection');
@@ -8525,6 +8641,9 @@
         }
 
         function navigateTo(screenId) {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'navigate', screenId: screenId });
+            }
             document.querySelectorAll('.page-view').forEach(screen => {
                 screen.classList.add('page-hidden');
                 screen.classList.remove('page-visible');
