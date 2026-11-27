@@ -3905,11 +3905,49 @@
                                 openSidebarModuleScreen(data.moduleName);
                             } else if (data.action === 'mobileTab' && data.tab) {
                                 switchMobilePOSTab(data.tab);
+                            } else if (data.action === 'sidebar') {
+                                if (data.open) openSidebarWithRotation(null);
+                                else closeSidebar();
+                            } else if (data.action === 'orderDetails' && data.orderId) {
+                                openSavedOrderDetails(data.orderId);
+                            } else if (data.action === 'shiftDetails') {
+                                if (data.shiftId) openClosedShiftDetails(data.shiftId);
+                                else openShiftsDetailsScreen();
+                            } else if (data.action === 'transferDetails' && data.transferId) {
+                                openStockTransferDetailsView(data.transferId);
+                            } else if (data.action === 'modal' && data.modalName) {
+                                if (data.modalName === 'addCustomer') openAddCustomerModal();
+                                else if (data.modalName === 'closeAddCustomer') closeAddCustomerModal();
+                                else if (data.modalName === 'customerProfile') openCustomerProfileModal(data.tab || 'contact');
+                                else if (data.modalName === 'closeCustomerProfile') closeContactDetailsModal();
+                                else if (data.modalName === 'discount') openDiscountModal();
+                                else if (data.modalName === 'closeDiscount') closeDiscountModal();
+                                else if (data.modalName === 'customSale') openCustomSaleModal();
+                                else if (data.modalName === 'closeCustomSale') closeCustomSaleModal();
+                                else if (data.modalName === 'adjustCash') openAdjustCashModal();
+                                else if (data.modalName === 'closeAdjustCash') closeAdjustCashModal();
+                                else if (data.modalName === 'adjustmentHistory') openAdjustmentHistoryModal();
+                                else if (data.modalName === 'closeAdjustmentHistory') closeAdjustmentHistoryModal();
+                                else if (data.modalName === 'salesCashList') openSalesCashListModal();
+                                else if (data.modalName === 'closeSalesCashList') closeSalesCashListModal();
+                                else if (data.modalName === 'storeCreditDetail') openStoreCreditDetailModal();
+                                else if (data.modalName === 'closeStoreCreditDetail') closeStoreCreditDetailModal();
+                                else if (data.modalName === 'totalSalesList') openTotalSalesListModal();
+                                else if (data.modalName === 'closeTotalSalesList') closeTotalSalesListModal();
+                                else if (data.modalName === 'shiftAction') openShiftActionModal();
+                                else if (data.modalName === 'closeShiftAction') closeShiftActionModal();
+                                else if (data.modalName === 'addLocation') openAddLocationModal();
+                                else if (data.modalName === 'closeAddLocation') closeAddLocationModal();
+                            } else if (data.action === 'cartAction') {
+                                if (data.type === 'addProduct' && data.productId) addToPOSCart(data.productId);
+                                else if (data.type === 'clearCart') clearPOSCart();
+                                else if (data.type === 'switchCartMode' && data.mode) switchCartMode(data.mode);
+                                else if (data.type === 'paymentMethod' && data.method) selectPaymentMethod(data.method);
                             }
                         } finally {
                             setTimeout(() => {
                                 isApplyingRemoteLiveCommand = false;
-                            }, 150);
+                            }, 180);
                         }
                     });
                 }
@@ -4415,6 +4453,9 @@
         function openStockTransferDetailsView(transferId) {
             const record = stockTransfersList.find(t => t.transferId === transferId);
             if (!record) return;
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'transferDetails', transferId: transferId });
+            }
             currentViewedTransferId = transferId;
 
             const titleEl = document.getElementById('sidebarModuleTitleText');
@@ -5787,6 +5828,9 @@
         }
 
         function openAddCustomerModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'addCustomer' });
+            }
             const phoneInput = document.getElementById('customerPhoneStepInput');
             phoneInput.value = currentCustomerPhone || '';
             validateCustomerPhoneStep();
@@ -5797,6 +5841,9 @@
         }
 
         function closeAddCustomerModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAddCustomer' });
+            }
             document.getElementById('addCustomerModalOverlay').classList.add('hidden');
         }
 
@@ -5899,6 +5946,9 @@
         }
 
         function openCustomerProfileModal(activeTab = 'contact') {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'customerProfile', tab: activeTab });
+            }
             document.getElementById('contactNameInput').value = currentCustomerData.name || '';
             document.getElementById('contactPhoneInput').value = currentCustomerData.phone || currentCustomerPhone || '';
             document.getElementById('contactEmailInput').value = currentCustomerData.email || '';
@@ -6007,6 +6057,9 @@
         }
 
         function closeContactDetailsModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeCustomerProfile' });
+            }
             document.getElementById('contactDetailsModalOverlay').classList.add('hidden');
         }
 
@@ -6152,6 +6205,9 @@
         }
 
         function openDiscountModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'discount' });
+            }
             selectedDiscountMode = discountConfig.type;
             selectDiscountType(selectedDiscountMode);
             const input = document.getElementById('discountAmountInput');
@@ -6161,6 +6217,9 @@
         }
 
         function closeDiscountModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeDiscount' });
+            }
             document.getElementById('discountModalOverlay').classList.add('hidden');
         }
 
@@ -6189,6 +6248,9 @@
         }
 
         function switchCartMode(mode) {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'cartAction', type: 'switchCartMode', mode: mode });
+            }
             refundCartMode = mode;
             const refBtn = document.getElementById('cartModeRefundBtn');
             const exchBtn = document.getElementById('cartModeExchangeBtn');
@@ -6267,6 +6329,9 @@
         }
 
         function clearPOSCart() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'cartAction', type: 'clearCart' });
+            }
             posCart = [];
             refundCartItems = [];
             exchangeCartItems = [];
@@ -6987,6 +7052,9 @@
         }
 
         function openSidebarWithRotation(el) {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'sidebar', open: true });
+            }
             if (el) {
                 el.classList.add('logo-box-rotated');
                 setTimeout(() => el.classList.remove('logo-box-rotated'), 220);
@@ -7001,6 +7069,9 @@
         }
 
         function closeSidebar() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'sidebar', open: false });
+            }
             const sidebar = document.getElementById('appSidebar');
             const backdrop = document.getElementById('sidebarBackdrop');
             if (sidebar) sidebar.classList.add('-translate-x-full');
@@ -7092,6 +7163,9 @@
         }
 
         function openAddLocationModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'addLocation' });
+            }
             const searchInput = document.getElementById('transferLocationSearchInput');
             const newInput = document.getElementById('newBranchLocationInput');
             if (searchInput) searchInput.value = '';
@@ -7103,6 +7177,9 @@
         }
 
         function closeAddLocationModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAddLocation' });
+            }
             document.getElementById('addLocationModalOverlay').classList.add('hidden');
         }
 
@@ -7598,6 +7675,9 @@
         function openSavedOrderDetails(orderId) {
             const found = allCompletedOrders.find(o => o.orderId === orderId);
             if (!found) return;
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'orderDetails', orderId: orderId });
+            }
             orderDetailsReturnScreen = 'orderHistoryScreen';
             populateOrderDetailsScreen(found);
             navigateTo('orderDetailsScreen');
@@ -8043,6 +8123,9 @@
         }
 
         function openShiftsDetailsScreen() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId: null });
+            }
             viewedShiftRecord = null;
             renderShiftsDetailsScreen();
             navigateTo('shiftsDetailsScreen');
@@ -8051,6 +8134,9 @@
         function openClosedShiftDetails(shiftId) {
             const found = pastShiftHistory.find(s => s.shiftId === shiftId);
             if (!found) return;
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftDetails', shiftId: shiftId });
+            }
             viewedShiftRecord = found;
             renderShiftsDetailsScreen();
             navigateTo('shiftsDetailsScreen');
@@ -8155,6 +8241,9 @@
         }
 
         function openAdjustCashModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustCash' });
+            }
             cashAdjustmentMode = 'out';
             selectCashAdjustmentType('out');
             document.getElementById('adjustCashAmountInput').value = '';
@@ -8164,6 +8253,9 @@
         }
 
         function closeAdjustCashModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustCash' });
+            }
             document.getElementById('adjustCashModalOverlay').classList.add('hidden');
         }
 
@@ -8231,6 +8323,9 @@
         }
 
         function openAdjustmentHistoryModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'adjustmentHistory' });
+            }
             const tbody = document.getElementById('adjustmentHistoryTableBody');
             const sourceShift = viewedShiftRecord || activeShiftState;
             const list = sourceShift.adjustments || [];
@@ -8268,16 +8363,25 @@
         }
 
         function closeAdjustmentHistoryModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeAdjustmentHistory' });
+            }
             document.getElementById('adjustmentHistoryModalOverlay').classList.add('hidden');
         }
 
         function openSalesCashListModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'salesCashList' });
+            }
             renderSalesCashListTable();
             document.getElementById('salesCashListModalOverlay').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
         }
 
         function closeSalesCashListModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeSalesCashList' });
+            }
             document.getElementById('salesCashListModalOverlay').classList.add('hidden');
         }
 
@@ -8323,12 +8427,18 @@
         }
 
         function openStoreCreditDetailModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'storeCreditDetail' });
+            }
             renderStoreCreditDetailTable();
             document.getElementById('storeCreditDetailModalOverlay').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
         }
 
         function closeStoreCreditDetailModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeStoreCreditDetail' });
+            }
             document.getElementById('storeCreditDetailModalOverlay').classList.add('hidden');
         }
 
@@ -8389,12 +8499,18 @@
         }
 
         function openTotalSalesListModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'totalSalesList' });
+            }
             renderTotalSalesListTable();
             document.getElementById('totalSalesListModalOverlay').classList.remove('hidden');
             if (window.lucide) lucide.createIcons();
         }
 
         function closeTotalSalesListModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeTotalSalesList' });
+            }
             document.getElementById('totalSalesListModalOverlay').classList.add('hidden');
         }
 
@@ -8447,6 +8563,9 @@
         }
 
         function openShiftActionModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'shiftAction' });
+            }
             const heading = document.getElementById('shiftModalHeading');
             const closeBody = document.getElementById('shiftModalCloseBody');
             const openBody = document.getElementById('shiftModalOpenBody');
@@ -8503,6 +8622,9 @@
         }
 
         function closeShiftActionModal() {
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'modal', modalName: 'closeShiftAction' });
+            }
             document.getElementById('shiftActionModalOverlay').classList.add('hidden');
         }
 
