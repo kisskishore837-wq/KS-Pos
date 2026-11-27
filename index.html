@@ -221,12 +221,6 @@
         <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
         <span>Admin Live Support Active</span>
     </div>
-        </div>
-        <button type="button" onclick="exitStoreImpersonationToAdmin()" class="py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs whitespace-nowrap flex items-center gap-1 cursor-pointer transition-colors flex-shrink-0">
-            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-            <span>Back to Admin</span>
-        </button>
-    </div>
 
     <!-- APP LAUNCH SPLASH SCREEN (3 SECONDS WHITE SPINNER) -->
     <div id="appLaunchSplashOverlay" class="fixed inset-0 z-[100] bg-gradient-to-br from-sky-600 via-sky-500 to-blue-700 flex flex-col items-center justify-center gap-5 transition-opacity duration-500">
@@ -3977,6 +3971,9 @@
         }
 
         function exitStoreImpersonationToAdmin() {
+            if (!isAdminImpersonatingStore) {
+                return;
+            }
             disconnectLiveSupportChannel();
             isAdminImpersonatingStore = false;
             isAdminPinUnlocked = true;
