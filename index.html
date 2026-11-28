@@ -194,6 +194,30 @@
             width: 100% !important;
             max-width: min(720px, calc(100vw - 12px)) !important;
         }
+
+        @keyframes livePointerRipple {
+            0% {
+                transform: translate(-50%, -50%) scale(0.45);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.1);
+                opacity: 0;
+            }
+        }
+
+        .live-touch-pointer-ring {
+            position: fixed;
+            width: 38px;
+            height: 38px;
+            border-radius: 9999px;
+            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.22);
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.65);
+            pointer-events: none;
+            z-index: 9999;
+            animation: livePointerRipple 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
     </style>
 </head>
 <body class="bg-white text-slate-900 min-h-screen w-full relative selection:bg-sky-200 selection:text-sky-900">
@@ -1632,8 +1656,8 @@
     </div>
 
     <!-- ADJUSTMENT HISTORY FLOATING TABLE MODAL -->
-    <div id="adjustmentHistoryModalOverlay" onclick="closeAdjustmentHistoryModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
+    <div id="adjustmentHistoryModalOverlay" onclick="closeAdjustmentHistoryModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-2 sm:p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[96vw] max-w-[1440px] h-[86vh] sm:h-[88vh] max-h-[92vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
                 <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Adjustment History</h3>
                 <button type="button" onclick="closeAdjustmentHistoryModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
@@ -1659,8 +1683,8 @@
     </div>
 
     <!-- SALES CASH LIST FLOATING TABLE MODAL -->
-    <div id="salesCashListModalOverlay" onclick="closeSalesCashListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
+    <div id="salesCashListModalOverlay" onclick="closeSalesCashListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-2 sm:p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[96vw] max-w-[1440px] h-[86vh] sm:h-[88vh] max-h-[92vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
                 <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Sales Cash List</h3>
                 <button type="button" onclick="closeSalesCashListModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
@@ -1686,8 +1710,8 @@
     </div>
 
     <!-- STORE CREDIT DETAIL FLOATING TABLE MODAL -->
-    <div id="storeCreditDetailModalOverlay" onclick="closeStoreCreditDetailModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-3xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
+    <div id="storeCreditDetailModalOverlay" onclick="closeStoreCreditDetailModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-2 sm:p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[96vw] max-w-[1440px] h-[86vh] sm:h-[88vh] max-h-[92vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
                 <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Store Credit Detail</h3>
                 <button type="button" onclick="closeStoreCreditDetailModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
@@ -1713,8 +1737,8 @@
     </div>
 
     <!-- TOTAL SALES LIST FLOATING TABLE MODAL -->
-    <div id="totalSalesListModalOverlay" onclick="closeTotalSalesListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-4 sm:p-8 transition-opacity">
-        <div onclick="event.stopPropagation()" class="w-full max-w-4xl max-h-[82vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
+    <div id="totalSalesListModalOverlay" onclick="closeTotalSalesListModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm hidden p-2 sm:p-4 transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[96vw] max-w-[1440px] h-[86vh] sm:h-[88vh] max-h-[92vh] flex flex-col glass-panel bg-white/95 rounded-3xl p-4 sm:p-6 shadow-2xl border border-sky-200 space-y-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-sky-100 flex-shrink-0">
                 <h3 class="luxury-heading text-base sm:text-lg font-bold text-slate-900 tracking-wide">Total Sales List</h3>
                 <button type="button" onclick="closeTotalSalesListModal()" class="p-1.5 rounded-xl hover:bg-sky-50 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
@@ -3866,6 +3890,77 @@
             }, 6000);
         }
 
+        function spawnLiveTouchPointerAtRatio(xRatio, yRatio) {
+            try {
+                const x = Math.max(8, Math.min(window.innerWidth - 8, (Number(xRatio) || 0.5) * window.innerWidth));
+                const y = Math.max(8, Math.min(window.innerHeight - 8, (Number(yRatio) || 0.5) * window.innerHeight));
+                const ring = document.createElement('div');
+                ring.className = 'live-touch-pointer-ring';
+                ring.style.left = `${x}px`;
+                ring.style.top = `${y}px`;
+                document.body.appendChild(ring);
+                setTimeout(() => ring.remove(), 900);
+            } catch (e) {}
+        }
+
+        function buildLiveFullStateSnapshot() {
+            return {
+                activeShiftState: activeShiftState,
+                pastShiftHistory: pastShiftHistory,
+                posCart: posCart,
+                isRefundExchangeActive: isRefundExchangeActive,
+                refundCartMode: refundCartMode,
+                refundCartItems: refundCartItems,
+                exchangeCartItems: exchangeCartItems,
+                discountConfig: discountConfig,
+                currentCustomerName: currentCustomerName,
+                currentCustomerPhone: currentCustomerPhone,
+                currentCustomerData: currentCustomerData,
+                allCompletedOrders: allCompletedOrders,
+                stockTransfersList: stockTransfersList,
+                customBranchLocations: customBranchLocations,
+                isStockTransferSellMode: isStockTransferSellMode,
+                selectedTransferDestination: selectedTransferDestination,
+                selectedStaffMember: selectedStaffMember,
+                currentPaymentMethod: currentPaymentMethod
+            };
+        }
+
+        function applyLiveFullStateSnapshot(snap) {
+            if (!snap || typeof snap !== 'object') return;
+            if (snap.activeShiftState) activeShiftState = snap.activeShiftState;
+            if (Array.isArray(snap.pastShiftHistory)) pastShiftHistory = snap.pastShiftHistory;
+            if (Array.isArray(snap.posCart)) posCart = snap.posCart;
+            if (typeof snap.isRefundExchangeActive === 'boolean') isRefundExchangeActive = snap.isRefundExchangeActive;
+            if (snap.refundCartMode) refundCartMode = snap.refundCartMode;
+            if (Array.isArray(snap.refundCartItems)) refundCartItems = snap.refundCartItems;
+            if (Array.isArray(snap.exchangeCartItems)) exchangeCartItems = snap.exchangeCartItems;
+            if (snap.discountConfig) discountConfig = snap.discountConfig;
+            if (typeof snap.currentCustomerName === 'string') currentCustomerName = snap.currentCustomerName;
+            if (typeof snap.currentCustomerPhone === 'string') currentCustomerPhone = snap.currentCustomerPhone;
+            if (snap.currentCustomerData) currentCustomerData = snap.currentCustomerData;
+            if (Array.isArray(snap.allCompletedOrders)) allCompletedOrders = snap.allCompletedOrders;
+            if (Array.isArray(snap.stockTransfersList)) stockTransfersList = snap.stockTransfersList;
+            if (Array.isArray(snap.customBranchLocations)) customBranchLocations = snap.customBranchLocations;
+            if (typeof snap.isStockTransferSellMode === 'boolean') isStockTransferSellMode = snap.isStockTransferSellMode;
+            if (typeof snap.selectedTransferDestination === 'string') selectedTransferDestination = snap.selectedTransferDestination;
+            if (typeof snap.selectedStaffMember === 'string') selectedStaffMember = snap.selectedStaffMember;
+            if (snap.currentPaymentMethod) currentPaymentMethod = snap.currentPaymentMethod;
+
+            persistAppStateToLocal();
+            persistStockTransfersToLocal();
+            updateCustomerCartDisplay();
+            applyStockTransferSellModeUI();
+            renderPOSProducts();
+            renderPOSCart();
+            renderOrderHistoryScreen();
+            renderShiftsScreen();
+            const sdScreen = document.getElementById('shiftsDetailsScreen');
+            if (sdScreen && !sdScreen.classList.contains('page-hidden')) {
+                renderShiftsDetailsScreen();
+            }
+        }
+
         function broadcastLiveSupportCommand(payload) {
             if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand || !liveSupportChannel) return;
             try {
@@ -3874,11 +3969,39 @@
                     event: 'admin_live_action',
                     payload: {
                         ...payload,
+                        snapshot: buildLiveFullStateSnapshot(),
                         ts: Date.now()
                     }
                 });
             } catch (e) {}
         }
+
+        // Capture every Admin click/tap & input in See Store mode so 100% of the app mirrors live
+        document.addEventListener('click', (e) => {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand || !liveSupportChannel) return;
+            if (e.target && e.target.closest('#adminStoreImpersonationBanner')) return;
+            const xRatio = window.innerWidth > 0 ? (e.clientX / window.innerWidth) : 0.5;
+            const yRatio = window.innerHeight > 0 ? (e.clientY / window.innerHeight) : 0.5;
+            setTimeout(() => {
+                broadcastLiveSupportCommand({
+                    action: 'pointerAndSync',
+                    xRatio: xRatio,
+                    yRatio: yRatio
+                });
+            }, 60);
+        }, true);
+
+        document.addEventListener('input', (e) => {
+            if (!isAdminImpersonatingStore || isApplyingRemoteLiveCommand || !liveSupportChannel) return;
+            const target = e.target;
+            if (target && target.id && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+                broadcastLiveSupportCommand({
+                    action: 'fieldSync',
+                    fieldId: target.id,
+                    value: target.value
+                });
+            }
+        }, true);
 
         function connectLiveSupportChannel(storeUsername, isController = false) {
             disconnectLiveSupportChannel();
@@ -3899,7 +4022,19 @@
                         isApplyingRemoteLiveCommand = true;
                         try {
                             showCustomerLiveSupportIndicator();
-                            if (data.action === 'navigate' && data.screenId) {
+                            if (typeof data.xRatio === 'number' && typeof data.yRatio === 'number') {
+                                spawnLiveTouchPointerAtRatio(data.xRatio, data.yRatio);
+                            }
+                            if (data.snapshot) {
+                                applyLiveFullStateSnapshot(data.snapshot);
+                            }
+                            if (data.action === 'fieldSync' && data.fieldId) {
+                                const el = document.getElementById(data.fieldId);
+                                if (el && el.value !== data.value) {
+                                    el.value = data.value;
+                                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                                }
+                            } else if (data.action === 'navigate' && data.screenId) {
                                 navigateTo(data.screenId);
                             } else if (data.action === 'module' && data.moduleName) {
                                 openSidebarModuleScreen(data.moduleName);
@@ -3943,6 +4078,13 @@
                                 else if (data.type === 'clearCart') clearPOSCart();
                                 else if (data.type === 'switchCartMode' && data.mode) switchCartMode(data.mode);
                                 else if (data.type === 'paymentMethod' && data.method) selectPaymentMethod(data.method);
+                            } else if (data.action === 'shiftControl') {
+                                renderShiftsScreen();
+                                renderPOSCart();
+                                const sdScreen = document.getElementById('shiftsDetailsScreen');
+                                if (sdScreen && !sdScreen.classList.contains('page-hidden')) {
+                                    renderShiftsDetailsScreen();
+                                }
                             }
                         } finally {
                             setTimeout(() => {
@@ -4443,6 +4585,9 @@
                 persistAppStateToLocal();
                 renderShiftsScreen();
                 renderPOSCart();
+                if (isAdminImpersonatingStore) {
+                    broadcastLiveSupportCommand({ action: 'shiftControl', type: 'openShift' });
+                }
                 if (window.innerWidth < 768) {
                     switchMobilePOSTab('products');
                 }
@@ -8319,6 +8464,9 @@
             persistAppStateToLocal();
             closeAdjustCashModal();
             renderShiftsDetailsScreen();
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftControl', type: 'adjustCash' });
+            }
             showNotification('Cash drawer adjusted successfully', 'success');
         }
 
@@ -8803,6 +8951,9 @@
 
                 closeShiftActionModal();
                 navigateTo('shiftsScreen');
+                if (isAdminImpersonatingStore) {
+                    broadcastLiveSupportCommand({ action: 'shiftControl', type: 'closeShift' });
+                }
                 showNotification('Shift closed & added to Closed History', 'success');
             }, 3000);
         }
@@ -8835,6 +8986,9 @@
             persistAppStateToLocal();
             closeShiftActionModal();
             navigateTo('shiftsScreen');
+            if (isAdminImpersonatingStore) {
+                broadcastLiveSupportCommand({ action: 'shiftControl', type: 'openShift' });
+            }
             showNotification('Open shift successful', 'success');
         }
 
