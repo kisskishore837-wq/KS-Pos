@@ -8397,8 +8397,46 @@
                 tbody.innerHTML = `<tr><td colspan="6" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or cash bills recorded in this shift yet.</td></tr>`;
                 return;
             }
-            tbody.innerHTML = salesOrders.map(o => {
+            const rowsHtml = [];
+            salesOrders.forEach(o => {
                 const pm = o.paymentMode;
+                const userStr = o.staff || activeShiftState.cashier || 'Kishore Kumar';
+                const rowClickAttr = `onclick="closeSalesCashListModal(); orderDetailsReturnScreen='shiftsDetailsScreen'; populateOrderDetailsScreen(allCompletedOrders.find(x => x.orderId === '${o.orderId}')); navigateTo('orderDetailsScreen');"`;
+
+                if (o.isRefundExchange) {
+                    const refVal = Number(o.totalRefundValue || 0);
+                    const exchVal = Number(o.totalExchangeValue || 0);
+
+                    if (refVal > 0 && pm === 'Cash Refund') {
+                        const refBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Cash Refund</span>`;
+                        rowsHtml.push(`
+                            <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors">
+                                <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId} <span class="text-[10px] font-semibold text-red-600">(Refund)</span></td>
+                                <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
+                                <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
+                                <td class="py-3.5 px-4 text-right font-bold text-red-600">-₹${Math.abs(refVal).toFixed(2)}</td>
+                                <td class="py-3.5 px-4 text-center">${refBadge}</td>
+                                <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
+                            </tr>
+                        `);
+                    }
+
+                    if (exchVal > 0) {
+                        const exchBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Exchange Sale</span>`;
+                        rowsHtml.push(`
+                            <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors bg-emerald-50/20">
+                                <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId} <span class="text-[10px] font-semibold text-emerald-700">(Exchange)</span></td>
+                                <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
+                                <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
+                                <td class="py-3.5 px-4 text-right font-bold text-emerald-700">+₹${Math.abs(exchVal).toFixed(2)}</td>
+                                <td class="py-3.5 px-4 text-center">${exchBadge}</td>
+                                <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
+                            </tr>
+                        `);
+                    }
+                    return;
+                }
+
                 let modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">${pm}</span>`;
                 if (pm === 'UPI') {
                     modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">UPI</span>`;
@@ -8408,12 +8446,11 @@
                     modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Cash Refund</span>`;
                 }
 
-                const totalAmt = o.isRefundExchange && o.totalExchangeValue > 0 ? o.totalExchangeValue : o.total;
+                const totalAmt = Number(o.total || 0);
                 const displayAmt = pm === 'Cash Refund' ? -Math.abs(o.totalRefundValue || totalAmt) : totalAmt;
-                const userStr = o.staff || activeShiftState.cashier || 'Kishore Kumar';
 
-                return `
-                    <tr onclick="closeSalesCashListModal(); orderDetailsReturnScreen='shiftsDetailsScreen'; populateOrderDetailsScreen(allCompletedOrders.find(x => x.orderId === '${o.orderId}')); navigateTo('orderDetailsScreen');" class="hover:bg-sky-50/70 cursor-pointer transition-colors">
+                rowsHtml.push(`
+                    <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors">
                         <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId}</td>
                         <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
                         <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
@@ -8421,8 +8458,9 @@
                         <td class="py-3.5 px-4 text-center">${modeBadge}</td>
                         <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
                     </tr>
-                `;
-            }).join('');
+                `);
+            });
+            tbody.innerHTML = rowsHtml.join('');
             if (window.lucide) lucide.createIcons();
         }
 
@@ -8523,12 +8561,53 @@
                 tbody.innerHTML = `<tr><td colspan="7" class="py-10 px-4 text-center text-xs sm:text-sm text-slate-500 font-medium">No sales or store credit orders recorded in this shift yet.</td></tr>`;
                 return;
             }
-            tbody.innerHTML = shiftOrders.map(o => {
+            const totalRowsHtml = [];
+            shiftOrders.forEach(o => {
                 const pm = o.paymentMode;
                 const isStoreCreditOrder = pm === 'Store Credit' || (o.storeCreditUsed || 0) > 0 || (o.storeCreditGiven || 0) > 0;
                 const categoryLabel = pm === 'Store Credit'
                     ? 'Store Credit'
                     : (isStoreCreditOrder ? 'Sales Cash + Store Credit' : 'Sales Cash');
+                const userStr = o.staff || activeShiftState.cashier || 'Kishore Kumar';
+                const rowClickAttr = `onclick="closeTotalSalesListModal(); orderDetailsReturnScreen='shiftsDetailsScreen'; populateOrderDetailsScreen(allCompletedOrders.find(x => x.orderId === '${o.orderId}')); navigateTo('orderDetailsScreen');"`;
+
+                if (o.isRefundExchange) {
+                    const refVal = Number(o.totalRefundValue || 0);
+                    const exchVal = Number(o.totalExchangeValue || 0);
+
+                    if (refVal > 0) {
+                        const refBadge = pm === 'Store Credit'
+                            ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Store Credit</span>`
+                            : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">Cash Refund</span>`;
+                        totalRowsHtml.push(`
+                            <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors">
+                                <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId} <span class="text-[10px] font-semibold text-red-600">(Refund)</span></td>
+                                <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
+                                <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
+                                <td class="py-3.5 px-4 font-semibold text-slate-700">${pm === 'Store Credit' ? 'Store Credit' : 'Sales Cash'}</td>
+                                <td class="py-3.5 px-4 text-center">${refBadge}</td>
+                                <td class="py-3.5 px-4 text-right font-bold text-red-600">-₹${Math.abs(refVal).toFixed(2)}</td>
+                                <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
+                            </tr>
+                        `);
+                    }
+
+                    if (exchVal > 0) {
+                        const exchBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Exchange Sale</span>`;
+                        totalRowsHtml.push(`
+                            <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors bg-emerald-50/20">
+                                <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId} <span class="text-[10px] font-semibold text-emerald-700">(Exchange)</span></td>
+                                <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
+                                <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
+                                <td class="py-3.5 px-4 font-semibold text-slate-700">Sales Cash</td>
+                                <td class="py-3.5 px-4 text-center">${exchBadge}</td>
+                                <td class="py-3.5 px-4 text-right font-bold text-emerald-700">+₹${Math.abs(exchVal).toFixed(2)}</td>
+                                <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
+                            </tr>
+                        `);
+                    }
+                    return;
+                }
 
                 let modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">${pm}</span>`;
                 if (pm === 'UPI') {
@@ -8541,14 +8620,13 @@
                     modeBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Store Credit</span>`;
                 }
 
-                const grossOrderTotal = (o.isRefundExchange && o.totalExchangeValue > 0 ? o.totalExchangeValue : o.total) + (o.storeCreditUsed || 0);
+                const grossOrderTotal = Number(o.total || 0) + (o.storeCreditUsed || 0);
                 const displayTotalVal = (pm === 'Cash Refund' || pm === 'Store Credit')
                     ? -Math.abs(o.totalRefundValue || grossOrderTotal)
                     : grossOrderTotal;
-                const userStr = o.staff || activeShiftState.cashier || 'Kishore Kumar';
 
-                return `
-                    <tr onclick="closeTotalSalesListModal(); orderDetailsReturnScreen='shiftsDetailsScreen'; populateOrderDetailsScreen(allCompletedOrders.find(x => x.orderId === '${o.orderId}')); navigateTo('orderDetailsScreen');" class="hover:bg-sky-50/70 cursor-pointer transition-colors">
+                totalRowsHtml.push(`
+                    <tr ${rowClickAttr} class="hover:bg-sky-50/70 cursor-pointer transition-colors">
                         <td class="py-3.5 px-4 font-bold text-sky-700">${o.orderId}</td>
                         <td class="py-3.5 px-4 text-slate-700">${o.dateStr}</td>
                         <td class="py-3.5 px-4 text-slate-500">${o.timeStr}</td>
@@ -8557,8 +8635,9 @@
                         <td class="py-3.5 px-4 text-right font-bold ${displayTotalVal < 0 ? 'text-red-600' : 'text-slate-900'}">₹${displayTotalVal.toFixed(2)}</td>
                         <td class="py-3.5 px-4 font-medium text-slate-800">${userStr}</td>
                     </tr>
-                `;
-            }).join('');
+                `);
+            });
+            tbody.innerHTML = totalRowsHtml.join('');
             if (window.lucide) lucide.createIcons();
         }
 
